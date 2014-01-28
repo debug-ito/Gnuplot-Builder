@@ -11,7 +11,7 @@ __END__
 
 =head1 NAME
 
-Gnuplot::Builder - abstract
+Gnuplot::Builder - Object-oriented gnuplot script builder
 
 =head1 SYNOPSIS
 
