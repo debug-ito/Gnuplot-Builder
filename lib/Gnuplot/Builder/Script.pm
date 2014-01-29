@@ -15,9 +15,6 @@ Gnuplot::Builder::Script - Object-oriented builder for gnuplot script
 =head1 SYNOPSIS
 
     use Gnuplot::Builder::Script;
-    use Gnuplot::Builder::Dataset;
-    
-    my $dataset = Gnuplot::Builder::Dataset->new(source => 'f(x)');
     
     my $builder = Gnuplot::Builder::Script->new(<<EOT);
     terminal = png size 500,500 enhanced
@@ -27,16 +24,16 @@ Gnuplot::Builder::Script - Object-oriented builder for gnuplot script
     xlabel   = x offset 0,1
     ylabel   = y offset 1,0
     output   = "sin_wave.png"
+    -key
     EOT
     
-    $builder->unset('key');
     $builder->def('f(x) = sin(pi * x)');
-    $builder->plot($dataset);               ## output sin_wave.png
+    $builder->plot("f(x)");                 ## output sin_wave.png
     
     my $child = $builder->child;
     $child->def('f(x) = cos(pi * x)');      ## override parent's setting
     $child->set('output = "cos_wave.png"'); ## override parent's setting
-    $child->plot($dataset);                 ## output cos_wave.png
+    $child->plot("f(x)");                   ## output cos_wave.png
 
 
 =head1 DESCRIPTION
@@ -55,7 +52,7 @@ So you can change those items individually.
 =item *
 
 It accepts code-refs for script sentences, option settings and definitions.
-They are evaluated every time it builds the script.
+They are evaluated lazily every time it builds the script.
 
 =item *
 
@@ -68,9 +65,10 @@ A child builder can override its parent's settings.
 
 =head2 $builder = Gnuplot::Builder::Script->new($set_arg)
 
-The constructor. It creates an empty builder.
+The constructor.
 
-The optional argument C<$set_arg> is directly given to C<set()> method.
+The argument C<$set_arg> is optional. If it's absent, it creates an empty builder.
+If it's set, C<$set_arg> is directly given to C<set()> method.
 
 =head1 OBJECT METHODS - BASICS
 
@@ -81,16 +79,17 @@ Most object methods return the object itself, so that you can chain those method
 Build and return the gnuplot script string.
 
 
-=head2 $builder = $buider->add(@sentences)
+=head2 $builder = $buider->add($sentence, ...)
 
 Add gnuplot script sentences to the C<$builder>.
 
 This is a low-level method. B<< In most cases you should use C<set()> and C<def()> methods below. >>
 
-C<@sentences> is a list of strings and/or code-refs.
+C<$sentences> is a string or a code-ref.
 A code-ref is evaluated in list context when it builds the script.
+The returned list of strings are added to the script.
 
-Example:
+You can pass more than one C<$sentence>s.
 
     $builder->add(<<'EOT');
     set title "sample"
@@ -154,6 +153,12 @@ The C<$builder> and C<$opt_name> are given to the code-ref.
 Then, the option is generated as if C<< $opt_name => \@returned_values >> was set.
 You can return single C<undef> to "unset" the option.
 
+    my %SCALE_LABELS = (1 => "", 1000 => "k", 1000000 => "M");
+    my $scale = 1000;
+    $builder->set_option(
+        xlabel => sub { qq{"Traffic [$SCALE_LABEL{$scale}bps]"} },
+    );
+
 =back
 
 The options are stored in the C<$builder>'s hash-like structure,
@@ -192,7 +197,7 @@ In fact, there may be more than one way to build the same script.
     );
 
 In the above example, C<$builder1> and C<$builder2> generate the same script.
-However, C<$builder2> cannot change the style for data individually, while C<$builder1> can.
+However, C<$builder2> cannot change the style for "data" or "fill" individually, while C<$builder1> can.
 
 
 =head2 $builder = $builder->set($options)
@@ -202,19 +207,24 @@ Easy-to-write front-end for C<set_option()> method.
 C<$options> is either an array-ref, a hash-ref or a string.
 
 If C<$options> is an array-ref or a hash-ref,
-it is equivalent to C<< $builder->set_option(@$options) >> or C<< $builder->set_option(%$options) >>, respectively.
+it is equivalent to C<< set_option(@$options) >> or C<< set_option(%$options) >>, respectively.
 
-If C<$options> is a string, it is parsed line-by-line to set options.
+If C<$options> is a string, it is parsed to set options.
 
     $builder->set(<<'EOT');
     xrange = [-5:10]
     output = "foo.png"
+    grid
+    -key
     
     ## terminal = png size 100,200
     terminal = pngcairo size 400,800
     
-    arrow 1 = from 0,  10 \
-              to   10, 0
+    tics = mirror in \
+           rotate autojustify
+    
+    arrow = 1 from 0,10 to 10,0
+    arrow = 2 from 5,5  to 10,10
     EOT
 
 Here is the parsing rule:
@@ -223,13 +233,27 @@ Here is the parsing rule:
 
 =item *
 
-Each line is a pair of option name and value with "=" between them.
+Each line is a "set" or "unset" command.
+
+=item *
+
+A "set" line is a pair of option name and value with "=" between them.
 
     OPT_NAME = OPT_VALUE
 
 =item *
 
+An "unset" line is the option name with leading "-".
+
+    -OPT_NAME
+
+=item *
+
 White spaces around OPT_NAME and OPT_VALUE are ignored.
+
+=item *
+
+If OPT_VALUE is an empty string in "set" line, you can omit "=".
 
 =item *
 
@@ -244,12 +268,17 @@ Empty lines are ignored.
 
 Lines starting with "#" are ignored.
 
+=item *
+
+You can write more than one lines for the same OPT_NAME.
+It's the same effect as C<< set_option($opt_name => [$opt_value1, $opt_value2, ...]) >>.
+
 =back
 
 
 =head2 $builder = $builder->unset($opt_name, ...)
 
-Short-cut for C<< $builder->set_option($opt_name => undef) >>.
+Short-cut for C<< set_option($opt_name => undef) >>.
 It generates "unset" command for the option.
 
 You can specify more that one C<$opt_name>s.
@@ -274,7 +303,7 @@ while returning an empty list means no "set" or "unset" sentence for the option.
 Delete the values for C<$opt_name> from the C<$builder>.
 You can specify more than one C<$opt_name>s.
 
-After C<$opt_name> is deleted, C<< $builder->get_option($opt_name) >> will search the C<$builder>'s parent for the values.
+After C<$opt_name> is deleted, C<get_option($opt_name)> will search the C<$builder>'s parent for the values.
 
 Note the difference between C<delete_option()> and C<unset()>.
 While C<unset($opt_name)> will generate "unset" sentence for the option,
@@ -284,7 +313,6 @@ C<delete_option($opt_name)> and C<< set_option($opt_name => []) >> are also diff
 C<set_option()> always overrides the parent setting, while C<delete_option()> resets such overrides.
 
 
-
 =head1 OBJECT METHODS - GNUPLOT DEFINITIONS
 
 Methods to manipulate user-defined variables and functions.
@@ -292,15 +320,15 @@ Methods to manipulate user-defined variables and functions.
 All methods in this category are analogous to the methods in L</OBJECT METHODS - GNUPLOT OPTIONS>.
 I'm sure you can understand this analogy by this example.
 
-    $builder->set_option(
+    $builder->set([
         xtics => 10,
         key   => undef
-    );
-    $builder->set_definition(
+    ]);
+    $builder->def([
         a      => 100,
         'f(x)' => 'sin(a * x)',
         b      => undef
-    );
+    ]);
     $builder->to_string();
     ## => set xtics 10
     ## => unset key
@@ -311,15 +339,27 @@ I'm sure you can understand this analogy by this example.
 
 =head2 $builder = $builder->set_definition($def_name => $def_value, ...)
 
-TODO: C<undef> to generate "undefine" command.
+Set function and variable definitions. See C<set_option()> method.
 
-=head2 $builder = $builder->def(@def_scripts)
+=head2 $builder = $builder->def($definitions)
+
+Easy-to-write front-end to C<set_definition()> method. See C<set()> method.
 
 =head2 $builder = $builder->undefine($def_name, ...)
 
+Short-cut for C<< set_definition($def_name => undef) >>. See C<unset()> method.
+
 =head2 @def_values = $builder->get_definition($def_name)
 
+Get definitions from the C<$builder>. See C<get_option()> method.
+
 =head2 $builder = $builder->delete_definition($def_name, ...)
+
+Delete definitions from the C<$builder>. See C<delete_option()> method.
+
+=head1 OBJECT METHODS - PLOTTING
+
+TODO.
 
 =head1 OBJECT METHODS - INHERITANCE
 
@@ -329,7 +369,6 @@ Methods about object inheritance.
 
 =head2 $parent_builder = $builder->parent()
 
-=head1 OBJECT METHODS - PLOTTING
 
 =head1 OVERRIDES
 
