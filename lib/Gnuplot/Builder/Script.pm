@@ -363,11 +363,47 @@ TODO.
 
 =head1 OBJECT METHODS - INHERITANCE
 
-Methods about object inheritance.
+A L<Gnuplot::Builder::Script> object can extend and/or override another object.
+This is similar to JavaScript's prototype-based inheritance.
 
-=head2 $child_builder = $builder->child()
+Let C<$parent> and C<$child> be the parent and its child builder, respectively.
+Then C<$child> builds a script on top of what C<$parent> builds.
+That is,
+
+=over
+
+=item *
+
+Sentences added by C<< $child->add() >> method are appended to the C<$parent>'s script.
+
+=item *
+
+Option settings and definitions in C<$child> are appended to the C<$parent>'s script,
+if they are not set in C<$parent>.
+
+=item :
+
+Option settings and definitions in C<$child> are substituted in the C<$parent>'s script,
+if they are already set in C<$parent>.
+
+=back
+
+
+=head2 $builder = $builder->set_parent($parent_builder)
+
+Set C<$parent_builder> as the C<$builder>'s parent.
+
+If C<$parent_builder> is C<undef>, C<$builder> doesn't have a parent anymore.
 
 =head2 $parent_builder = $builder->parent()
+
+Return the C<$builder>'s parent. It returns C<undef> if C<$builder> does not have a parent.
+
+=head2 $child_builder = $builder->new_child()
+
+Create and return a new child builder of C<$builder>.
+
+This is a short-cut for C<< Gnuplot::Builder::Script->new->set_parent($builder) >>.
 
 
 =head1 OVERRIDES
