@@ -30,7 +30,7 @@ Gnuplot::Builder::Script - Object-oriented builder for gnuplot script
     $builder->def('f(x) = sin(pi * x)');
     $builder->plot("f(x)");                 ## output sin_wave.png
     
-    my $child = $builder->child;
+    my $child = $builder->new_child;
     $child->def('f(x) = cos(pi * x)');      ## override parent's setting
     $child->set('output = "cos_wave.png"'); ## override parent's setting
     $child->plot("f(x)");                   ## output cos_wave.png
@@ -359,7 +359,18 @@ Delete definitions from the C<$builder>. See C<delete_option()> method.
 
 =head1 OBJECT METHODS - PLOTTING
 
-TODO.
+=head2 $builder = $builder->plot($dataset, ...)
+
+=head2 $script = $builder->plot_string($dataset, ...)
+
+=head2 $builder = $builder->splot($dataset, ...)
+
+=head2 $script = $builder->splot_string($dataset, ...)
+
+=head2 $builder = $builder->multiplot($subplot_script, ...)
+
+=head2 $script = $builder->multiplot_string($subplot_script, ...)
+
 
 =head1 OBJECT METHODS - INHERITANCE
 
