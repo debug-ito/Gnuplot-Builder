@@ -27,11 +27,11 @@ Gnuplot::Builder::Script - Object-oriented builder for gnuplot script
     -key
     EOT
     
-    $builder->def('f(x) = sin(pi * x)');
+    $builder->define('f(x) = sin(pi * x)');
     $builder->plot("f(x)");                 ## output sin_wave.png
     
     my $child = $builder->new_child;
-    $child->def('f(x) = cos(pi * x)');      ## override parent's setting
+    $child->define('f(x) = cos(pi * x)');   ## override parent's setting
     $child->set('output = "cos_wave.png"'); ## override parent's setting
     $child->plot("f(x)");                   ## output cos_wave.png
 
@@ -102,7 +102,7 @@ You can pass more than one C<$sentence>s.
 
 Methods to manipulate gnuplot options (the "set" and "unset" commands).
 
-=head2 $builder = $builder->set_option($opt_name => $opt_value, ...)
+=head2 $builder = $builder->set($opt_name => $opt_value, ...)
 
 Set a gnuplot option named C<$opt_name> to C<$opt_value>.
 You can set more than one name-value pairs.
@@ -124,7 +124,7 @@ If C<$opt_value> is a string, the option is set to that string.
 If C<$opt_value> is an array-ref, the "set" command is repeated for each element in it.
 If the array is empty, no "set" or "unset" command is generated.
 
-    $builder->set_option(
+    $builder->set(
         terminal => 'png size 200,200',
         key      => undef,
     );
@@ -132,7 +132,7 @@ If the array is empty, no "set" or "unset" command is generated.
     ## => set terminal png size 200,200
     ## => unset key
         
-    $builder->set_option(
+    $builder->set(
         arrow => ['1 from 0,0 to 0,1', '2 from 100,0 to 0,100']
     );
     $builder->to_string();
@@ -155,7 +155,7 @@ You can return single C<undef> to "unset" the option.
 
     my %SCALE_LABELS = (1 => "", 1000 => "k", 1000000 => "M");
     my $scale = 1000;
-    $builder->set_option(
+    $builder->set(
         xlabel => sub { qq{"Traffic [$SCALE_LABEL{$scale}bps]"} },
     );
 
@@ -166,7 +166,7 @@ so you can change those options individually.
 
 Even if the options are changed later, their order in the script is unchanged.
 
-    $builder->set_option(
+    $builder->set(
         terminal => 'png size 500,500',
         xrange => '[100:200]',
         output => '"foo.png"',
@@ -176,7 +176,7 @@ Even if the options are changed later, their order in the script is unchanged.
     ## => set xrange [100:200]
     ## => set output "foo.png"
     
-    $builder->set_option(
+    $builder->set(
         terminal => 'postscript eps size 5.0,5.0',
         output => '"foo.eps"'
     );
@@ -188,11 +188,11 @@ Even if the options are changed later, their order in the script is unchanged.
 Note that you are free to use any string as C<$opt_name>.
 In fact, there may be more than one way to build the same script.
 
-    $builder1->set_option(
+    $builder1->set(
         'style data' => 'lines',
         'style fill' => 'solid 0.5'
     );
-    $builder2->set_option(
+    $builder2->set(
         style => ['data lines', 'fill solid 0.5']
     );
 
@@ -202,14 +202,8 @@ However, C<$builder2> cannot change the style for "data" or "fill" individually,
 
 =head2 $builder = $builder->set($options)
 
-Easy-to-write front-end for C<set_option()> method.
-
-C<$options> is either an array-ref, a hash-ref or a string.
-
-If C<$options> is an array-ref or a hash-ref,
-it is equivalent to C<< set_option(@$options) >> or C<< set_option(%$options) >>, respectively.
-
-If C<$options> is a string, it is parsed to set options.
+If C<set()> method is called with a single string argument C<$options>,
+it is parsed to set options.
 
     $builder->set(<<'EOT');
     xrange = [-5:10]
@@ -271,14 +265,18 @@ Lines starting with "#" are ignored.
 =item *
 
 You can write more than one lines for the same OPT_NAME.
-It's the same effect as C<< set_option($opt_name => [$opt_value1, $opt_value2, ...]) >>.
+It's the same effect as C<< set($opt_name => [$opt_value1, $opt_value2, ...]) >>.
 
 =back
+
+=head2 $builder = $builder->set_option(...)
+
+C<set_option()> is alias of C<set()>.
 
 
 =head2 $builder = $builder->unset($opt_name, ...)
 
-Short-cut for C<< set_option($opt_name => undef) >>.
+Short-cut for C<< set($opt_name => undef) >>.
 It generates "unset" command for the option.
 
 You can specify more that one C<$opt_name>s.
@@ -290,7 +288,7 @@ Get the option values for C<$opt_name>.
 If C<$opt_name> is set in the C<$builder>, it returns its values.
 If a code-ref is set to the C<$opt_name>, it is evaluated and its results are returned.
 
-If C<$opt_name> is not set in the C<$builder>, the values stored in C<$builder>'s parent are returned.
+If C<$opt_name> is not set in the C<$builder>, the values of C<$builder>'s parent are returned.
 If C<$builder> does not have parent, it returns an empty list.
 
 Always receive the result of this method by an array, because it may return both C<< (undef) >> and C<< () >>.
@@ -309,8 +307,8 @@ Note the difference between C<delete_option()> and C<unset()>.
 While C<unset($opt_name)> will generate "unset" sentence for the option,
 C<delete_option($opt_name)> will be likely to generate no sentence (well, strictly speaking, it depends on the parent).
 
-C<delete_option($opt_name)> and C<< set_option($opt_name => []) >> are also different if the C<$builder> is a child.
-C<set_option()> always overrides the parent setting, while C<delete_option()> resets such overrides.
+C<delete_option($opt_name)> and C<< set($opt_name => []) >> are also different if the C<$builder> is a child.
+C<set()> always overrides the parent setting, while C<delete_option()> resets such overrides.
 
 
 =head1 OBJECT METHODS - GNUPLOT DEFINITIONS
@@ -320,15 +318,15 @@ Methods to manipulate user-defined variables and functions.
 All methods in this category are analogous to the methods in L</OBJECT METHODS - GNUPLOT OPTIONS>.
 I'm sure you can understand this analogy by this example.
 
-    $builder->set([
+    $builder->set(
         xtics => 10,
         key   => undef
-    ]);
-    $builder->def([
+    );
+    $builder->define(
         a      => 100,
         'f(x)' => 'sin(a * x)',
         b      => undef
-    ]);
+    );
     $builder->to_string();
     ## => set xtics 10
     ## => unset key
@@ -337,17 +335,19 @@ I'm sure you can understand this analogy by this example.
     ## => undefine b
 
 
-=head2 $builder = $builder->set_definition($def_name => $def_value, ...)
+=head2 $builder = $builder->define($def_name => $def_value, ...)
 
-Set function and variable definitions. See C<set_option()> method.
+=head2 $builder = $builder->define($definitions)
 
-=head2 $builder = $builder->def($definitions)
+Set function and variable definitions. See C<set()> method.
 
-Easy-to-write front-end to C<set_definition()> method. See C<set()> method.
+=head2 $builder = $builder->set_definition(...)
+
+Alias for C<define()> method.
 
 =head2 $builder = $builder->undefine($def_name, ...)
 
-Short-cut for C<< set_definition($def_name => undef) >>. See C<unset()> method.
+Short-cut for C<< define($def_name => undef) >>. See C<unset()> method.
 
 =head2 @def_values = $builder->get_definition($def_name)
 
