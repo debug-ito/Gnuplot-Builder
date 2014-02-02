@@ -63,12 +63,12 @@ A child builder can override its parent's settings.
 
 =head1 CLASS METHODS
 
-=head2 $builder = Gnuplot::Builder::Script->new($set_arg)
+=head2 $builder = Gnuplot::Builder::Script->new(@set_args)
 
 The constructor.
 
-The argument C<$set_arg> is optional. If it's absent, it creates an empty builder.
-If it's set, C<$set_arg> is directly given to C<set()> method.
+The argument C<@set_args> is optional. If it's absent, it creates an empty builder.
+If it's set, C<@set_args> is directly given to C<set()> method.
 
 =head1 OBJECT METHODS - BASICS
 
@@ -153,7 +153,7 @@ The C<$builder> and C<$opt_name> are given to the code-ref.
 Then, the option is generated as if C<< $opt_name => \@returned_values >> was set.
 You can return single C<undef> to "unset" the option.
 
-    my %SCALE_LABELS = (1 => "", 1000 => "k", 1000000 => "M");
+    my %SCALE_LABEL = (1 => "", 1000 => "k", 1000000 => "M");
     my $scale = 1000;
     $builder->set(
         xlabel => sub { qq{"Traffic [$SCALE_LABEL{$scale}bps]"} },
