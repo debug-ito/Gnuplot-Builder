@@ -80,9 +80,24 @@ In the above example, only the third dataset has its inline data.
 
 =head2 $dataset = Gnuplot::Builder::Dataset->new($source, @set_option_args)
 
+The general-purpose constructor. All arguments are optional.
+C<$source> is the source string of this dataset. C<@set_option_args> are the option settings.
+
+This method is equivalent to C<< new()->set_source($source)->set_option(@set_option_args) >>.
+
 =head2 $dataset = Gnuplot::Builder::Dataset->new_file($filename, @set_option_args)
 
+The constructor for datasets whose source is a file.
+C<$filename> is the name of the source file.
+
+This method is equivalent to C<< new()->set_file($filename)->set_option(@set_option_args) >>.
+
 =head2 $dataset = Gnuplot::Builder::Dataset->new_data($data_provider, @set_option_args)
+
+The constructor for datasets that have inline data.
+C<$data_provider> is the source of the inline data.
+
+This method is equivalent to C<< new()->set_file('-')->set_data($data_provider)->set_option(@set_option_args) >>.
 
 =head1 OBJECT METHODS - BASICS
 
