@@ -359,17 +359,100 @@ Delete definitions from the C<$builder>. See C<delete_option()> method.
 
 =head1 OBJECT METHODS - PLOTTING
 
+Methods for plotting.
+
+All plotting methods are non-mutator, that is, they don't change the state of the C<$builder>.
+This means you can plot different datasets with the same settings.
+
+Some plotting methods run a gnuplot process background, and let it do the plotting work.
+The variable C<$Gnuplot::Builder::GNUPLOT_PATH> is used for the path to the gnuplot executable.
+See L<Gnuplot::Builder> for detail.
+
 =head2 $builder = $builder->plot($dataset, ...)
+
+Build the script and plot the given C<$dataset>s with gnuplot's "plot" command.
+This method lets a gnuplot process do the actual job.
+
+You can specify more than one C<$dataset>s to plot.
+
+Usually you should use a L<Gnuplot::Builder::Dataset> object for C<$dataset>.
+In this case, you can skip reading the rest of this section.
+
+In detail, C<$dataset> is either a string, an array-ref or an object.
+
+=over
+
+=item *
+
+If C<$dataset> is a string, it's treated as the dataset parameters for "plot" command.
+
+    $builder->plot(
+        'sin(x) with lines lw 2',
+        'cos(x) with lines lw 5',
+        '"datafile.dat" using 1:3 with points ps 4'
+    );
+
+=item *
+
+If C<$dataset> is an array-ref, it must be an array-ref of a string and a code-ref.
+
+    $dataset = [$params, $data_provider]
+
+C<$params> is the dataset parameters and C<$data_provider> is a code-ref to generate inline data for the dataset.
+C<$data_provider> is passed another code-ref (C<$writer>).
+C<$data_provider> must call the C<$writer> with the inline data it provides.
+
+    ## @measured_data contains a series of {x => $x_value, y => $y_value}.
+    $builder->plot(
+        'f(x) title "theoretical" with lines',
+        ['"-" using 1:2 title "measured data" with lp', sub {
+            my ($writer) = @_;
+            foreach my $data_point (@measured_data) {
+                $writer->("$data_point->{x} $data_point->{y}");
+            }
+        }]
+    );
+
+You can pass the whole inline data to the C<$writer> at once.
+
+    $builder->plot(['"-" u 1:2', sub { shift->(<<END_DATA) }]);
+    1 1
+    2 4
+    3 9
+    4 16
+    5 25
+    END_DATA
+
+If you don't pass any data to the C<$writer>, the C<plot()> method doesn't generate the inline data section.
+
+=item *
+
+If C<$dataset> is an object and implements C<params_string()> and C<write_to()> methods,
+it's equivalent to passing
+
+    [$dataset->params_string, sub { my $writer = shift; $dataset->write_to($writer) }]
+
+That is, C<params_string()> method is supposed to return a string of dataset parameters,
+and C<write_to()> method provide the inline data if it has.
+
+L<Gnuplot::Builder::Dataset> implements those methods.
+
+=back
 
 =head2 $script = $builder->plot_string($dataset, ...)
 
+Same as C<plot()> method except it does not pass the script to the gnuplot process
+but returns it as a string.
+
+The C<$script> includes the plot settings, "plot" command and inline data if exist.
+
 =head2 $builder = $builder->splot($dataset, ...)
+
+Same as C<plot()> method except it uses "splot" command.
 
 =head2 $script = $builder->splot_string($dataset, ...)
 
-=head2 $builder = $builder->multiplot($subplot_script, ...)
-
-=head2 $script = $builder->multiplot_string($subplot_script, ...)
+Same as C<plot_string()> method except if uses "splot" command.
 
 
 =head1 OBJECT METHODS - INHERITANCE

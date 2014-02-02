@@ -17,6 +17,12 @@ Gnuplot::Builder - Object-oriented gnuplot script builder
 
 =head1 DESCRIPTION
 
+=head1 PACKAGE VARIABLES
+
+=head2 $Gnuplot::Builder::GNUPLOT_PATH
+
+
+
 =head1 SEE ALSO
 
 =head1 REPOSITORY
