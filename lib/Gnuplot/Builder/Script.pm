@@ -427,13 +427,13 @@ If you don't pass any data to the C<$writer>, the C<plot()> method doesn't gener
 
 =item *
 
-If C<$dataset> is an object and implements C<params_string()> and C<write_to()> methods,
+If C<$dataset> is an object and implements C<params_string()> and C<write_data_to()> methods,
 it's equivalent to passing
 
-    [$dataset->params_string, sub { my $writer = shift; $dataset->write_to($writer) }]
+    [$dataset->params_string, sub { my $writer = shift; $dataset->write_data_to($writer) }]
 
 That is, C<params_string()> method is supposed to return a string of dataset parameters,
-and C<write_to()> method provide the inline data if it has.
+and C<write_data_to()> method provide the inline data if it has.
 
 L<Gnuplot::Builder::Dataset> implements those methods.
 
@@ -505,6 +505,10 @@ This is a short-cut for C<< Gnuplot::Builder::Script->new->set_parent($builder) 
 When you evaluate a C<$builder> as a string, it executes C<< $builder->to_string() >>. That is,
 
     "$builder" eq $builder->to_string;
+
+=head1 SEE ALSO
+
+L<Gnuplot::Builder::Dataset>
 
 =head1 AUTHOR
 
