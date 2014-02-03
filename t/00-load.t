@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
  
 BEGIN {
-    foreach my $module ("", "::Script", "::Dataset") {
+    foreach my $module ("", "::Script", "::Dataset", "::PartiallyKeyedList") {
         use_ok('Gnuplot::Builder' . $module);
     }
 }
