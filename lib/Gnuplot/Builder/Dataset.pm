@@ -401,6 +401,6 @@ L<Gnuplot::Builder::Script>
 
 =head1 AUTHOR
 
-Toshio Ito
+Toshio Ito, C<< <toshioito at cpan.org> >>
 
 =cut
