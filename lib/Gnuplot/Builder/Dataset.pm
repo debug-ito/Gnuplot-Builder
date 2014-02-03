@@ -133,6 +133,11 @@ The first element of the result (C<$source_str>) is used for the source.
 Same as C<set_source()> method except that the eventual source string is quoted.
 Useful for setting the file name of the dataset.
 
+    my $file_index = 5;
+    $dataset->setq_source(sub { qq{file_$file_index.dat} });
+    $dataset->to_string();
+    ## => 'file_5.dat'
+
 =head2 $dataset = $dataset->set_file($source_filename)
 
 Alias of C<setq_source()> method.
@@ -288,11 +293,75 @@ On the other hand, C<set_option()> always overrides the parent's setting.
 
 =head1 OBJECT METHODS - INLINE DATA
 
+Methods about the inline data of the dataset.
+
 =head2 $dataset = $dataset->set_data($data_provider)
+
+Set the inline data of the C<$dataset>.
+
+C<$data_provider> is either C<undef>, a string or a code-ref.
+
+=over
+
+=item *
+
+If C<$data_provider> is C<undef>, it means that C<$dataset> has no inline data.
+
+=item *
+
+If C<$data_provider> is a string, that is the inline data of the C<$dataset>.
+
+    $dataset->set_data(<<INLINE_DATA);
+    1 10
+    2 20
+    3 30
+    INLINE_DATA
+
+=item *
+
+If C<$data_provider> is a code-ref, it is called in void context when C<$dataset> needs the inline data.
+
+    $data_provider->($dataset, $writer)
+
+C<$dataset> is passed as the first argument to the code-ref.
+The second argument (C<$writer>) is a code-ref that you have to call to write inline data.
+
+    $dataset->set_data(sub {
+        my ($dataset, $writer) = @_;
+        foreach my $x (1 .. 3) {
+            my $y = $x * 10;
+            $writer->("$x $y");
+        }
+    });
+
+This allows for very large inline data streaming directly into the gnuplot process.
+
+If you don't pass any data to C<$writer>, it means the C<$dataset> doesn't have inline data at all.
+
+=back
 
 =head2 $dataset = $dataset->write_data_to($writer)
 
+Write the inline data using the C<$writer>.
+This method is required by plotting methods of L<Gnuplot::Builder::Script>.
+
+C<$writer> is a code-ref that is called by the C<$dataset> to write inline data.
+C<$writer> can be called zero or more times.
+
+    my $inline_data = "";
+    $dataset->write_data_to(sub {
+        my ($data_part) = @_;
+        $inline_data .= $data_part . "\n";
+    });
+
+If C<$dataset> doesn't have inline data setting,
+it's up to C<$dataset>'s ancestors to write the inline data.
+If none of them have inline data, C<$writer> is not called at all.
+
 =head2 $dataset = $dataset->delete_data()
+
+Delete the inline data setting from the C<$dataset>.
+
 
 =head1 OBJECT METHODS - INHERITANCE
 
