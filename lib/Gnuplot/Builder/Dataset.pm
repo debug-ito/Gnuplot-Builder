@@ -200,19 +200,19 @@ Even if you change an option value, its order is unchanged.
     $dataset->set_file('dataset.csv');
     $dataset->set_option(
         every => undef,
-        using => sub { qq{1:(\$2/$scale)} },
+        using => sub { qq{1:(\$2*$scale)} },
         title => '"data"',
         with  => 'lines lw 2'
     );
     $dataset->to_string();
-    ## => 'dataset.csv' using 1:($2/0.001) title "data" with lines lw 2
+    ## => 'dataset.csv' using 1:($2*0.001) title "data" with lines lw 2
     
     $dataset->set_option(
         title => undef,
         every => '::1',
     );
     $dataset->to_string();
-    ## => 'dataset.csv' every ::1 using 1:($2/0.001) with lines lw 2
+    ## => 'dataset.csv' every ::1 using 1:($2*0.001) with lines lw 2
 
 You are free to pass any string to C<$opt_name> in any order,
 but this module does not guarantee it's syntactically correct.
@@ -365,11 +365,29 @@ Delete the inline data setting from the C<$dataset>.
 
 =head1 OBJECT METHODS - INHERITANCE
 
+L<Gnuplot::Builder::Dataset> supports prototype-based inheritance
+just like L<Gnuplot::Builder::Script>.
+
+A child dataset inherits the source, the options and the inline data from its parent.
+The child can override them individually, or use the parent's setting as-is.
+
 =head2 $dataset = $dataset->set_parent($parent_dataset)
+
+Set C<$parent_dataset> as the C<$dataset>'s parent.
+
+If C<$parent_dataset> is C<undef>, C<$dataset> doesn't have parent anymore.
 
 =head2 $parent_dataset = $dataset->parent()
 
+Return the C<$dataset>'s parent.
+
+If C<$dataset> doesn't have any parent, it returns C<undef>.
+
 =head2 $child_dataset = $dataset->new_child()
+
+Create and return a new child of the C<$dataset>.
+
+This is equivalent to C<< Gnuplot::Builder::Dataset->new->set_parent($dataset) >>.
 
 =head1 OVERRIDES
 
