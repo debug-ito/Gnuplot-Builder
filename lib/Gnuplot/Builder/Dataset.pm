@@ -43,7 +43,7 @@ It supports lazy evaluation and prototype-based inheritance, too.
 
 =head2 Data Model
 
-A L<Gnuplot::Builder::Dataset> consists of three attributes; C<< the source, the options and the inline data >>.
+A L<Gnuplot::Builder::Dataset> consists of three attributes; B<< the source, the options and the inline data >>.
 
     plot "source.dat" using 1:2 title "file" with lp, \
          f(x) title "function" with lines, \
@@ -65,7 +65,6 @@ In the above example, C<"source.dat">, C<f(x)> and C<"-"> are the sources.
 
 The options are the rest of the dataset parameters after the source.
 In the above example, C<< using 1:2 title "file" with lp >> is the options of the first dataset.
-
 L<Gnuplot::Builder::Dataset> stores the options in a hash-like data structure.
 
 =item *

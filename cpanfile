@@ -1,6 +1,8 @@
 
 on 'test' => sub {
     requires 'Test::More' => "0";
+    requires 'Test::MockObject::Extends' => "0";
+    requires 'Test::Identity' => "0";
 };
 
 on 'configure' => sub {

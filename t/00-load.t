@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use Test::More;
  
-plan tests => 1;
- 
 BEGIN {
-    use_ok( 'Gnuplot::Builder' ) || print "Bail out!\n";
+    foreach my $module ("", "::Script", "::Dataset") {
+        use_ok('Gnuplot::Builder' . $module);
+    }
 }
  
 diag( "Testing Gnuplot::Builder $Gnuplot::Builder::VERSION, Perl $], $^X" );
+done_testing;
