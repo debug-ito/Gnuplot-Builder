@@ -40,6 +40,7 @@ sub create_pkl {
         my $del_exp = exists($case->{del_exp}) ? $case->{del_exp} : uc($case->{del});
         is $p->delete($case->{del}), $del_exp, "return from delete OK";
         elems_ok $p, @{$case->{check}};
+        is $p->get($case->{del}), undef, "return undef for deleted key";
     }
 }
 
@@ -56,6 +57,7 @@ sub create_pkl {
     $p->set("b", "B2");
     elems_ok $p, qw(c d e);
     is $p->get("b"), "B2";
+    is $p->get("a"), undef;
     expect_pkl $p, [[undef,1], [undef,2], [b => "B2"], [undef,3], [d => "D"],
                     [e => "E"], [undef,4], [undef,5], [c => "C"]];
     

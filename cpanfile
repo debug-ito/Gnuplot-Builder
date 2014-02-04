@@ -1,6 +1,4 @@
 
-requires "List::DoubleLinked" => "0.003";
-
 on 'test' => sub {
     requires 'Test::More' => "0";
     requires 'Test::MockObject::Extends' => "0";

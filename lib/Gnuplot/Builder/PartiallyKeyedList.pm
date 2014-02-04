@@ -2,14 +2,13 @@ package Gnuplot::Builder::PartiallyKeyedList;
 use strict;
 use warnings;
 use Carp;
-use List::DoubleLinked;
-
 
 sub new {
     my ($class) = @_;
     my $self = bless {
-        list => List::DoubleLinked->new(),
-        iterator_for => {},
+        index_for => {},
+        keys => [],
+        values => [],
     }, $class;
     return $self;
 }
@@ -17,60 +16,54 @@ sub new {
 sub set {
     my ($self, $key, $value) = @_;
     croak "key must be defined" if not defined $key;
-    my $existing_iterator = $self->{iterator_for}{$key};
-    if(!defined($existing_iterator)) {
-        $self->{list}->push([$key, $value]);
-        ## $self->{iterator_for}{$key} = $self->{list}->end;
-
-        ## end() method is fuckin' buggy.
-        use List::DoubleLinked::Iterator;
-        $self->{iterator_for}{$key} = List::DoubleLinked::Iterator->new($self->{list}, $self->{list}->{tail});
-        
+    my $index = $self->{index_for}{$key};
+    if(defined($index)) {
+        $self->{values}[$index] = $value;
     }else {
-        my $entry = $existing_iterator->get;
-        $entry->[1] = $value;
+        push(@{$self->{keys}}, $key);
+        push(@{$self->{values}}, $value);
+        $self->{index_for}{$key} = $#{$self->{keys}};
     }
 }
 
 sub get {
     my ($self, $key) = @_;
     croak "key must be defined" if not defined $key;
-    my $existing_iterator = $self->{iterator_for}{$key};
-    return defined($existing_iterator) ? $existing_iterator->get->[1] : undef;
+    my $index = $self->{index_for}{$key};
+    return defined($index) ? $self->{values}[$index] : undef;
 }
 
 sub exists {
     my ($self, $key) = @_;
     croak "key must be defined" if not defined $key;
-    return defined($self->{iterator_for}{$key});
+    return defined($self->{index_for}{$key});
 }
 
 sub delete {
     my ($self, $key) = @_;
     croak "key must be defined" if not defined $key;
-    my $existing_iterator = $self->{iterator_for}{$key};
-    return undef if not defined $existing_iterator;
-    my $value = $existing_iterator->get->[1];
-    $existing_iterator->remove();
-    delete $self->{iterator_for}{$key};
+    my $index = delete $self->{index_for}{$key};
+    return undef if not defined $index;
+    splice(@{$self->{keys}}, $index, 1);
+    my $value = splice(@{$self->{values}}, $index, 1);
+    
+    foreach my $existing_index (values %{$self->{index_for}}) {
+        $existing_index-- if $existing_index > $index;
+    }
     return $value;
 }
 
 sub add {
     my ($self, $entry) = @_;
-    $self->{list}->push([undef, $entry]);
+    push(@{$self->{keys}}, undef);
+    push(@{$self->{values}}, $entry);
 }
 
 sub each {
     my ($self, $code) = @_;
     croak "code must be a code-ref" if !defined($code) || ref($code) ne "CODE";
-
-    ## iteration looks ugly... https://github.com/Leont/list-doublelinked/issues/2
-    my $size = $self->{list}->size;
-    my $iterator;
-    for (1..$size) {
-        $iterator = defined($iterator) ? $iterator->next : $self->{list}->begin;
-        $code->(@{$iterator->get});
+    foreach my $index (0 .. $#{$self->{keys}}) {
+        $code->($self->{keys}[$index], $self->{values}[$index]);
     }
 }
 
