@@ -273,6 +273,26 @@ It's the same effect as C<< set($opt_name => [$opt_value1, $opt_value2, ...]) >>
 
 C<set_option()> is alias of C<set()>.
 
+=head2 $builder = $builder->setq(...)
+
+C<setq()> method is the same as C<set()> except that eventual option values are quoted.
+
+This method is useful for setting "title", "xlabel", "output" etc.
+
+    $builder->setq(
+        output => "hoge.png",
+        title  => "hoge's values",
+    );
+    $builder->to_string;
+    ## => set output 'hoge.png'
+    ## => set title 'hoge''s values'
+
+If the option value is a list, it quotes the all elements.
+
+=head2 $builder = $builder->setq_option(...)
+
+C<setq_option()> is alias of C<setq()>.
+
 
 =head2 $builder = $builder->unset($opt_name, ...)
 
@@ -315,7 +335,20 @@ C<set()> always overrides the parent setting, while C<delete_option()> resets su
 
 Methods to manipulate user-defined variables and functions.
 
-All methods in this category are analogous to the methods in L</OBJECT METHODS - GNUPLOT OPTIONS>.
+Most methods in this category are analogous to the methods in L</OBJECT METHODS - GNUPLOT OPTIONS>.
+
+    +---------------+-------------------+
+    |    Options    |    Definitions    |
+    +===============+===================|
+    | set           | define            |
+    | set_option    | set_definition    |
+    | setq          | (N/A)             |
+    | setq_option   | (N/A)             |
+    | unset         | undefine          |
+    | get_option    | get_definition    |
+    | delete_option | delete_definition |
+    +---------------+-------------------+
+
 I'm sure you can understand this analogy by this example.
 
     $builder->set(
@@ -333,7 +366,6 @@ I'm sure you can understand this analogy by this example.
     ## => a = 100
     ## => f(x) = sin(a * x)
     ## => undefine b
-
 
 =head2 $builder = $builder->define($def_name => $def_value, ...)
 

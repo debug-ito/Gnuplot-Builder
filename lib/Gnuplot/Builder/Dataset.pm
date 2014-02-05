@@ -160,6 +160,8 @@ After the source is deleted, C<get_source()> method will search the parent for t
 
 Methods about the options of the dataset.
 
+These methods are very similar to the methods of the same names in L<Gnuplot::Builder::Script>.
+
 =head2 $dataset = $dataset->set_option($opt_name => $opt_value, ...)
 
 Set the dataset option named C<$opt_name> to C<$opt_value>.
@@ -193,6 +195,7 @@ You can return C<undef> to disable the option.
 =back
 
 The options are stored in a hash-like structure, so you can change them individually.
+
 Even if you change an option value, its order is unchanged.
 
     my $scale = 0.001;
@@ -253,7 +256,49 @@ Or, you can even write like this.
 
 There is more than one way to do it.
 
-=head2 $dataset = $dataset->setq_option($opt_name => $opt_value, ...)
+=head2 $dataset = $dataset->set_option($options)
+
+If C<set_option()> method is called with a single string argument C<$options>,
+it is parsed to set options.
+
+    $datasaet->set_option(<<END_OPTIONS);
+    using = 1:3
+    -axes
+    title = "Weight [kg]"
+    with  = lines
+    lw    = 2
+    END_OPTIONS
+
+The parsing rule is more or less the same as C<set_option()> method of L<Gnuplot::Builder::Script>.
+Here is the overview.
+
+=over
+
+=item *
+
+Options are set like
+
+    OPT_NAME = OPT_VALUE
+
+=item *
+
+If OPT_VALUE is an empty string, you can omit "=".
+
+=item *
+
+Options can be explicitly disabled by the leading "-" like
+
+    -OPT_NAME
+
+=item *
+
+If the same OPT_NAME is repeated with different OPT_VALUEs,
+only the last OPT_VALUE is effective.
+
+=back
+
+
+=head2 $dataset = $dataset->setq_option(...)
 
 Same as C<set_option()> method except that the eventual option value is quoted.
 This is useful for setting "title" and "index".

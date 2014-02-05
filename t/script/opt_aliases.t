@@ -23,4 +23,6 @@ EOD
         "unset() is alias for set(name => undef)";
 }
 
+fail("setq <=> setq_option alias");
+
 done_testing;
