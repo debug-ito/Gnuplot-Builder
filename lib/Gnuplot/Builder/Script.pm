@@ -410,7 +410,7 @@ You can specify more than one C<$dataset>s to plot.
 Usually you should use a L<Gnuplot::Builder::Dataset> object for C<$dataset>.
 In this case, you can skip reading the rest of this section.
 
-In detail, C<$dataset> is either a string, an array-ref or an object.
+In detail, C<$dataset> is either a string or an object.
 
 =over
 
@@ -426,48 +426,41 @@ If C<$dataset> is a string, it's treated as the dataset parameters for "plot" co
 
 =item *
 
-If C<$dataset> is an array-ref, it must be an array-ref of a string and a code-ref.
+If C<$dataset> is an object, it must implement C<params_string()> and C<write_data_to()> methods (like L<Gnuplot::Builder::Dataset>).
 
-    $dataset = [$params, $data_provider]
-
-C<$params> is the dataset parameters and C<$data_provider> is a code-ref to generate inline data for the dataset.
-C<$data_provider> is passed another code-ref (C<$writer>).
-C<$data_provider> must call the C<$writer> with the inline data it provides.
-
-    ## @measured_data contains a series of {x => $x_value, y => $y_value}.
-    $builder->plot(
-        'f(x) title "theoretical" with lines',
-        ['"-" using 1:2 title "measured data" with lp', sub {
-            my ($writer) = @_;
-            foreach my $data_point (@measured_data) {
-                $writer->("$data_point->{x} $data_point->{y}");
-            }
-        }]
-    );
-
-You can pass the whole inline data to the C<$writer> at once.
-
-    $builder->plot(['"-" u 1:2', sub { shift->(<<END_DATA) }]);
-    1 1
-    2 4
-    3 9
-    4 16
-    5 25
-    END_DATA
-
-If you don't pass any data to the C<$writer>, the C<plot()> method doesn't generate the inline data section.
-
-=item *
-
-If C<$dataset> is an object and implements C<params_string()> and C<write_data_to()> methods,
-it's equivalent to passing
-
-    [$dataset->params_string, sub { my $writer = shift; $dataset->write_data_to($writer) }]
-
-That is, C<params_string()> method is supposed to return a string of dataset parameters,
+C<params_string()> method is supposed to return a string of the dataset parameters,
 and C<write_data_to()> method provide the inline data if it has.
 
-L<Gnuplot::Builder::Dataset> implements those methods.
+The two methods are called like
+
+    ($params_str) = $dataset->params_string();
+    $dataset->write_data_to($writer);
+
+where C<$writer> is a code-ref that you must call with the inline data you have.
+
+    package My::Data;
+    
+    sub new {
+        my ($class, $x_data, $y_data) = @_;
+        return bless { x => $x_data, y => $y_data }, $class;
+    }
+    
+    sub params_string { q{"-" using 1:2 title "My Data" with lp} }
+    
+    sub write_data_to {
+        my ($self, $writer) = @_;
+        foreach my $i (0 .. $#{$self->{x}}) {
+            my ($x, $y) = ($self->{x}[$i], $self->{y}[$i]);
+            $writer->("$x $y\n");
+        }
+    }
+    
+    $builder->plot(My::Data->new([1,2,3], [1,4,9]));
+
+
+If C<write_data_to()> method doesn't pass any data to the C<$writer>,
+the C<plot()> method doesn't generate the inline data section.
+
 
 =back
 

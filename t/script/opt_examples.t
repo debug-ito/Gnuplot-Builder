@@ -4,6 +4,6 @@ use Test::More;
 use Test::Identical;
 use Gnuplot::Builder::Script;
 
-fail("examples in POD about options");
+fail("THIS FILE MUST BE REMOVED. examples tests should be in tests for individual functionalities.");
 
 done_testing;
