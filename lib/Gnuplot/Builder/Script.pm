@@ -464,20 +464,59 @@ the C<plot()> method doesn't generate the inline data section.
 
 =back
 
-=head2 $script = $builder->plot_string($dataset, ...)
+=head2 $script = $builder->plot_with(%args)
 
-Same as C<plot()> method except it does not pass the script to the gnuplot process
-but returns it as a string.
+Plot with more functionalities than C<plot()> method.
 
-The C<$script> includes the plot settings, "plot" command and inline data if exist.
+Fields in C<%args> are
+
+=over
+
+=item C<dataset> => DATASETS (mandatory)
+
+Datasets to plot. It is either a dataset or an array-ref of datasets.
+See C<plot()> for specification of datasets.
+
+=item C<output> => OUTPUT_FILENAME (optional)
+
+If set, "set output" command is printed just before "plot" command,
+so that it would output the plot to the specified file.
+The specified file name is quoted.
+
+If not set, it won't print "set output" command.
+
+=item C<writer> => CODE-REF (optional)
+
+A code-ref to receive the whole script string.
+If set, it is called one or more times with the script string that C<$builder> builds.
+
+If not set, C<$builder> streams the script into the gnuplot process.
+
+=back
+
+    my $script = "";
+    $builder->plot_with(
+        dataset => ['sin(x)', 'cos(x)'],
+        output  => "hoge.eps",
+        writer  => sub {
+            my ($script_part) = @_;
+            $script .= $script_part;
+        }
+    );
+    
+    $script;
+    ## => set output 'hoge.eps'
+    ## => plot sin(x),cos(x)
+
+
 
 =head2 $builder = $builder->splot($dataset, ...)
 
 Same as C<plot()> method except it uses "splot" command.
 
-=head2 $script = $builder->splot_string($dataset, ...)
+=head2 $script = $builder->splot_with(%args)
 
-Same as C<plot_string()> method except if uses "splot" command.
+Same as C<plot_with()> method except it uses "splot" command.
 
 
 =head1 OBJECT METHODS - INHERITANCE
