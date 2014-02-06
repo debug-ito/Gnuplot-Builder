@@ -94,7 +94,7 @@ This method is equivalent to C<< new()->set_file($filename)->set_option(@set_opt
 =head2 $dataset = Gnuplot::Builder::Dataset->new_data($data_provider, @set_option_args)
 
 The constructor for datasets that have inline data.
-C<$data_provider> is the source of the inline data.
+C<$data_provider> is the inline data or a code-ref that provides it.
 
 This method is equivalent to C<< new()->set_file('-')->set_data($data_provider)->set_option(@set_option_args) >>.
 
@@ -374,7 +374,7 @@ The second argument (C<$writer>) is a code-ref that you have to call to write in
         my ($dataset, $writer) = @_;
         foreach my $x (1 .. 3) {
             my $y = $x * 10;
-            $writer->("$x $y");
+            $writer->("$x $y\n");
         }
     });
 
@@ -395,7 +395,7 @@ C<$writer> can be called zero or more times.
     my $inline_data = "";
     $dataset->write_data_to(sub {
         my ($data_part) = @_;
-        $inline_data .= $data_part . "\n";
+        $inline_data .= $data_part;
     });
 
 If C<$dataset> doesn't have inline data setting,

@@ -21,6 +21,13 @@ Gnuplot::Builder - Object-oriented gnuplot script builder
 
 =head2 $Gnuplot::Builder::GNUPLOT_PATH
 
+=head1 EXPORTED FUNCTIONS
+
+=head2 $builder = script(@args)
+
+=head2 $dataset = dataset(@args)
+
+=head2 $message = help()
 
 
 =head1 SEE ALSO

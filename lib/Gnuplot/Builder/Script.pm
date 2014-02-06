@@ -482,7 +482,8 @@ Same as C<plot_string()> method except if uses "splot" command.
 
 =head1 OBJECT METHODS - INHERITANCE
 
-A L<Gnuplot::Builder::Script> object can extend and/or override another object.
+A L<Gnuplot::Builder::Script> object can extend and/or override another
+L<Gnuplot::Builder::Script> object.
 This is similar to JavaScript's prototype-based inheritance.
 
 Let C<$parent> and C<$child> be the parent and its child builder, respectively.
