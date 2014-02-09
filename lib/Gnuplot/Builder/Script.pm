@@ -1,6 +1,74 @@
 package Gnuplot::Builder::Script;
 use strict;
 use warnings;
+use Gnuplot::Builder::PrototypedData;
+
+sub new {
+    my ($class, @set_args) = @_;
+    my $self = bless {
+        pdata => Gnuplot::Builder::PrototypedData->new
+    };
+    if(@set_args) {
+        $self->set(@set_args);
+    }
+    return $self;
+}
+
+sub add {
+    my ($self, @sentences) = @_;
+    foreach my $sentence (@sentences) {
+        $self->list->add($sentence);
+    }
+    return $self;
+}
+
+sub set {
+    my ($self, @pairs) = @_;
+    return $self if !@pairs;
+    if(@pairs == 1) {
+        @pairs = _parse_pairs($pairs[0]);
+    }
+    ...;
+}
+
+*set_option = *set;
+
+sub _trim_whitespaces {
+    my ($val) = @_;
+    $val =~ s/^\s+//g;
+    $val =~ s/\s+$//g;
+    return $val;
+}
+
+sub _parse_pairs {
+    my ($pairs_str) = @_;
+    my @pairs = ();
+    my $carried = "";
+    foreach my $line (split /^/, $pairs_str) {
+        $line =~ s/\s+$//g;
+        if($line =~ /\\$/) {
+            $carried .= substr($line, 0, -1);
+            next;
+        }
+        $line = $carried . $line;
+        $carried = "";
+        next if $line =~ /^#/;
+        $line =~ s/^\s//g;
+        next if $line eq "";
+        if($line =~ /^([^=]*)=(.*)$/) {
+            my ($name, $value) = ($1, $2);
+            push(@pairs, _trim_whitespaces($name), _trim_whitespaces($value));
+        }else {
+            my $name = _trim_whitespaces($line);
+            if($name =~ /^-/) {
+                push(@pairs, substr($name, 1), undef);
+            }else {
+                push(@pairs, $name, "");
+            }
+        }
+    }
+    return @pairs;
+}
 
 1;
 

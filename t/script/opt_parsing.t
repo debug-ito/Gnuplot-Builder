@@ -34,6 +34,19 @@ EXP
 }
 
 {
+    note("--- multiple lines with trailing backslash");
+    my $builder = Gnuplot::Builder::Script->new;
+    $builder->set(<<'EOT');
+term\
+inal =\
+png \
+size 100,\
+200
+EOT
+    is $builder->to_string, 'set terminal png size 100,200';
+}
+
+{
     note("--- trailing backslash should take effect before commenting out.");
     my $builder = Gnuplot::Builder::Script->new;
     $builder->set(<<'EOT');
@@ -42,6 +55,7 @@ title = "foobar"
 EOT
     is $builder->to_string, "";
 }
+
 
 done_testing;
 

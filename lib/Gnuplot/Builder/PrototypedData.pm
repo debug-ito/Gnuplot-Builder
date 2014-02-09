@@ -1,9 +1,22 @@
 package Gnuplot::Builder::PrototypedData;
 use strict;
 use warnings;
+use Gnuplot::Builder::PartiallyKeyedList;
+
+sub new {
+    my ($class) = @_;
+    my $self = bless {
+        list => Gnuplot::Builder::PartiallyKeyedList->new,
+        attributes => {},
+    }, $class;
+    return $self;
+}
+
+sub list { $_[0]->{list} }
+
 
 ## Common data structure for Script and Dataset. It has a
-## PartiallyKeyedIndex and optional named attributes. It implements
+## PartiallyKeyedList and optional named attributes. It implements
 ## prototype-based inheritance.
 
 ## should it have setq()? or setq() can be implemented as a common wrapper function.
