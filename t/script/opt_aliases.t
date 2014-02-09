@@ -23,6 +23,10 @@ EOD
         "unset() is alias for set(name => undef)";
 }
 
-fail("setq <=> setq_option alias");
+{
+    my $builder = Gnuplot::Builder::Script->new;
+    identical $builder->setq_option(title => "This is A's result"), $builder, "setq_option() returns the object.";
+    is $builder->is_string, qq{set title 'This is A''s result'\n}, "setq_option() is alias for setq()";
+}
 
 done_testing;
