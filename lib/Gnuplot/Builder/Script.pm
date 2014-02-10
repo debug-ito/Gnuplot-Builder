@@ -2,73 +2,109 @@ package Gnuplot::Builder::Script;
 use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
+use Scalar::Util qw(weaken);
+use Carp;
 
 sub new {
     my ($class, @set_args) = @_;
     my $self = bless {
-        pdata => Gnuplot::Builder::PrototypedData->new
+        pdata => undef,
     };
+    $self->_init_pdata();
     if(@set_args) {
         $self->set(@set_args);
     }
     return $self;
 }
 
+sub _init_pdata {
+    my ($self) = @_;
+    weaken $self;
+    $self->{pdata} = Gnuplot::Builder::PrototypedData->new(
+        entry_evaluator => sub {
+            my ($key, $value_code) = @_;
+            if(defined($key)) {
+                return $value_code->($self, substr($key, 1));
+            }else {
+                return $value_code->($self);
+            }
+        }
+    );
+}
+
 sub add {
     my ($self, @sentences) = @_;
     foreach my $sentence (@sentences) {
-        $self->list->add($sentence);
+        $self->{pdata}->add_entry($sentence);
     }
+    return $self;
+}
+
+sub _set {
+    my ($self, $quote, @pairs) = @_;
+    $self->{pdata}->set_entry(
+        entries => \@pairs,
+        key_prefix => "o",
+        quote => $quote,
+    );
     return $self;
 }
 
 sub set {
     my ($self, @pairs) = @_;
-    return $self if !@pairs;
-    if(@pairs == 1) {
-        @pairs = _parse_pairs($pairs[0]);
-    }
-    ...;
+    return $self->_set(0, @pairs);
 }
 
 *set_option = *set;
 
-sub _trim_whitespaces {
-    my ($val) = @_;
-    $val =~ s/^\s+//g;
-    $val =~ s/\s+$//g;
-    return $val;
+sub setq {
+    my ($self, @pairs) = @_;
+    return $self->_set(1, @pairs);
 }
 
-sub _parse_pairs {
-    my ($pairs_str) = @_;
-    my @pairs = ();
-    my $carried = "";
-    foreach my $line (split /^/, $pairs_str) {
-        $line =~ s/\s+$//g;
-        if($line =~ /\\$/) {
-            $carried .= substr($line, 0, -1);
-            next;
-        }
-        $line = $carried . $line;
-        $carried = "";
-        next if $line =~ /^#/;
-        $line =~ s/^\s//g;
-        next if $line eq "";
-        if($line =~ /^([^=]*)=(.*)$/) {
-            my ($name, $value) = ($1, $2);
-            push(@pairs, _trim_whitespaces($name), _trim_whitespaces($value));
-        }else {
-            my $name = _trim_whitespaces($line);
-            if($name =~ /^-/) {
-                push(@pairs, substr($name, 1), undef);
-            }else {
-                push(@pairs, $name, "");
-            }
-        }
-    }
-    return @pairs;
+*setq_option = *setq;
+
+sub unset {
+    my ($self, @names) = @_;
+    return $self->set(map { $_ => undef } @names);
 }
+
+sub get_option {
+    my ($self, $name) = @_;
+    return $self->{pdata}->get_resolved_entry("o" . $name);
+}
+
+sub delete_option {
+    my ($self, @names) = @_;
+    $self->{pdata}->delete_entry("o$_") foreach @names;
+    return $self;
+}
+
+sub _create_statement {
+    my ($raw_key, $value) = @_;
+    return $value if !defined $raw_key;
+    my ($prefix, $name) = (substr($raw_key, 0, 1), substr($raw_key, 1));
+    if($prefix eq "o") {
+        return "set $name $value";
+    }elsif($prefix eq "d") {
+        return "$name = $value";
+    }else {
+        confess "Unknown key prefix: $prefix";
+    }
+}
+
+sub to_string {
+    my ($self) = @_;
+    my $result = "";
+    $self->{pdata}->each_resolved_entry(sub {
+        my ($raw_key, $values) = @_;
+        foreach my $value (@$values) {
+            $result .= _create_statement($raw_key, $value) . "\n";
+        }
+    });
+    return $result;
+}
+
 
 1;
 

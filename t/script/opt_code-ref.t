@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Identical;
+use Test::Identity;
 use Gnuplot::Builder::Script;
 
 my $builder = Gnuplot::Builder::Script->new;

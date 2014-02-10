@@ -56,6 +56,18 @@ EOT
     is $builder->to_string, "";
 }
 
+{
+    note("--- white speces in keys and values");
+    my $builder = Gnuplot::Builder::Script->new;
+    $builder->set(<<'EOT');
+arrow 1 = from 0,0 to 1,1
+  arrow 2  =  from   5,5  to 10,10
+EOT
+    is $builder->to_string, <<'EOT';
+set arrow 1 from 0,0 to 1,1
+set arrow 2 from   5,5  to 10,10
+EOT
+}
 
 done_testing;
 
