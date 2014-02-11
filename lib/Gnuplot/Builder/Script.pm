@@ -70,15 +70,29 @@ sub unset {
     return $self->set(map { $_ => undef } @names);
 }
 
+sub _get_entry {
+    my ($self, $prefix, $name) = @_;
+    croak "name cannot be undef" if not defined $name;
+    return $self->{pdata}->get_resolved_entry("$prefix$name");
+}
+
 sub get_option {
     my ($self, $name) = @_;
-    return $self->{pdata}->get_resolved_entry("o$name");
+    return $self->_get_entry("o", $name);
+}
+
+sub _delete_entry {
+    my ($self, $prefix, @names) = @_;
+    foreach my $name (@names) {
+        croak "name cannot be undef" if not defined $name;
+        $self->{pdata}->delete_entry("$prefix$name");
+    }
+    return $self;
 }
 
 sub delete_option {
     my ($self, @names) = @_;
-    $self->{pdata}->delete_entry("o$_") foreach @names;
-    return $self;
+    return $self->_delete_entry("o", @names);
 }
 
 sub _create_statement {
@@ -89,7 +103,7 @@ sub _create_statement {
     if($prefix eq "o") {
         @words = defined($value) ? ("set", $name, $value) : ("unset", $name);
     }elsif($prefix eq "d") {
-        @words = defined($value) ? ($name, "=", $value) : "undefine $value";
+        @words = defined($value) ? ($name, "=", $value) : "undefine $name";
     }else {
         confess "Unknown key prefix: $prefix";
     }
@@ -108,6 +122,28 @@ sub to_string {
         }
     });
     return $result;
+}
+
+sub define {
+    my ($self, @pairs) = @_;
+    return $self->_set_entry("d", 0, @pairs);
+}
+
+*set_definition = *define;
+
+sub undefine {
+    my ($self, @names) = @_;
+    return $self->define(map { $_ => undef } @names);
+}
+
+sub get_definition {
+    my ($self, $name) = @_;
+    return $self->_get_entry("d", $name);
+}
+
+sub delete_definition {
+    my ($self, @names) = @_;
+    return $self->_delete_entry("d", @names);
 }
 
 
@@ -192,7 +228,7 @@ Build and return the gnuplot script string.
 
 Add gnuplot script sentences to the C<$builder>.
 
-This is a low-level method. B<< In most cases you should use C<set()> and C<def()> methods below. >>
+This is a low-level method. B<< In most cases you should use C<set()> and C<define()> methods below. >>
 
 C<$sentences> is a string or a code-ref.
 A code-ref is evaluated in list context when it builds the script.
