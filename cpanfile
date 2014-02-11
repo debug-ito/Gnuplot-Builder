@@ -6,6 +6,7 @@ requires "overload" => "0";
 on 'test' => sub {
     requires 'Test::More' => "0";
     requires 'Test::Identity' => "0";
+    requires 'Test::Memory::Cycle' => "0";
 };
 
 on 'configure' => sub {
