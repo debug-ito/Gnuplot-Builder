@@ -673,7 +673,7 @@ Create and return a new child builder of C<$builder>.
 This is a short-cut for C<< Gnuplot::Builder::Script->new->set_parent($builder) >>.
 
 
-=head1 OVERRIDES
+=head1 OVERLOAD
 
 When you evaluate a C<$builder> as a string, it executes C<< $builder->to_string() >>. That is,
 

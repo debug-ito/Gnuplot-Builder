@@ -4,7 +4,6 @@ requires 'Scalar::Util' => "0";
 
 on 'test' => sub {
     requires 'Test::More' => "0";
-    requires 'Test::MockObject::Extends' => "0";
     requires 'Test::Identity' => "0";
 };
 

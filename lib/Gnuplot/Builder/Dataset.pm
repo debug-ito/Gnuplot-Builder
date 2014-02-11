@@ -433,7 +433,7 @@ Create and return a new child of the C<$dataset>.
 
 This is equivalent to C<< Gnuplot::Builder::Dataset->new->set_parent($dataset) >>.
 
-=head1 OVERRIDES
+=head1 OVERLOAD
 
 When you evaluate a C<$dataset> as a string, it executes C<< $dataset->to_string() >>. That is,
 
