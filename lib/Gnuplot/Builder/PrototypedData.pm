@@ -60,10 +60,23 @@ sub set_entry {
     if(@$entries == 1) {
         $entries = _parse_pairs($entries->[0]);
     }
+    
+    ## Multiple occurrences of the same key are combined into an array-ref value.
+    my $temp_list = Gnuplot::Builder::PartiallyKeyedList->new;
     foreach my $entry_pair (pairs @$entries) {
-        my ($key, $value) = @$entry_pair;
-        $self->{list}->set($prefix . $key, $quote ? _wrap_value_with_quote($value) : $value);
+        my ($given_key, $value) = @$entry_pair;
+        my $key = $prefix . $given_key;
+        if($temp_list->exists($key)) {
+            push(@{$temp_list->get($key)}, $value);
+        }else {
+            $temp_list->set($key, [$value]);
+        }
     }
+    $temp_list->each(sub {
+        my ($key, $value_arrayref) = @_;
+        my $value = (@$value_arrayref == 1) ? $value_arrayref->[0] : $value_arrayref;
+        $self->{list}->set($key, $quote ? _wrap_value_with_quote($value) : $value);
+    });
 }
 
 sub _quote_gnuplot_str {

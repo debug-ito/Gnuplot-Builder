@@ -43,7 +43,7 @@ png \
 size 100,\
 200
 EOT
-    is $builder->to_string, 'set terminal png size 100,200';
+    is $builder->to_string, "set terminal png size 100,200\n";
 }
 
 {
