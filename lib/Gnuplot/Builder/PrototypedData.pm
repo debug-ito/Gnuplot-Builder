@@ -246,7 +246,7 @@ Set PKL entry. In C<%args>,
 
 =item C<entries> => ARRAY-REF (mandatory)
 
-Arrayr-ref of entry settings.
+Array-ref of entry settings. If it contains a single string, the string is parsed. Otherwise it must be a flat array of key-value pairs.
 
 =item C<key_prefix> => STR (optional, default: "")
 

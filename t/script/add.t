@@ -11,11 +11,7 @@ use Gnuplot::Builder::Script;
     identical $builder->add("set term png"), $builder, "add() should return the object";
     is $builder->to_string, "set term png\n", "add() should append newline if not exists";
 
-    $builder->add(q{
-set key
-set grid
-});
-
+    $builder->add("set key\n", "set grid\n");
     is $builder->to_string,
         "set term png\nset key\nset grid\n",
             "add() should not change the trailing newline.";

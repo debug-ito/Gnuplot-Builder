@@ -101,7 +101,9 @@ sub to_string {
     $self->{pdata}->each_resolved_entry(sub {
         my ($raw_key, $values) = @_;
         foreach my $value (@$values) {
-            $result .= _create_statement($raw_key, $value) . "\n";
+            my $statement = _create_statement($raw_key, $value);
+            $result .= $statement;
+            $result .= "\n" if $statement !~ /\n$/;
         }
     });
     return $result;
