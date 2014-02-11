@@ -148,9 +148,12 @@ sub _normalize_value {
 
 sub get_resolved_entry {
     my ($self, $key) = @_;
-    my $merged = $self->_create_merged_pkl();
-    return () if !$merged->exists($key);
-    my $raw_value = $merged->get($key);
+    my $pdata_with_key = $self;
+    while(defined($pdata_with_key) && !$pdata_with_key->has_own_entry($key)) {
+        $pdata_with_key = $pdata_with_key->parent;
+    }
+    return () if not defined $pdata_with_key;
+    my $raw_value = $pdata_with_key->{list}->get($key);
     return _normalize_value($raw_value, $self->{entry_evaluator}, $key);
 }
 
