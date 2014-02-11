@@ -4,6 +4,7 @@ use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Scalar::Util qw(weaken);
 use Carp;
+use overload '""' => "to_string";
 
 sub new {
     my ($class, @set_args) = @_;

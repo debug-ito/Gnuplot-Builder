@@ -1,6 +1,7 @@
 
 requires 'List::Util' => "1.28";
 requires 'Scalar::Util' => "0";
+requires "overload" => "0";
 
 on 'test' => sub {
     requires 'Test::More' => "0";
