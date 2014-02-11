@@ -10,6 +10,7 @@ sub new {
     my ($class, @set_args) = @_;
     my $self = bless {
         pdata => undef,
+        parent => undef,
     };
     $self->_init_pdata();
     if(@set_args) {
@@ -146,6 +147,27 @@ sub delete_definition {
     return $self->_delete_entry("d", @names);
 }
 
+sub set_parent {
+    my ($self, $parent) = @_;
+    if(!defined($parent)) {
+        $self->{parent} = undef;
+        $self->{pdata}->set_parent(undef);
+        return $self;
+    }
+    if(!ref($parent) || !$parent->isa("Gnuplot::Builder::Script")) {
+        croak "parent must be a Gnuplot::Builder::Script"
+    }
+    $self->{parent} = $parent;
+    $self->{pdata}->set_parent($parent->{pdata});
+    return $self;
+}
+
+sub parent { return $_[0]->{parent} }
+
+sub new_child {
+    my ($self) = @_;
+    return Gnuplot::Builder::Script->new->set_parent($self);
+}
 
 1;
 
@@ -484,7 +506,7 @@ Most methods in this category are analogous to the methods in L</OBJECT METHODS 
 
     +---------------+-------------------+
     |    Options    |    Definitions    |
-    +===============+===================|
+    +===============+===================+
     | set           | define            |
     | set_option    | set_definition    |
     | setq          | (N/A)             |
