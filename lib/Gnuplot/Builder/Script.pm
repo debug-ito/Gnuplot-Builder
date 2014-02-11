@@ -2,6 +2,7 @@ package Gnuplot::Builder::Script;
 use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
+use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use Scalar::Util qw(weaken);
 use Carp;
 use overload '""' => "to_string";
@@ -167,6 +168,37 @@ sub parent { return $_[0]->{parent} }
 sub new_child {
     my ($self) = @_;
     return Gnuplot::Builder::Script->new->set_parent($self);
+}
+
+sub _draw_with {
+    my ($self, %args) = @_;
+    my $plot_command = $args{command};
+    my $dataset = $args{dataset};
+    croak "dataset is mandatory" if not defined $dataset;
+    if(ref($dataset) ne "ARRAY") {
+        $dataset = [$dataset];
+    }
+    my $output = $args{output};
+    my $writer = $args{writer};
+    $writer->($self->to_string);
+    if(defined $output) {
+        $writer->("set output " . quote_gnuplot_str($output) . "\n");
+    }
+    $writer->("$plot_command " . join(",", @$dataset) . "\n");
+    if(defined $output) {
+        $writer->("set output\n");
+    }
+    return $self;
+}
+
+sub plot_with {
+    my ($self, %args) = @_;
+    return $self->_draw_with(%args, command => "plot");
+}
+
+sub splot_with {
+    my ($self, %args) = @_;
+    return $self->_draw_with(%args, command => "splot");
 }
 
 1;
@@ -575,7 +607,7 @@ This method lets a gnuplot process do the actual job.
 You can specify more than one C<$dataset>s to plot.
 
 Usually you should use a L<Gnuplot::Builder::Dataset> object for C<$dataset>.
-In this case, you can skip reading the rest of this section.
+In this case, you can skip the rest of this section.
 
 In detail, C<$dataset> is either a string or an object.
 
@@ -631,7 +663,7 @@ the C<plot()> method doesn't generate the inline data section.
 
 =back
 
-=head2 $script = $builder->plot_with(%args)
+=head2 $builder = $builder->plot_with(%args)
 
 Plot with more functionalities than C<plot()> method.
 
@@ -649,8 +681,9 @@ See C<plot()> for specification of datasets.
 If set, "set output" command is printed just before "plot" command,
 so that it would output the plot to the specified file.
 The specified file name is quoted.
+After "plot" command, it prints "set output" command with no argument to unlock the file.
 
-If not set, it won't print "set output" command.
+If not set, it won't print "set output" commands.
 
 =item C<writer> => CODE-REF (optional)
 
@@ -674,14 +707,14 @@ If not set, C<$builder> streams the script into the gnuplot process.
     $script;
     ## => set output 'hoge.eps'
     ## => plot sin(x),cos(x)
-
+    ## => set output
 
 
 =head2 $builder = $builder->splot($dataset, ...)
 
 Same as C<plot()> method except it uses "splot" command.
 
-=head2 $script = $builder->splot_with(%args)
+=head2 $builder = $builder->splot_with(%args)
 
 Same as C<plot_with()> method except it uses "splot" command.
 

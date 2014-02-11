@@ -2,6 +2,7 @@ package Gnuplot::Builder::PrototypedData;
 use strict;
 use warnings;
 use Gnuplot::Builder::PartiallyKeyedList;
+use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use List::Util 1.28 qw(pairs);
 
 sub new {
@@ -79,24 +80,17 @@ sub set_entry {
     });
 }
 
-sub _quote_gnuplot_str {
-    my ($str) = @_;
-    return undef if !defined($str);
-    $str =~ s/'/''/g;
-    return qq{'$str'};
-}
-
 sub _wrap_value_with_quote {
     my ($value) = @_;
     my $ref = ref($value);
     if($ref eq "ARRAY") {
-        return [map { _quote_gnuplot_str($_) } @$value];
+        return [map { quote_gnuplot_str($_) } @$value];
     }elsif($ref eq "CODE") {
         return sub {
-            return map { _quote_gnuplot_str($_) } $value->(@_);
+            return map { quote_gnuplot_str($_) } $value->(@_);
         };
     }else {
-        return _quote_gnuplot_str($value);
+        return quote_gnuplot_str($value);
     }
 }
 
