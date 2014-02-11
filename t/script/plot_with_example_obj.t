@@ -26,7 +26,7 @@ use testlib::ScriptUtil qw(plot_str);
 use Gnuplot::Builder::Script;
 
 my $builder = Gnuplot::Builder::Script->new;
-is plot_str($builder, "plot", dataset => My::Data->new([1,2,3], [1,4,9])), <<EXP, "example OK";
+is plot_str($builder, "plot_with", dataset => My::Data->new([1,2,3], [1,4,9])), <<EXP, "example OK";
 plot "-" using 1:2 title "My Data" with lp
 1 1
 2 4

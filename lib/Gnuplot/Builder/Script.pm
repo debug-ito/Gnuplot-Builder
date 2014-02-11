@@ -170,6 +170,46 @@ sub new_child {
     return Gnuplot::Builder::Script->new->set_parent($self);
 }
 
+sub _collect_dataset_params {
+    my ($dataset_arrayref) = @_;
+    my @params_str = ();
+    my @dataset_objects = ();
+    foreach my $dataset (@$dataset_arrayref) {
+        my $ref = ref($dataset);
+        if(!$ref) {
+            push(@params_str, $dataset);
+        }else {
+            if(!$dataset->can("params_string") || !$dataset->can("write_data_to")) {
+                croak "You cannot use $ref object as a dataset.";
+            }
+            my ($param_str) = $dataset->params_string();
+            push(@params_str, $param_str);
+            push(@dataset_objects, $dataset);
+        }
+    }
+    return (\@params_str, \@dataset_objects);
+}
+
+sub _write_inline_data {
+    my ($writer, $dataset_objects_arrayref) = @_;
+    my $ended_with_newline = 0;
+    my $data_written = 0;
+    my $wrapped_writer = sub {
+        my @nonempty_data = grep { defined($_) && $_ ne "" } @_;
+        return if !@nonempty_data;
+        $data_written = 1;
+        $ended_with_newline = ($nonempty_data[-1] =~ /\n$/);
+        $writer->(join("", @nonempty_data));
+    };
+    foreach my $dataset (@$dataset_objects_arrayref) {
+        $data_written = $ended_with_newline = 0;
+        $dataset->write_data_to($wrapped_writer);
+        next if !$data_written;
+        $writer->("\n") if !$ended_with_newline;
+        $writer->("e\n");
+    }
+}
+
 sub _draw_with {
     my ($self, %args) = @_;
     my $plot_command = $args{command};
@@ -184,7 +224,9 @@ sub _draw_with {
     if(defined $output) {
         $writer->("set output " . quote_gnuplot_str($output) . "\n");
     }
-    $writer->("$plot_command " . join(",", @$dataset) . "\n");
+    my ($params, $dataset_objects) = _collect_dataset_params($dataset);
+    $writer->("$plot_command " . join(",", @$params) . "\n");
+    _write_inline_data($writer, $dataset_objects);
     if(defined $output) {
         $writer->("set output\n");
     }
