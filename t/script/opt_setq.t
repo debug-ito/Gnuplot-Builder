@@ -15,9 +15,25 @@ foreach my $case (
     
 ) {
     my $builder = Gnuplot::Builder::Script->new;
-    identical $builder->setq(output => $case->{give}), $builder, "$case->{label}: setq() returns the builder";
+    identical $builder->setq(output => $case->{input}), $builder, "$case->{label}: setq() returns the builder";
     is $builder->to_string, $case->{exp}, "$case->{label}: quoted OK";
 }
 
+{
+    note("--- setq() code-ref");
+    my $builder = Gnuplot::Builder::Script->new;
+    my $called = 0;
+    $builder->setq(arrow => sub {
+        my ($inner_builder, $opt_name) = @_;
+        $called++;
+        identical $inner_builder, $builder, "first arg for code-ref OK";
+        is $opt_name, "arrow", "second arg for code-ref OK";
+        ok wantarray, "code-ref in list context OK";
+        return ("1", "2", "3");
+    });
+    is $called, 0, "not called yet";
+    is $builder->to_string, "set arrow '1'\nset arrow '2'\nset arrow '3'\n", "script OK";
+    is $called, 1, "called once";
+}
 
 done_testing;

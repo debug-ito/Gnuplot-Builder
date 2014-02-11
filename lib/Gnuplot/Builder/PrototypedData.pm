@@ -62,9 +62,29 @@ sub set_entry {
     }
     foreach my $entry_pair (pairs @$entries) {
         my ($key, $value) = @$entry_pair;
-        $self->{list}->set($prefix . $key, $value);
+        $self->{list}->set($prefix . $key, $quote ? _wrap_value_with_quote($value) : $value);
     }
-    ## TODO: quoting
+}
+
+sub _quote_gnuplot_str {
+    my ($str) = @_;
+    return undef if !defined($str);
+    $str =~ s/'/''/g;
+    return qq{'$str'};
+}
+
+sub _wrap_value_with_quote {
+    my ($value) = @_;
+    my $ref = ref($value);
+    if($ref eq "ARRAY") {
+        return [map { _quote_gnuplot_str($_) } @$value];
+    }elsif($ref eq "CODE") {
+        return sub {
+            return map { _quote_gnuplot_str($_) } $value->(@_);
+        };
+    }else {
+        return _quote_gnuplot_str($value);
+    }
 }
 
 sub add_entry {

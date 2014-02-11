@@ -40,11 +40,11 @@ sub add {
     return $self;
 }
 
-sub _set {
-    my ($self, $quote, @pairs) = @_;
+sub _set_entry {
+    my ($self, $prefix, $quote, @pairs) = @_;
     $self->{pdata}->set_entry(
         entries => \@pairs,
-        key_prefix => "o",
+        key_prefix => $prefix,
         quote => $quote,
     );
     return $self;
@@ -52,14 +52,14 @@ sub _set {
 
 sub set {
     my ($self, @pairs) = @_;
-    return $self->_set(0, @pairs);
+    return $self->_set_entry("o", 0, @pairs);
 }
 
 *set_option = *set;
 
 sub setq {
     my ($self, @pairs) = @_;
-    return $self->_set(1, @pairs);
+    return $self->_set_entry("o", 1, @pairs);
 }
 
 *setq_option = *setq;
@@ -71,7 +71,7 @@ sub unset {
 
 sub get_option {
     my ($self, $name) = @_;
-    return $self->{pdata}->get_resolved_entry("o" . $name);
+    return $self->{pdata}->get_resolved_entry("o$name");
 }
 
 sub delete_option {
@@ -84,13 +84,15 @@ sub _create_statement {
     my ($raw_key, $value) = @_;
     return $value if !defined $raw_key;
     my ($prefix, $name) = (substr($raw_key, 0, 1), substr($raw_key, 1));
+    my @words = ();
     if($prefix eq "o") {
-        return "set $name $value";
+        @words = defined($value) ? ("set", $name, $value) : ("unset", $name);
     }elsif($prefix eq "d") {
-        return "$name = $value";
+        @words = defined($value) ? ($name, "=", $value) : "undefine $value";
     }else {
         confess "Unknown key prefix: $prefix";
     }
+    return join(" ", grep { $_ ne "" } @words);
 }
 
 sub to_string {

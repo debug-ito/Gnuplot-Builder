@@ -20,7 +20,7 @@ EXPECTED
     is $builder->to_string(), <<EXPECTED;
 set terminal png size 200,200
 unset key
-set arrow 1 0,0 to 0,1
+set arrow 1 from 0,0 to 0,1
 set arrow 2 from 100,0 to 0,100
 EXPECTED
 }

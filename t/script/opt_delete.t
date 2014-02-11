@@ -14,14 +14,14 @@ use Gnuplot::Builder::Script;
         c => "C"
     );
     $builder->delete_option("b");
-    is $buidler->to_string(), <<EXP;
+    is $builder->to_string(), <<EXP, "deleted option should not exist.";
 set a A
 set c C
 EXP
-    is_deeply [$builder->get_option("b")], [];
+    is_deeply [$builder->get_option("b")], [], "get_option() should return an empty list for deleted option";
 
     $builder->set(b => "B2");
-    is $builder->to_string(), <<EXP;
+    is $builder->to_string(), <<EXP, "if the deleted option is set again, it's at the bottom.";
 set a A
 set c C
 set b B2
