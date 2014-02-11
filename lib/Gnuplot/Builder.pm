@@ -4,6 +4,7 @@ use warnings;
 
 our $VERSION = "0.01";
 
+
 1;
 __END__
 
@@ -16,10 +17,6 @@ Gnuplot::Builder - Object-oriented gnuplot script builder
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
-
-=head1 PACKAGE VARIABLES
-
-=head2 $Gnuplot::Builder::GNUPLOT_PATH
 
 =head1 EXPORTED FUNCTIONS
 

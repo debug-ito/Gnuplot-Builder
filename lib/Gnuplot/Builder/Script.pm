@@ -5,7 +5,10 @@ use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use Scalar::Util qw(weaken);
 use Carp;
+use IO::Pipe;
 use overload '""' => "to_string";
+
+our $GNUPLOT_PATH = "gnuplot";
 
 sub new {
     my ($class, @set_args) = @_;
@@ -210,6 +213,15 @@ sub _write_inline_data {
     }
 }
 
+sub _create_gnuplot_writer {
+    my $gnuplot = IO::Pipe->new;
+    $gnuplot->writer($GNUPLOT_PATH);
+    $gnuplot->autoflush(1);
+    return sub {
+        $gnuplot->print(@_);
+    };
+}
+
 sub _draw_with {
     my ($self, %args) = @_;
     my $plot_command = $args{command};
@@ -218,8 +230,9 @@ sub _draw_with {
     if(ref($dataset) ne "ARRAY") {
         $dataset = [$dataset];
     }
+    croak "at least one dataset is required" if !@$dataset;
     my $output = $args{output};
-    my $writer = $args{writer};
+    my $writer = $args{writer} || _create_gnuplot_writer();
     $writer->($self->to_string);
     if(defined $output) {
         $writer->("set output " . quote_gnuplot_str($output) . "\n");
@@ -241,6 +254,16 @@ sub plot_with {
 sub splot_with {
     my ($self, %args) = @_;
     return $self->_draw_with(%args, command => "splot");
+}
+
+sub plot {
+    my ($self, @dataset) = @_;
+    return $self->_draw_with(command => "plot", dataset => \@dataset);
+}
+
+sub splot {
+    my ($self, @dataset) = @_;
+    return $self->_draw_with(command => "splot", dataset => \@dataset);
 }
 
 1;
@@ -638,8 +661,8 @@ All plotting methods are non-mutator, that is, they don't change the state of th
 This means you can plot different datasets with the same settings.
 
 Some plotting methods run a gnuplot process background, and let it do the plotting work.
-The variable C<$Gnuplot::Builder::GNUPLOT_PATH> is used for the path to the gnuplot executable.
-See L<Gnuplot::Builder> for detail.
+The variable C<$Gnuplot::Builder::Script::GNUPLOT_PATH> is used for the path to the gnuplot executable.
+By default, it's C<"gnuplot">.
 
 =head2 $builder = $builder->plot($dataset, ...)
 
