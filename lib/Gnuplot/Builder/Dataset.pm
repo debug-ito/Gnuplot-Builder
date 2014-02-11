@@ -293,7 +293,7 @@ Options can be explicitly disabled by the leading "-" like
 =item *
 
 If the same OPT_NAME is repeated with different OPT_VALUEs,
-only the last OPT_VALUE is effective.
+only the first OPT_VALUE is effective.
 
 =back
 
