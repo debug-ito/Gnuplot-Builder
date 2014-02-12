@@ -3,12 +3,10 @@ use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
+use Gnuplot::Builder::ProcessManager qw(spawn_gnuplot);
 use Scalar::Util qw(weaken);
 use Carp;
-use IO::Pipe;
 use overload '""' => "to_string";
-
-our @GNUPLOT_COMMAND = qw(gnuplot --persist);
 
 sub new {
     my ($class, @set_args) = @_;
@@ -214,11 +212,9 @@ sub _write_inline_data {
 }
 
 sub _create_gnuplot_writer {
-    my $gnuplot = IO::Pipe->new;
-    $gnuplot->writer(@GNUPLOT_COMMAND);
-    $gnuplot->autoflush(1);
+    my $gnuplot_handle = spawn_gnuplot();
     return sub {
-        $gnuplot->print(@_);
+        print $gnuplot_handle (@_);
     };
 }
 
@@ -661,8 +657,8 @@ All plotting methods are non-mutator, that is, they don't change the state of th
 This means you can plot different datasets with the same settings.
 
 Some plotting methods run a gnuplot process background, and let it do the plotting work.
-The variable C<@Gnuplot::Builder::Script::GNUPLOT_COMMAND> is used for the command to run the gnuplot process.
-By default, it's C<("gnuplot", "--persist")>.
+The variable C<@Gnuplot::Builder::ProcessManager::COMMAND> is used to start the gnuplot process.
+See L<Gnuplot::Builder::ProcessManager> for detail.
 
 =head2 $builder = $builder->plot($dataset, ...)
 
