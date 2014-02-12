@@ -108,7 +108,7 @@ sub _create_statement {
     if($prefix eq "o") {
         @words = defined($value) ? ("set", $name, $value) : ("unset", $name);
     }elsif($prefix eq "d") {
-        @words = defined($value) ? ($name, "=", $value) : "undefine $name";
+        @words = defined($value) ? ($name, "=", $value) : ("undefine", $name);
     }else {
         confess "Unknown key prefix: $prefix";
     }
