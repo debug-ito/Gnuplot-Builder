@@ -12,6 +12,7 @@ our @EXPORT_OK = qw(spawn_gnuplot);
 sub spawn_gnuplot {
     my ($writer, $reader) = @_;
     my $pid = open3($writer, $reader, undef, @COMMAND);
+    close $reader;
     return $writer;
 }
 
