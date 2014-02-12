@@ -8,7 +8,7 @@ use Carp;
 use IO::Pipe;
 use overload '""' => "to_string";
 
-our $GNUPLOT_PATH = "gnuplot";
+our @GNUPLOT_COMMAND = qw(gnuplot --persist);
 
 sub new {
     my ($class, @set_args) = @_;
@@ -215,7 +215,7 @@ sub _write_inline_data {
 
 sub _create_gnuplot_writer {
     my $gnuplot = IO::Pipe->new;
-    $gnuplot->writer($GNUPLOT_PATH);
+    $gnuplot->writer(@GNUPLOT_COMMAND);
     $gnuplot->autoflush(1);
     return sub {
         $gnuplot->print(@_);
@@ -661,8 +661,8 @@ All plotting methods are non-mutator, that is, they don't change the state of th
 This means you can plot different datasets with the same settings.
 
 Some plotting methods run a gnuplot process background, and let it do the plotting work.
-The variable C<$Gnuplot::Builder::Script::GNUPLOT_PATH> is used for the path to the gnuplot executable.
-By default, it's C<"gnuplot">.
+The variable C<@Gnuplot::Builder::Script::GNUPLOT_COMMAND> is used for the command to run the gnuplot process.
+By default, it's C<("gnuplot", "--persist")>.
 
 =head2 $builder = $builder->plot($dataset, ...)
 
