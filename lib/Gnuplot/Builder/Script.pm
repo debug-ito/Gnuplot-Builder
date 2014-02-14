@@ -660,12 +660,14 @@ Some plotting methods run a gnuplot process background, and let it do the plotti
 The variable C<@Gnuplot::Builder::ProcessManager::COMMAND> is used to start the gnuplot process.
 See L<Gnuplot::Builder::ProcessManager> for detail.
 
-=head2 $builder = $builder->plot($dataset, ...)
+=head2 $result = $builder->plot($dataset, ...)
 
 Build the script and plot the given C<$dataset>s with gnuplot's "plot" command.
 This method lets a gnuplot process do the actual job.
 
 You can specify more than one C<$dataset>s to plot.
+
+The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR.
 
 Usually you should use a L<Gnuplot::Builder::Dataset> object for C<$dataset>.
 In this case, you can skip the rest of this section.
@@ -724,7 +726,7 @@ the C<plot()> method doesn't generate the inline data section.
 
 =back
 
-=head2 $builder = $builder->plot_with(%args)
+=head2 $result = $builder->plot_with(%args)
 
 Plot with more functionalities than C<plot()> method.
 
@@ -750,8 +752,10 @@ If not set, it won't print "set output" commands.
 
 A code-ref to receive the whole script string.
 If set, it is called one or more times with the script string that C<$builder> builds.
+In this case, the return value C<$result> will be an empty string.
 
 If not set, C<$builder> streams the script into the gnuplot process.
+The return value C<$result> will be the data the gnuplot process writes to STDOUT and STDERR.
 
 =back
 
@@ -771,11 +775,11 @@ If not set, C<$builder> streams the script into the gnuplot process.
     ## => set output
 
 
-=head2 $builder = $builder->splot($dataset, ...)
+=head2 $result = $builder->splot($dataset, ...)
 
 Same as C<plot()> method except it uses "splot" command.
 
-=head2 $builder = $builder->splot_with(%args)
+=head2 $result = $builder->splot_with(%args)
 
 Same as C<plot_with()> method except it uses "splot" command.
 

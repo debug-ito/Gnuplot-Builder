@@ -1,7 +1,7 @@
 package testlib::ScriptUtil;
 use strict;
 use warnings;
-use Test::Identity;
+use Test::More;
 use Test::Builder;
 use Exporter qw(import);
 
@@ -15,7 +15,7 @@ sub plot_str {
         my $part = shift;
         $result .= $part;
     };
-    identical $builder->$method(%args), $builder, "$method should return the object.";
+    is $builder->$method(%args), "", "$method should return an empty string if writer is set.";
     return $result;
 }
 
