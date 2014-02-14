@@ -5,6 +5,7 @@ use Exporter qw(import);
 use IPC::Open3 qw(open3);
 
 our @COMMAND = qw(gnuplot --persist);
+our $MAX_PROCESSES = 10;
 
 our @EXPORT_OK = qw(spawn_gnuplot);
 
@@ -46,6 +47,13 @@ You can configure its package variables to change its behavior.
 The command and arguments to run a gnuplot process.
 
 By default, it's C<("gnuplot", "--persist")>.
+
+=head2 $MAX_PROCESSES
+
+Maximum number of gnuplot processes that can run in parallel.
+If C<$MAX_PROCESSES> <= 0, the number of processes is unlimited.
+
+By default, it's C<10>.
 
 =head1 AUTHOR
 
