@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
+use Time::HiRes qw(time);
 
 sub if_no_file {
     my ($filename, $code) = @_;
@@ -41,7 +42,7 @@ ylabel = "y label"
 zlabel = "z label"
 SET
     $builder->setq(output => $filename);
-    is $builder->splot("sin(x*x + y*y) / (x*x + y*y)"), $builder, "gnuplot process should output nothing";
+    is $builder->splot("sin(x*x + y*y) / (x*x + y*y)"), "", "gnuplot process should output nothing";
     ok((-f $filename), "$filename output OK");
 };
 
@@ -56,5 +57,14 @@ if_no_file "test_error.png", sub {
     isnt $result, "", "gnuplot process should output some error messages";
     note("gnuplot error message: $result");
 };
+
+{
+    note("--- window mode");
+    my $builder = Gnuplot::Builder::Script->new;
+    my $before_time = time;
+    is $builder->plot("cos(x)"), "", "gnuplot process should output nothing";
+    my $wait_time = time - $before_time;
+    cmp_ok $wait_time, "<", 0.1, "plot() should return no time";
+}
 
 done_testing;

@@ -7,14 +7,23 @@ use IPC::Open3 qw(open3);
 our @COMMAND = qw(gnuplot --persist);
 our $MAX_PROCESSES = 10;
 
-our @EXPORT_OK = qw(spawn_gnuplot);
+our @EXPORT_OK = qw(spawn_gnuplot wait_for_gnuplot);
 
-## return a writable filehandle into the new gnuplot process
+## return the PID, write handle and read handle of the new gnuplot process.
 sub spawn_gnuplot {
     my ($writer, $reader) = @_;
     my $pid = open3($writer, $reader, undef, @COMMAND);
-    close $reader;
-    return $writer;
+    return {
+        pid => $pid,
+        write_handle => $writer,
+        read_handle => $reader,
+    };
+}
+
+## wait a gnuplot process to finish. It blocks.
+sub wait_for_gnuplot {
+    my ($gnuplot_process) = @_;
+    waitpid $gnuplot_process->{pid}, 0;
 }
 
 1;

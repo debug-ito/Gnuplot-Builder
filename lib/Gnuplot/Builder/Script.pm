@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
-use Gnuplot::Builder::ProcessManager qw(spawn_gnuplot);
+use Gnuplot::Builder::ProcessManager qw(spawn_gnuplot wait_for_gnuplot);
 use Scalar::Util qw(weaken);
 use Carp;
 use overload '""' => "to_string";
@@ -211,13 +211,6 @@ sub _write_inline_data {
     }
 }
 
-sub _create_gnuplot_writer {
-    my $gnuplot_handle = spawn_gnuplot();
-    return sub {
-        print $gnuplot_handle (@_);
-    };
-}
-
 sub _draw_with {
     my ($self, %args) = @_;
     my $plot_command = $args{command};
@@ -228,7 +221,14 @@ sub _draw_with {
     }
     croak "at least one dataset is required" if !@$dataset;
     my $output = $args{output};
-    my $writer = $args{writer} || _create_gnuplot_writer();
+    my $writer = $args{writer};
+    my $gnuplot_process;
+    if(!defined($writer)) {
+        $gnuplot_process = spawn_gnuplot();
+        my $write_handle = $gnuplot_process->{write_handle};
+        $writer = sub { print $write_handle (@_) };
+    }
+    
     $writer->($self->to_string);
     if(defined $output) {
         $writer->("set output " . quote_gnuplot_str($output) . "\n");
@@ -239,7 +239,19 @@ sub _draw_with {
     if(defined $output) {
         $writer->("set output\n");
     }
-    return $self;
+    $writer->("exit gnuplot\n");
+
+    my $result = "";
+    if(defined $gnuplot_process) {
+        close $gnuplot_process->{write_handle};
+        my $read_handle = $gnuplot_process->{read_handle};
+        while(defined(my $gnuplot_output = <$read_handle>)) {
+            $result .= $gnuplot_output;
+        }
+        close $read_handle;
+        wait_for_gnuplot($gnuplot_process);
+    }
+    return $result;
 }
 
 sub plot_with {
