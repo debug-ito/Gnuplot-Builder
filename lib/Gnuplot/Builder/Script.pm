@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
-use Gnuplot::Builder::ProcessManager qw(spawn_gnuplot wait_for_gnuplot);
+use Gnuplot::Builder::Process;
 use Scalar::Util qw(weaken);
 use Carp;
 use overload '""' => "to_string";
@@ -224,9 +224,8 @@ sub _draw_with {
     my $writer = $args{writer};
     my $gnuplot_process;
     if(!defined($writer)) {
-        $gnuplot_process = spawn_gnuplot();
-        my $write_handle = $gnuplot_process->{write_handle};
-        $writer = sub { print $write_handle (@_) };
+        $gnuplot_process = Gnuplot::Builder::Process->new;
+        $writer = $gnuplot_process->writer;
     }
     
     $writer->($self->to_string);
@@ -239,17 +238,11 @@ sub _draw_with {
     if(defined $output) {
         $writer->("set output\n");
     }
-    $writer->("exit gnuplot\n");
 
     my $result = "";
     if(defined $gnuplot_process) {
-        close $gnuplot_process->{write_handle};
-        my $read_handle = $gnuplot_process->{read_handle};
-        while(defined(my $gnuplot_output = <$read_handle>)) {
-            $result .= $gnuplot_output;
-        }
-        close $read_handle;
-        wait_for_gnuplot($gnuplot_process);
+        $gnuplot_process->wait_to_finish();
+        $result = $gnuplot_process->result;
     }
     return $result;
 }
@@ -669,8 +662,8 @@ All plotting methods are non-mutator, that is, they don't change the state of th
 This means you can plot different datasets with the same settings.
 
 Some plotting methods run a gnuplot process background, and let it do the plotting work.
-The variable C<@Gnuplot::Builder::ProcessManager::COMMAND> is used to start the gnuplot process.
-See L<Gnuplot::Builder::ProcessManager> for detail.
+The variable C<@Gnuplot::Builder::Process::COMMAND> is used to start the gnuplot process.
+See L<Gnuplot::Builder::Process> for detail.
 
 =head2 $result = $builder->plot($dataset, ...)
 

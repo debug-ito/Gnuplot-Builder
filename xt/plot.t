@@ -64,7 +64,7 @@ if_no_file "test_error.png", sub {
     my $before_time = time;
     is $builder->plot("cos(x)"), "", "gnuplot process should output nothing";
     my $wait_time = time - $before_time;
-    cmp_ok $wait_time, "<", 0.1, "plot() should return no time";
+    cmp_ok $wait_time, "<", 1, "plot() should return no time";
 }
 
 done_testing;
