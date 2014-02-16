@@ -10,6 +10,7 @@ sub if_no_file {
         if(-f $filename) {
             skip "File $filename exists. Remove it first.", 1;
         }
+        note("--- output $filename");
         $code->($filename);
     }
 }
@@ -65,6 +66,14 @@ if_no_file "test_error.png", sub {
     is $builder->plot("cos(x)"), "", "gnuplot process should output nothing";
     my $wait_time = time - $before_time;
     cmp_ok $wait_time, "<", 1, "plot() should return no time";
+}
+
+{
+    note("--- window mode with error");
+    my $builder = Gnuplot::Builder::Script->new;
+    my $result = $builder->plot('sin(x) ps 4 with lp title "FOOBAR"');
+    isnt $result, "", "gnuplot process should output some error messages";
+    note("gnuplot error message: $result");
 }
 
 done_testing;
