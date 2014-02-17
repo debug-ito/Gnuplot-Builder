@@ -60,8 +60,9 @@ sub wait_to_finish {
         ## it won't close the output fd. So $read_handle won't be
         ## closed until we close the wxt window. This is not good
         ## especially we are in REPL mode.
-        if($result =~ /^(.*)\Q$END_SCRIPT_MARK\E/s) {
-            $result = $1;
+        my $end_position = index($result, $END_SCRIPT_MARK);
+        if($end_position != -1) {
+            $result = substr($result, 0, $end_position);
             last;
         }
     }
