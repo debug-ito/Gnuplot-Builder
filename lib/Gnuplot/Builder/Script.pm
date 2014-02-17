@@ -762,6 +762,19 @@ In this case, the return value C<$result> will be an empty string.
 If not set, C<$builder> streams the script into the gnuplot process.
 The return value C<$result> will be the data the gnuplot process writes to STDOUT and STDERR.
 
+=item C<async> => BOOL (optional, default: false)
+
+If set to true, it won't wait for the gnuplot process to finish.
+In this case, the return value C<$result> will be an empty string.
+
+Using C<async> option, you can run more than one gnuplot processes to do the job.
+However, the maximum number of gnuplot processes are limited to
+the variable C<$Gnuplot::Builder::Process::MAX_PROCESSES>.
+See L<Gnuplot::Builder::Process> for detail.
+
+If set to false, which is the default, it waits for the gnuplot process to finish
+and return its output.
+
 =back
 
     my $script = "";
