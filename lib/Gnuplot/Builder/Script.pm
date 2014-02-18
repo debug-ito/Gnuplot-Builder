@@ -222,6 +222,7 @@ sub _draw_with {
     croak "at least one dataset is required" if !@$dataset;
     my $output = $args{output};
     my $writer = $args{writer};
+    my $async = $args{async};
     my $gnuplot_process;
     if(!defined($writer)) {
         $gnuplot_process = Gnuplot::Builder::Process->new;
@@ -241,8 +242,11 @@ sub _draw_with {
 
     my $result = "";
     if(defined $gnuplot_process) {
-        $gnuplot_process->wait_to_finish();
-        $result = $gnuplot_process->result;
+        $gnuplot_process->close_input();
+        if(!$async) {
+            $gnuplot_process->wait_to_finish();
+            $result = $gnuplot_process->result;
+        }
     }
     return $result;
 }

@@ -25,6 +25,6 @@ $builder->add("pause 3");
 cmp_ok plot_time($builder), "<", "1", "1st plot: no time";
 cmp_ok plot_time($builder), "<", "1", "2st plot: no time";
 cmp_ok plot_time($builder), "<", "1", "3st plot: no time";
-cmp_ok plot_time($builder), ">", "2", "4th plot: wait until any of the previous ones";
+cmp_ok plot_time($builder), ">", "2", "4th plot: wait until one of the previous ones";
 
 done_testing;
