@@ -16,6 +16,9 @@ sub expect_pkl {
         push(@$got, [$key, $value]);
     });
     is_deeply($got, $exp, $msg);
+    foreach my $index (0 .. ($pkl->size - 1)) {
+        is_deeply([$pkl->get_at($index)], $exp->[$index], "... get_at($index) OK");
+    }
 }
 
 1;

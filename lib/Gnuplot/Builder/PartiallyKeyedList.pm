@@ -33,6 +33,12 @@ sub get {
     return defined($index) ? $self->{values}[$index] : undef;
 }
 
+sub get_at {
+    my ($self, $index) = @_;
+    croak "index out of bounds" if $index < 0 || $index >= $self->size;
+    return ($self->{keys}[$index], $self->{values}[$index]);
+}
+
 sub exists {
     my ($self, $key) = @_;
     croak "key must be defined" if not defined $key;
@@ -183,6 +189,15 @@ Get the value for the C<$key>.
 
 If C<$key> doesn't exist in C<$pkl>, it returns C<undef>.
 
+=head2 ($key, $value) = $pkl->get_at($index)
+
+Get an entry at C<$index>. C<$index> starts with 0.
+
+This method can return both keyed and non-keyed entries.
+For non-keyed entries, the return value C<$key> is C<undef>.
+
+Complexity of C<< get_at(0) >> is guaranteed to be O(1).
+
 =head2 $does_exist = $pkl->exists($key)
 
 Return true if C<$key> exists in C<$pkl>. False otherwise.
@@ -215,6 +230,8 @@ C<$code> is passed two arguments, C<$key> and C<$value>.
 For non-keyed entry, C<$key> is C<undef>.
 For keyed entry, C<$key> is the key of the entry.
 C<$value> is the value of the entry in both cases.
+
+Currently, you must not alter C<$pkl> while iterating.
 
 =head2 $pkl->merge($another_pkl)
 
