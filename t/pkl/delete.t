@@ -41,6 +41,7 @@ sub create_pkl {
         is $p->delete($case->{del}), $del_exp, "return from delete OK";
         elems_ok $p, @{$case->{check}};
         is $p->get($case->{del}), undef, "return undef for deleted key";
+        is $p->size, scalar(@{$case->{check}} + 3), "size OK";
     }
 }
 
@@ -50,11 +51,13 @@ sub create_pkl {
     $p->delete("a");
     $p->delete("c");
     elems_ok $p, qw(b d);
+    is $p->size, 5;
     $p->set("e", "E");
     $p->add(4);
     $p->add(5);
     $p->set("c", "C");
     $p->set("b", "B2");
+    is $p->size, 9;
     elems_ok $p, qw(c d e);
     is $p->get("b"), "B2";
     is $p->get("a"), undef;

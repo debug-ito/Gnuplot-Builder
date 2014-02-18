@@ -19,9 +19,11 @@ note("tests for merge()");
     $another->set(c => 5);
     $another->add(6);
 
+    is $pkl->size, 3;
     expect_pkl $pkl, [[undef, 1], [a => 2], [b => 3]],
         "before merge OK";
     $pkl->merge($another);
+    is $pkl->size, 6;
     expect_pkl $pkl, [[undef, 1], [a => 20], [b => 3],
                       [undef, 4], [c => 5], [undef, 6]],
                           "after merge OK";

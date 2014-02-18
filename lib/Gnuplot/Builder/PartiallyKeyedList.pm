@@ -80,6 +80,8 @@ sub merge {
     });
 }
 
+sub size { scalar(@{ $_[0]->{keys} }) }
+
 1;
 
 __END__
@@ -195,6 +197,10 @@ If C<$key> doesn't exist, it returns C<undef>.
 =head2 $pkl->add($entry)
 
 Add a non-keyed entry to the C<$pkl>.
+
+=head2 $size = $pkl->size()
+
+Get the size of the list. This includes both keyed and non-keyed entries.
 
 =head2 $pkl->each($code)
 
