@@ -827,7 +827,7 @@ Sentences added by C<< $child->add() >> method are appended to the C<$parent>'s 
 Option settings and definitions in C<$child> are appended to the C<$parent>'s script,
 if they are not set in C<$parent>.
 
-=item :
+=item *
 
 Option settings and definitions in C<$child> are substituted in the C<$parent>'s script,
 if they are already set in C<$parent>.
