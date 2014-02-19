@@ -261,7 +261,7 @@ There is more than one way to do it.
 If C<set_option()> method is called with a single string argument C<$options>,
 it is parsed to set options.
 
-    $datasaet->set_option(<<END_OPTIONS);
+    $dataset->set_option(<<END_OPTIONS);
     using = 1:3
     -axes
     title = "Weight [kg]"
