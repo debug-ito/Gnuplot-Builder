@@ -18,10 +18,12 @@ sub _clear_zombies {
     $_->_waitpid(0) foreach @proc_objs;
 }
 
+sub FOR_TEST_process_num { $processes->size }
+
 sub new {
     my ($class) = @_;
     _clear_zombies();
-    while($processes->size() >= $MAX_PROCESSES) {
+    while($MAX_PROCESSES > 0 && $processes->size() >= $MAX_PROCESSES) {
         ## wait for the first process to finish. it's not the smartest
         ## way, but is it possible to wait for specific set of
         ## processes?
