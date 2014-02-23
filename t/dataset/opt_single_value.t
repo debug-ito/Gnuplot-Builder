@@ -19,7 +19,7 @@ foreach my $case (
      exp_str => "f(x)", exp_get => undef},
     {method => 'setq_option', label => "string", val => "bar",
      exp_str => "f(x) foo 'bar'", exp_get => q{'bar'}},
-    {method => 'set_option', label => "empty string", val => "",
+    {method => 'setq_option', label => "empty string", val => "",
      exp_str => "f(x) foo ''", exp_get => q{''}},
     {method => 'setq_option', label => "code", val => sub { "BAR" },
      exp_str => "f(x) foo 'BAR'", exp_get => q{'BAR'}},
@@ -53,7 +53,7 @@ foreach my $case (
             return ("buzz", "hoge");
         });
         is $called, 0, "$method: not called yet";
-        is $dataset->to_string, "f(x) $case->{exp}", "$method: result OK";
+        is $dataset->to_string, "f(x) fizz $case->{exp}", "$method: result OK";
         is $called, 1, "$method: called once";
         $called = 0;
 

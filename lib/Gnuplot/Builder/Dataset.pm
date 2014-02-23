@@ -105,7 +105,7 @@ sub setq_option {
 
 sub get_option {
     my ($self, $name) = @_;
-    my ($result) = $self->{pdata}->get_resolved_entry();
+    my ($result) = $self->{pdata}->get_resolved_entry($name);
     return $result;
 }
 
