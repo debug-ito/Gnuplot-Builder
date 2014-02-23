@@ -4,7 +4,7 @@ use warnings;
 use Gnuplot::Builder::PartiallyKeyedList;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use List::Util 1.28 qw(pairs);
-use Gnuplot::Builder::Version; our $VERSION = VERSION;
+use Gnuplot::Builder::Version; our $VERSION = $Gnuplot::Builder::Version::VERSION;
 
 sub new {
     my ($class, %args) = @_;

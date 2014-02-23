@@ -1,5 +1,10 @@
 Revision history for Gnuplot-Builder
 
+0.02    2014/02/24
+        - No change to the code.
+        - Now version numbers refer directly to $Gnuplot::Builder::Version::VERSION.
+          Using an Exported function seemed to mess up something in CPAN...
+
 0.01    2014/02/23
         First version, released on an unsuspecting world.
 
