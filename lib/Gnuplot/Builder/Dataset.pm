@@ -178,7 +178,7 @@ __END__
 
 =head1 NAME
 
-Gnuplot::Builder::Dataset - Object-oriented builder for gnuplot dataset
+Gnuplot::Builder::Dataset - object-oriented builder for gnuplot dataset
 
 =head1 SYNOPSIS
 

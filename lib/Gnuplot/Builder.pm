@@ -12,22 +12,37 @@ __END__
 
 =head1 NAME
 
-Gnuplot::Builder - Object-oriented gnuplot script builder
-
-=head1 SYNOPSIS
+Gnuplot::Builder - object-oriented gnuplot script builder
 
 =head1 DESCRIPTION
 
-=head1 EXPORTED FUNCTIONS
+B<< This is an alpha release. API may change in the future. >>
 
-=head2 $builder = script(@args)
+L<Gnuplot::Builder> is a gnuplot script builder with the following charactestics.
 
-=head2 $dataset = dataset(@args)
+=over
 
-=head2 $message = help()
+=item *
 
+B<Object-oriented>. Script settings are encapsulated in a L<Gnuplot::Builder::Script> object,
+and dataset parameters are in a L<Gnuplot::Builder::Dataset> object.
 
-=head1 SEE ALSO
+=item *
+
+B<Thin>. L<Gnuplot::Builder> just builds script texts and streams to a gnuplot process.
+Its behavior is extremely predictable and easy to debug.
+
+=item *
+
+B<Hierarchical>. L<Gnuplot::Builder::Script> and L<Gnuplot::Builder::Dataset> objects support
+prototype-based inheritance, just like JavaScript objects.
+This is useful for hierarchical configuration.
+
+=back
+
+Currently, L<Gnuplot::Builder> does not have any useful code.
+Use L<Gnuplot::Builder::Script> and L<Gnuplot::Builder::Dataset>.
+
 
 =head1 REPOSITORY
 

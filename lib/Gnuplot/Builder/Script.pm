@@ -281,7 +281,7 @@ __END__
 
 =head1 NAME
 
-Gnuplot::Builder::Script - Object-oriented builder for gnuplot script
+Gnuplot::Builder::Script - object-oriented builder for gnuplot script
 
 =head1 SYNOPSIS
 
