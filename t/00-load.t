@@ -5,7 +5,7 @@ use Test::More;
  
 BEGIN {
     foreach my $module (
-        "", "::Script", "::Dataset", "::PartiallyKeyedList",
+        "::Version", "", "::Script", "::Dataset", "::PartiallyKeyedList",
         "::PrototypedData", "::Process", "::Util"
     ) {
         use_ok('Gnuplot::Builder' . $module);

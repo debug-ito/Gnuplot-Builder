@@ -5,6 +5,7 @@ use Gnuplot::Builder::PrototypedData;
 use Scalar::Util qw(weaken);
 use Carp;
 use overload '""' => 'to_string';
+use Gnuplot::Builder::Version; our $VERSION = VERSION;
 
 sub new {
     my ($class, $source, @set_option_args) = @_;

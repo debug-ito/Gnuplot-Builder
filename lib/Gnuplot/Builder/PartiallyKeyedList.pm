@@ -2,6 +2,7 @@ package Gnuplot::Builder::PartiallyKeyedList;
 use strict;
 use warnings;
 use Carp;
+use Gnuplot::Builder::Version; our $VERSION = VERSION;
 
 sub new {
     my ($class) = @_;
