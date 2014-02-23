@@ -1,6 +1,140 @@
 package Gnuplot::Builder::Dataset;
 use strict;
 use warnings;
+use Gnuplot::Builder::PrototypedData;
+use Gnuplot::Builder::Util qw(quote_gnuplot_str);
+use Scalar::Util qw(weaken);
+use Carp;
+
+sub new {
+    my ($class, $source, @set_option_args) = @_;
+    my $self = bless {
+        pdata => undef,
+        parent => undef,
+    }, $class;
+    $self->_init_pdata();
+    if(defined $source) {
+        $self->set_source($source);
+    }
+    if(@set_option_args) {
+        $self->set_option(@set_option_args);
+    }
+    return $self;
+}
+
+sub new_file {
+    my ($class, $filename, @set_option_args) = @_;
+    return $class->new->set_file($filename)->set_option(@set_option_args);
+}
+
+sub _init_pdata {
+    my ($self) = @_;
+    weaken $self;
+    $self->{pdata} = Gnuplot::Builder::PrototypedData->new(
+        entry_evaluator => sub {
+            my ($key, $coderef) = @_;
+            return $coderef->($self, $key);
+        },
+        attribute_evaluator => { source => sub {
+            my ($key, $coderef) = @_;
+            return $coderef->($self);
+        } },
+    );
+}
+
+sub to_string {
+    my ($self) = @_;
+    my @words = ();
+    push @words, $self->get_source;
+    $self->{pdata}->each_resolved_entry(sub {
+        my ($name, $values_arrayref) = @_;
+        my $value = $values_arrayref->[0];
+        return if not defined $value;
+        push @words, $name, $value;
+    });
+    return join " ", grep { defined($_) && $_ ne "" } @words;
+}
+
+*params_string = *to_string;
+
+sub set_source {
+    my ($self, $source) = @_;
+    $self->{pdata}->set_attribute(source => $source);
+    return $self;
+}
+
+sub setq_source {
+    my ($self, $source) = @_;
+    return $self->set_source(quote_gnuplot_str($source));
+}
+
+*set_file = *setq_source;
+
+sub get_source {
+    my ($self) = @_;
+    return $self->{pdata}->get_resolved_attribute("source");
+}
+
+sub delete_source {
+    my ($self) = @_;
+    $self->{pdata}->delete_attribute("source");
+    return $self;
+}
+
+sub set_option {
+    my ($self, @options) = @_;
+    $self->{pdata}->set_entry(
+        entries => \@options,
+        quote => 0,
+    );
+    return $self;
+}
+
+sub setq_option {
+    my ($self, @options) = @_;
+    $self->{pdata}->set_entry(
+        entries => \@options,
+        quote => 1,
+    );
+    return $self;
+}
+
+sub get_option {
+    my ($self, $name) = @_;
+    my ($result) = $self->{pdata}->get_resolved_entry();
+    return $result;
+}
+
+sub delete_option {
+    my ($self, @names) = @_;
+    foreach my $name (@names) {
+        $self->{pdata}->delete_entry($name);
+    }
+    return $self;
+}
+
+sub set_parent {
+    my ($self, $parent) = @_;
+    if(!defined($parent)) {
+        $self->{parent} = undef;
+        $self->{pdata}->set_parent(undef);
+        return $self;
+    }
+    if(!ref($parent) || !$parent->isa("Gnuplot::Builder::Dataset")) {
+        croak "parent must be a Gnuplot::Builder::Dataset";
+    }
+    $self->{parent} = $parent;
+    $self->{pdata}->set_parent($parent->{pdata});
+    return $self;
+}
+
+sub parent { return $_[0]->{parent} }
+
+sub new_child {
+    my ($self) = @_;
+    return Gnuplot::Builder::Dataset->new->set_parent($self);
+}
+
 
 1;
 

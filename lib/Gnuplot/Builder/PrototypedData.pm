@@ -12,6 +12,7 @@ sub new {
         attributes => {},
         parent => undef,
         entry_evaluator => $args{entry_evaluator},
+        attribute_evaluator => $args{attribute_evaluator} || {},
     }, $class;
     return $self;
 }
@@ -160,6 +161,32 @@ sub each_resolved_entry {
     });
 }
 
+sub set_attribute {
+    my ($self, $name, $value) = @_;
+    $self->{attributes}{$name} = $value;
+}
+
+sub get_resolved_attribute {
+    my ($self, $name) = @_;
+    my $pdata_with_attr = $self;
+    while(defined($pdata_with_attr) && !$pdata_with_attr->has_own_attribute($name)) {
+        $pdata_with_attr = $pdata_with_attr->parent;
+    }
+    return undef if not defined $pdata_with_attr;
+    my $raw_value = $pdata_with_attr->{attributes}{$name};
+    if(ref($raw_value) eq "CODE" && defined($self->{attribute_evaluator}{$name})) {
+        my ($result) = $self->{attribute_evaluator}{$name}->($name, $raw_value);
+        return $result;
+    }else {
+        return $raw_value;
+    }
+}
+
+sub has_own_attribute { exists $_[0]->{attributes}{$_[1]} }
+
+sub delete_attribute { delete $_[0]->{attributes}{$_[1]} }
+
+
 1;
 
 __END__
@@ -228,7 +255,7 @@ For non-keyed entries, C<$key> is C<undef>.
 The key-evaluator pairs for attributes.
 
     { $attribute_name => $evaluator }
-    @result = $evaluator->($attribute_name, $value_code_ref)
+    ($result) = $evaluator->($attribute_name, $value_code_ref)
 
 =back
 
@@ -271,6 +298,17 @@ Iterate over resolved PKL entries.
 =head2 $pdata->delete_entry($key)
 
 =head2 $exists = $pdata->has_own_entry($key)
+
+=head2 $pdata->set_attribute($name, $value)
+
+=head2 $value = $pdata->get_resolved_attribute($name)
+
+Get the attribute value for the C<$name>. It resolves inheritance and evaluates code-ref values
+if the corresponding evaluator exists. It returns C<undef> if it cannot find the name anywhere.
+
+=head2 $exists = $pdata->has_own_attribute($name)
+
+=head2 $pdata->delete_attribute($name)
 
 =head2 $pdata->set_parent($parent)
 

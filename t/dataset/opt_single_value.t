@@ -13,6 +13,8 @@ foreach my $case (
      exp_str => 'f(x) foo', exp_get => ''},
     {method => 'set_option', label => "code", val => sub { "BAR" },
      exp_str => "f(x) foo BAR", exp_get => "BAR"},
+    {method => 'set_option', label => "code returning undef", val => sub { (undef, "BAR") },
+     exp_str => 'f(x)', exp_get => undef},
     {method => 'setq_option', label => "undef", val => undef,
      exp_str => "f(x)", exp_get => undef},
     {method => 'setq_option', label => "string", val => "bar",
@@ -21,6 +23,8 @@ foreach my $case (
      exp_str => "f(x) foo ''", exp_get => q{''}},
     {method => 'setq_option', label => "code", val => sub { "BAR" },
      exp_str => "f(x) foo 'BAR'", exp_get => q{'BAR'}},
+    {method => 'setq_option', label => "code returning undef", val => sub { (undef, "BAR") },
+     exp_str => 'f(x)', exp_get => undef},
 
 ) {
     my $label = "$case->{method} $case->{label}";
