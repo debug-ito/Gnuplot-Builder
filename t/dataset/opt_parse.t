@@ -30,9 +30,9 @@ OPT
     {
         my $dataset = Gnuplot::Builder::Dataset->new('sin(x)');
         identical $dataset->setq_option($options_script), $dataset, "setq_option() returns the dataset";
-        is $dataset->to_string(), q{cos(x) title '"Weight [kg]"' with 'lines' lw '2' matrix ''}, "setq_option() OK";
+        is $dataset->to_string(), q{sin(x) title '"Weight [kg]"' with 'lines' lw '2' matrix ''}, "setq_option() OK";
         $dataset->setq_option(axes => 'x1y2');
-        is $dataset->to_string(), q{cos(x) axes 'x1y2' title '"Weight [kg]"' with 'lines' lw '2' matrix ''}, "axes remains the original position";
+        is $dataset->to_string(), q{sin(x) axes 'x1y2' title '"Weight [kg]"' with 'lines' lw '2' matrix ''}, "axes remains the original position";
     }
 
 }
@@ -47,7 +47,7 @@ OPT
     my $dataset = Gnuplot::Builder::Dataset->new('f(x)');
     $dataset->set_option($options);
     is $dataset->to_string(), q{f(x) using 1:4}, "the first occurrence is used in to_string()";
-    is $dataset->get_option("using"), "1:3", "the first occurrence is used in get_option()";
+    is $dataset->get_option("using"), "1:4", "the first occurrence is used in get_option()";
 }
 
 done_testing;
