@@ -6,7 +6,6 @@ use Carp;
 use Gnuplot::Builder::PartiallyKeyedList;
 use POSIX qw(:sys_wait_h);
 use Guard ();
-use Gnuplot::Builder::Version; our $VERSION = $Gnuplot::Builder::Version::VERSION;
 
 our @COMMAND = qw(gnuplot --persist);
 our $MAX_PROCESSES = 10;

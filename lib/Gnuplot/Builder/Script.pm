@@ -4,7 +4,6 @@ use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use Gnuplot::Builder::Process;
-use Gnuplot::Builder::Version; our $VERSION = $Gnuplot::Builder::Version::VERSION;
 use Scalar::Util qw(weaken);
 use Carp;
 use overload '""' => "to_string";

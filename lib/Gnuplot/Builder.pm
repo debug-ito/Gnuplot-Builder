@@ -1,7 +1,7 @@
 package Gnuplot::Builder;
 use strict;
 use warnings;
-use Gnuplot::Builder::Version; our $VERSION = $Gnuplot::Builder::Version::VERSION;
+our $VERSION = "0.03";
 
 
 1;
