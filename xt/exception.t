@@ -1,8 +1,70 @@
 use strict;
 use warnings;
 use Test::More;
+use Gnuplot::Builder::Process;
+use Gnuplot::Builder::Script;
+use Gnuplot::Builder::Dataset;
+use Time::HiRes qw(sleep);
 
-fail('Exception during plotting. Throwers are lazy-eval values for script and dataset and inline data provider. It should terminate the gnuplot process.');
+note("--- exception during plotting.");
+
+foreach my $case (
+    {label => "from added sentence", plotset => sub {
+        my $script = Gnuplot::Builder::Script->new;
+        $script->add(sub { die "BOOM!" });
+        return ($script, "sin(x)");
+    }},
+    {label => "from script option", plotset => sub {
+        return (Gnuplot::Builder::Script->new(xrange => sub { die "BOOM!" }), "sin(x)");
+    }},
+    {label => "from script definition", plotset => sub {
+        my $script = Gnuplot::Builder::Script->new;
+        $script->define(a => sub { die "BOOM!" });
+        return ($script, "sin(x)");
+    }},
+    {label => "from dataset source", plotset => sub {
+        my $dataset = Gnuplot::Builder::Dataset->new(sub { die "BOOM!" });
+        return (Gnuplot::Builder::Script->new, $dataset);
+    }},
+    {label => "from dataset option", plotset => sub {
+        my $dataset = Gnuplot::Builder::Dataset->new("sin(x)", using => sub { die "BOOM!" });
+        return (Gnuplot::Builder::Script->new, $dataset);
+    }},
+    {label => "from dataset inline data", plotset => sub {
+        my $dataset = Gnuplot::Builder::Dataset->new_data(sub { die "BOOM!" });
+        return (Gnuplot::Builder::Script->new, $dataset);
+    }},
+) {
+    my ($script, @datasets) = $case->{plotset}->();
+    local $@;
+    eval {
+        $script->plot(@datasets);
+        fail("$case->{label}: it should die");
+    };
+    if($@) {
+        pass("$case->{label}: died");
+    }
+    sleep 0.5;
+    Gnuplot::Builder::Script->new(term => "postscript")->plot("sin(x)"); ## to clear the died process.
+    is(Gnuplot::Builder::Process->FOR_TEST_process_num(), 0, "$case->{label}: no running process.");
+}
+
+{
+    note("--- when writer for plot_with() dies.");
+    local $@;
+    my $script = Gnuplot::Builder::Script->new;
+    eval {
+        $script->plot_with(
+            dataset => "sin(x)",
+            writer => sub {
+                die "BOOM!";
+            }
+        );
+        fail("plot_with() should die");
+    };
+    if($@) {
+        pass("plot_with() dies OK");
+    }
+}
 
 done_testing;
-

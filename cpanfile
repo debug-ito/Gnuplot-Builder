@@ -4,6 +4,7 @@ requires 'Scalar::Util' => "0";
 requires "overload" => "0";
 requires "IPC::Open3" => "0";
 requires "POSIX" => "0";
+requires "Guard" => "0";
 
 on 'test' => sub {
     requires 'Test::More' => "0";

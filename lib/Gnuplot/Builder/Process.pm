@@ -5,6 +5,7 @@ use IPC::Open3 qw(open3);
 use Carp;
 use Gnuplot::Builder::PartiallyKeyedList;
 use POSIX qw(:sys_wait_h);
+use Guard ();
 
 our @COMMAND = qw(gnuplot --persist);
 our $MAX_PROCESSES = 10;
@@ -101,6 +102,12 @@ sub wait_to_finish {
 
 sub result { $_[0]->{result} }
 
+sub terminator_guard {
+    my ($self) = @_;
+    return Guard::guard {
+        kill 'TERM', $self->{pid};
+    };
+}
 
 
 1;

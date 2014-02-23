@@ -223,10 +223,11 @@ sub _draw_with {
     my $output = $args{output};
     my $writer = $args{writer};
     my $async = $args{async};
-    my $gnuplot_process;
+    my ($gnuplot_process, $terminator_guard);
     if(!defined($writer)) {
         $gnuplot_process = Gnuplot::Builder::Process->new;
         $writer = $gnuplot_process->writer;
+        $terminator_guard = $gnuplot_process->terminator_guard; ## stop the process if aborted.
     }
     
     $writer->($self->to_string);
@@ -248,6 +249,7 @@ sub _draw_with {
             $result = $gnuplot_process->result;
         }
     }
+    $terminator_guard->cancel if defined $terminator_guard;
     return $result;
 }
 
