@@ -33,7 +33,7 @@ use Gnuplot::Builder::Dataset;
         ps => "variable",
         u  => "1:2:3"
     );
-    is $bad_dataset->to_string(), q{"hoge" lw 4 w lp ps variable u 1:2:3};
+    is $bad_dataset->to_string(), q{'hoge' lw 4 w lp ps variable u 1:2:3};
 
     my $good_dataset = Gnuplot::Builder::Dataset->new_file('hoge');
     $good_dataset->set_option(
@@ -42,7 +42,7 @@ use Gnuplot::Builder::Dataset;
         lw => 4,
         ps => "variable"
     );
-    is $good_dataset->to_string(), q{"hoge" u 1:2:3 w lp lw 4 ps variable};
+    is $good_dataset->to_string(), q{'hoge' u 1:2:3 w lp lw 4 ps variable};
 }
 
 {

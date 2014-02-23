@@ -364,7 +364,7 @@ but this module does not guarantee it's syntactically correct.
         u  => "1:2:3"
     );
     $bad_dataset->to_string();
-    ## => "hoge" lw 4 w lp ps variable u 1:2:3
+    ## => 'hoge' lw 4 w lp ps variable u 1:2:3
     
     ## The above parameters are invalid!!!
     
@@ -375,7 +375,7 @@ but this module does not guarantee it's syntactically correct.
         ps => "variable"
     );
     $good_dataset->to_string();
-    ## => "hoge" u 1:2:3 w lp lw 4 ps variable
+    ## => 'hoge' u 1:2:3 w lp lw 4 ps variable
 
 
 Some dataset options such as "matrix" and "volatile" don't have arguments.
