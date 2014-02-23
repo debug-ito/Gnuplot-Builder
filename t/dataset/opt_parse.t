@@ -46,8 +46,8 @@ using = 2:3:5
 OPT
     my $dataset = Gnuplot::Builder::Dataset->new('f(x)');
     $dataset->set_option($options);
-    is $dataset->to_string(), q{f(x) using 1:4}, "the first occurrence is used in to_string()";
-    is $dataset->get_option("using"), "1:4", "the first occurrence is used in get_option()";
+    is $dataset->to_string(), q{f(x) using 1:4 2:3:5}, "to_string(): multiple occurrences are aggregated.";
+    is_deeply [$dataset->get_option("using")], "1:4", "get_option(): multiple occurrences are aggregated.";
 }
 
 done_testing;

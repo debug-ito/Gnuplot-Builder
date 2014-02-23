@@ -308,7 +308,7 @@ You can specify more than one pairs of C<$opt_name> and C<$opt_value>.
 
 C<$opt_name> is the name of the option (e.g. "using" and "every").
 
-C<$opt_value> is either C<undef>, a string or a code-ref.
+C<$opt_value> is either C<undef>, a string, an array-ref of strings or a code-ref.
 
 =over
 
@@ -322,14 +322,25 @@ If C<$opt_value> is a string, the option is set to that string.
 
 =item *
 
+If C<$opt_value> is an array-ref, the elements in the array-ref will be concatenated with spaces when it builds the parameters.
+If the array-ref is empty, the whole option (including the name) won't appear in the parameters.
+
+    $dataset->set_option(
+        binary => ['record=356:356:356', 'skip=512:256:256']
+    );
+    $dataset->to_string;
+    ## => 'hoge' binary record=356:356:356 skip=512:256:256
+
+=item *
+
 If C<$opt_value> is a code-ref, that is evaluated in list context when the C<$dataset> builds the parameters.
 
-    ($opt_value_str) = $opt_value->($dataset, $opt_name)
+    @returned_values = $opt_value->($dataset, $opt_name)
 
 C<$dataset> and C<$opt_name> are passed to the code-ref.
 
-Then, the first element in the result (C<$opt_value_str>) is used for the option value.
-You can return C<undef> to disable the option.
+Then, the option is generated as if C<< $opt_name => \@returned_values >> was set.
+You can return an C<undef> or an empty list to disable the option.
 
 =back
 
@@ -432,7 +443,7 @@ Options can be explicitly disabled by the leading "-" like
 =item *
 
 If the same OPT_NAME is repeated with different OPT_VALUEs,
-only the first OPT_VALUE is effective.
+it's equivalent to C<< set_option($opt_name => [$opt_value1, $opt_value2, ...]) >>.
 
 =back
 
@@ -455,14 +466,14 @@ This is useful for setting "title" and "index".
     ## => "hoge" title ''
 
 
-=head2 $opt_value = $dataset->get_option($opt_name)
+=head2 @opt_values = $dataset->get_option($opt_name)
 
-Return the option value for the name C<$opt_name>.
+Return the option values for the name C<$opt_name>.
 
-If a code-ref is set to the C<$opt_name>, it's evaluated and its result is returned.
+If a code-ref is set to the C<$opt_name>, it's evaluated and its results are returned.
 
 If the option is not set in C<$dataset>, the value of its parent is returned.
-If none of the ancestors doesn't have the option, it returns C<undef>.
+If none of the ancestors doesn't have the option, it returns an empty list.
 
 =head2 $dataset = $dataset->delete_option($opt_name, ...)
 

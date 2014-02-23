@@ -10,7 +10,7 @@ use Gnuplot::Builder::Dataset;
     
     $dataset = Gnuplot::Builder::Dataset->new('f(x)', with => "lp", lw => 3);
     is $dataset->to_string, "f(x) with lp lw 3", "source and opts OK";
-    is $dataset->get_option("with"), "lp", "option 'with' OK";
+    is_deeply [$dataset->get_option("with")], ["lp"], "option 'with' OK";
 }
 
 {
@@ -20,7 +20,7 @@ use Gnuplot::Builder::Dataset;
     
     $dataset = Gnuplot::Builder::Dataset->new_file('hoge.dat', u => "3:4", every => "::1");
     is $dataset->to_string, q{'hoge.dat' u 3:4 every ::1}, "file and opts OK";
-    is $dataset->get_option("every"), "::1", "option 'every' OK";
+    is_deeply [$dataset->get_option("every")], ["::1"], "option 'every' OK";
 }
 
 TODO: {
