@@ -27,6 +27,11 @@ sub new_file {
     return $class->new->set_file($filename)->set_option(@set_option_args);
 }
 
+sub new_data {
+    my ($class, $data_provider, @set_option_args) = @_;
+    return $class->new->set_file('-')->set_data($data_provider)->set_option(@set_option_args);
+}
+
 sub _init_pdata {
     my ($self) = @_;
     weaken $self;

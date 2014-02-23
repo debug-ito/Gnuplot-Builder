@@ -3,25 +3,8 @@ use warnings;
 use Test::More;
 use Test::Identity;
 use Gnuplot::Builder::Dataset;
-
-sub get_data_and_count {
-    my ($dataset) = @_;
-    my $inline_data = "";
-    my $count = 0;
-    my $result = $dataset->write_data_to(sub {
-        my $part = shift;
-        $inline_data .= $part;
-        $count++;
-    });
-    identical $result, $dataset, "write_data_to() returns the object";
-    return ($inline_data, $count);
-}
-
-sub get_data {
-    my ($dataset) = @_;
-    my ($data, $count) = get_data_and_count($dataset);
-    return $data;
-}
+use lib "t";
+use testlib::DatasetUtil qw(get_data_and_count get_data);
 
 {
     note("--- initially, no inline data");
