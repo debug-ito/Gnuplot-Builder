@@ -8,3 +8,4 @@ our $VERSION = "0.01";
 
 sub VERSION { $VERSION }
 
+1;
