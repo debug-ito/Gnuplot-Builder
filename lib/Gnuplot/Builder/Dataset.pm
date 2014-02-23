@@ -48,9 +48,9 @@ sub to_string {
     push @words, $self->get_source;
     $self->{pdata}->each_resolved_entry(sub {
         my ($name, $values_arrayref) = @_;
-        my $value = $values_arrayref->[0];
-        return if not defined $value;
-        push @words, $name, $value;
+        my @values = grep { defined($_) } @$values_arrayref;
+        return if !@values;
+        push @words, $name, @values;
     });
     return join " ", grep { defined($_) && $_ ne "" } @words;
 }
@@ -106,8 +106,7 @@ sub setq_option {
 
 sub get_option {
     my ($self, $name) = @_;
-    my ($result) = $self->{pdata}->get_resolved_entry($name);
-    return $result;
+    return $self->{pdata}->get_resolved_entry($name);
 }
 
 sub delete_option {

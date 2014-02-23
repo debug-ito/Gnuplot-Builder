@@ -90,7 +90,7 @@ foreach my $case (
         binary => ['record=356:356:356', 'skip=512:256:256']
     );
     is $dataset->to_string, q{'hoge' binary record=356:356:356 skip=512:256:256}, "to_string() ok";
-    is_deeply [$dataset->get_option('hoge')], ['record=356:356:356', 'skip=512:256:256'], "get_option() ok";
+    is_deeply [$dataset->get_option('binary')], ['record=356:356:356', 'skip=512:256:256'], "get_option() ok";
 }
 
 done_testing;
