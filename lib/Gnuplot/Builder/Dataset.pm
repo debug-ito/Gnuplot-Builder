@@ -139,6 +139,31 @@ sub new_child {
     return Gnuplot::Builder::Dataset->new->set_parent($self);
 }
 
+sub set_data {
+    my ($self, $data_provider) = @_;
+    $self->{pdata}->set_attribute(
+        key => "data", value => $data_provider
+    );
+    return $self;
+}
+
+sub write_data_to {
+    my ($self, $writer) = @_;
+    my $data_provider = $self->{pdata}->get_resolved_attribute("data");
+    return $self if not defined $data_provider;
+    if(ref($data_provider) eq "CODE") {
+        $data_provider->($self, $writer);
+    }else {
+        $writer->($data_provider);
+    }
+    return $self;
+}
+
+sub delete_data {
+    my ($self) = @_;
+    $self->{pdata}->delete_attribute("data");
+    return $self;
+}
 
 1;
 
