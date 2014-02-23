@@ -162,8 +162,8 @@ sub each_resolved_entry {
 }
 
 sub set_attribute {
-    my ($self, $name, $value) = @_;
-    $self->{attributes}{$name} = $value;
+    my ($self, %args) = @_;
+    $self->{attributes}{$args{key}} = $args{quote} ? _wrap_value_with_quote($args{value}) : $args{value};
 }
 
 sub get_resolved_attribute {
@@ -299,7 +299,19 @@ Iterate over resolved PKL entries.
 
 =head2 $exists = $pdata->has_own_entry($key)
 
-=head2 $pdata->set_attribute($name, $value)
+=head2 $pdata->set_attribute(%args)
+
+Set an attribute value. Fields in C<%args> are
+
+=over
+
+=item C<key> => STR (mandatory)
+
+=item C<value> => STR (mandatory)
+
+=item C<quote> => BOOL (optional, default: 0)
+
+=back
 
 =head2 $value = $pdata->get_resolved_attribute($name)
 

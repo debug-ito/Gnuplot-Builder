@@ -2,7 +2,6 @@ package Gnuplot::Builder::Dataset;
 use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
-use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use Scalar::Util qw(weaken);
 use Carp;
 
@@ -59,13 +58,18 @@ sub to_string {
 
 sub set_source {
     my ($self, $source) = @_;
-    $self->{pdata}->set_attribute(source => $source);
+    $self->{pdata}->set_attribute(
+        key => "source", value => $source
+    );
     return $self;
 }
 
 sub setq_source {
     my ($self, $source) = @_;
-    return $self->set_source(quote_gnuplot_str($source));
+    $self->{pdata}->set_attribute(
+        key => "source", value => $source, quote => 1,
+    );
+    return $self;
 }
 
 *set_file = *setq_source;
