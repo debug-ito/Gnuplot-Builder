@@ -19,8 +19,11 @@ sub _clear_zombies {
     $_->_waitpid(0) foreach @proc_objs;
 }
 
+## PUBLIC ONLY IN TESTS: number of processes it keeps now
 sub FOR_TEST_process_num { $processes->size }
 
+## create a new gnuplot process. it blocks if the number of processes
+## has reached $MAX_PROCESSES.
 sub new {
     my ($class) = @_;
     _clear_zombies();
@@ -42,6 +45,7 @@ sub new {
     return $self;
 }
 
+## Return the writer code-ref for this process.
 sub writer {
     my ($self) = @_;
     croak "Input end is already closed" if not defined $self->{write_handle};
@@ -51,6 +55,7 @@ sub writer {
     };
 }
 
+## Close the input channel. You can call this method multiple times.
 sub close_input {
     my ($self) = @_;
     return if not defined $self->{write_handle};
@@ -70,6 +75,8 @@ sub _waitpid {
     }
 }
 
+## Blocks until the process finishes. It automatically close the input
+## channel if necessary.
 sub wait_to_finish {
     my ($self) = @_;
     $self->close_input();
@@ -100,8 +107,13 @@ sub wait_to_finish {
     $self->_waitpid(1);
 }
 
+## Get the result of the finished process. Valid only after calling
+## wait_to_finish().
 sub result { $_[0]->{result} }
 
+## Return a Guard object. When the Guard is DESTROYed, the gnuplot
+## process is forced to terminate. Call cancel() method on the guard
+## to cancel the termination.
 sub terminator_guard {
     my ($self) = @_;
     return Guard::guard {
