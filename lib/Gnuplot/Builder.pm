@@ -28,7 +28,7 @@ sub gdata {
 
 sub ghelp {
     my (@help_args) = @_;
-    my $process = Gnuplot::Builder::Process->new;
+    my $process = Gnuplot::Builder::Process->new(capture => 1);
     my $terminator_guard = $process->terminator_guard;
     my $writer = $process->writer;
     $writer->("help");

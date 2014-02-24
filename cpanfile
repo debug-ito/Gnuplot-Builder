@@ -6,6 +6,7 @@ requires "IPC::Open3" => "0";
 requires "POSIX" => "0";
 requires "Guard" => "0";
 requires "parent" => "0";
+requires "File::Spec" => "0";
 
 on 'test' => sub {
     requires 'Test::More' => "0";

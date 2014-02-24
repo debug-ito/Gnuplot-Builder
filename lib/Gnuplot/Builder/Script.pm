@@ -225,7 +225,7 @@ sub _draw_with {
     my $async = $args{async};
     my ($gnuplot_process, $terminator_guard);
     if(!defined($writer)) {
-        $gnuplot_process = Gnuplot::Builder::Process->new;
+        $gnuplot_process = Gnuplot::Builder::Process->new(capture => !$async);
         $writer = $gnuplot_process->writer;
         $terminator_guard = $gnuplot_process->terminator_guard; ## stop the process if aborted.
     }
