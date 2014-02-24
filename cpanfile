@@ -5,6 +5,7 @@ requires "overload" => "0";
 requires "IPC::Open3" => "0";
 requires "POSIX" => "0";
 requires "Guard" => "0";
+requires "parent" => "0";
 
 on 'test' => sub {
     requires 'Test::More' => "0";

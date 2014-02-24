@@ -1,12 +1,12 @@
 package Gnuplot::Builder;
 use strict;
 use warnings;
-use Exporter qw(import);
+use parent qw(Exporter);
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 use Gnuplot::Builder::Process;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp);
 

@@ -1,5 +1,9 @@
 Revision history for Gnuplot-Builder
 
+0.11    2014-02-24
+        - Now Gnuplot::Builder inherits Exporter (instead of importing import()),
+          because I want to call export_to_level() on that.
+
 0.10    2014-02-24
         - Add some easy-to-type functions to Gnuplot::Builder. They are exported by default.
         - POD update on Gnuplot::Builder.
