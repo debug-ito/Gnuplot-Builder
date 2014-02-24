@@ -4,6 +4,7 @@ use warnings;
 use Exporter qw(import);
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
+use Gnuplot::Builder::Process;
 
 our $VERSION = "0.03";
 
@@ -26,7 +27,20 @@ sub gdata {
 }
 
 sub ghelp {
-    ## stub
+    my (@help_args) = @_;
+    my $process = Gnuplot::Builder::Process->new;
+    my $terminator_guard = $process->terminator_guard;
+    my $writer = $process->writer;
+    $writer->("help");
+    foreach my $arg (@help_args) {
+        $writer->(" $arg");
+    }
+    $writer->("\n");
+    undef $writer;
+    $process->wait_to_finish;
+    my $result = $process->result;
+    $terminator_guard->cancel;
+    return $result;
 }
 
 1;
