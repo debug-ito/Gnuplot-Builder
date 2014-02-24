@@ -1,8 +1,33 @@
 package Gnuplot::Builder;
 use strict;
 use warnings;
+use Exporter qw(import);
+use Gnuplot::Builder::Script;
+use Gnuplot::Builder::Dataset;
+
 our $VERSION = "0.03";
 
+our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp);
+
+sub gscript {
+    return Gnuplot::Builder::Script->new(@_);
+}
+
+sub gfunc {
+    return Gnuplot::Builder::Dataset->new(@_);
+}
+
+sub gfile {
+    return Gnuplot::Builder::Dataset->new_file(@_);
+}
+
+sub gdata {
+    return Gnuplot::Builder::Dataset->new_data(@_);
+}
+
+sub ghelp {
+    ## stub
+}
 
 1;
 __END__
@@ -27,8 +52,8 @@ Gnuplot::Builder - object-oriented gnuplot script builder
     
     $script->plot(
         gfile('result.dat',
-              using => '1:2:3', title => "Measured", with => "yerrorbars"),
-        gfunc('f(x)', title => "Theoretical", with => "lines")
+              using => '1:2:3', title => "'Measured'", with => "yerrorbars"),
+        gfunc('f(x)', title => "'Theoretical'", with => "lines")
     );
 
 
