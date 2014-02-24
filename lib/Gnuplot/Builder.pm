@@ -13,11 +13,30 @@ __END__
 
 Gnuplot::Builder - object-oriented gnuplot script builder
 
+=head1 SYNOPSIS
+
+    use Gnuplot::Builder;
+    
+    my $script = gscript(grid => "y", mxtics => 5, mytics => 5);
+    $script->setq(
+        xlabel => 'x values',
+        ylabel => 'y values',
+        title  => 'my plot'
+    );
+    $script->define('f(x)' => 'sin(x) / x');
+    
+    $script->plot(
+        gfile('result.dat',
+              using => '1:2:3', title => "Measured", with => "yerrorbars"),
+        gfunc('f(x)', title => "Theoretical", with => "lines")
+    );
+
+
 =head1 DESCRIPTION
 
-B<< This is an alpha release. API may change in the future. >>
+B<< This is a beta release. API may change in the future. >>
 
-L<Gnuplot::Builder> is a gnuplot script builder with the following charactestics.
+L<Gnuplot::Builder> is a gnuplot script builder. Its advantages include:
 
 =over
 
@@ -25,6 +44,7 @@ L<Gnuplot::Builder> is a gnuplot script builder with the following charactestics
 
 B<Object-oriented>. Script settings are encapsulated in a L<Gnuplot::Builder::Script> object,
 and dataset parameters are in a L<Gnuplot::Builder::Dataset> object.
+It eliminates global variables, which gnuplot uses extensively.
 
 =item *
 
@@ -37,10 +57,59 @@ B<Hierarchical>. L<Gnuplot::Builder::Script> and L<Gnuplot::Builder::Dataset> ob
 prototype-based inheritance, just like JavaScript objects.
 This is useful for hierarchical configuration.
 
+=item *
+
+B<Interactive>. L<Gnuplot::Builder> works well both in batch scripts and in interactive shells.
+Use L<Devel::REPL> or L<Reply> or whatever you like instead of the plain old gnuplot interative shell.
+
 =back
 
-Currently, L<Gnuplot::Builder> does not have any useful code.
-Use L<Gnuplot::Builder::Script> and L<Gnuplot::Builder::Dataset>.
+=head1 USAGE GUIDE
+
+L<Gnuplot::Builder> is meant to be used in interactive shells.
+It exports some easy-to-type functions by default.
+
+For batch scripts, I recommend using L<Gnuplot::Builder::Script> and L<Gnuplot::Builder::Dataset> directly.
+These modules are purely object-oriented, and won't mess up your namespace.
+
+
+=head1 EXPORTED FUNCTIONS
+
+L<Gnuplot::Builder> exports the following functions by default.
+
+=head2 $script = gscript(@script_options)
+
+Create a script object. It's just an alias for C<< Gnuplot::Builder::Script->new(...) >>.
+See L<Gnuplot::Builder::Script> for detail.
+
+=head2 $dataset = gfunc($funcion_spec, @dataset_options)
+
+Create a dataset object representing a function, such as "sin(x)" and "f(x)".
+It's just an alias for C<< Gnuplot::Builder::Dataset->new(...) >>.
+See L<Gnuplot::Builder::Dataset> for detail.
+
+=head2 $dataset = gfile($filename, @dataset_options)
+
+Create a dataset object representing a data file.
+It's just an alias for C<< Gnuplot::Builder::Dataset->new_file(...) >>.
+See L<Gnuplot::Builder::Dataset> for detail.
+
+=head2 $dataset = gdata($inline_data, @dataset_options)
+
+Create a dataset object representing a data file.
+It's just an alias for C<< Gnuplot::Builder::Dataset->new_data(...) >>.
+See L<Gnuplot::Builder::Dataset> for detail.
+
+=head2 $help_message = ghelp(@help_args)
+
+Run the gnuplot "help" command and return the help message.
+C<@help_args> is the arguments for the "help" command. They are joined with white spaces.
+
+    ghelp("style data");
+    
+    ## or you can say
+    
+    ghelp("style", "data");
 
 
 =head1 REPOSITORY
