@@ -1,5 +1,9 @@
 Revision history for Gnuplot-Builder
 
+0.10    2014-02-24
+        - Add some easy-to-type functions to Gnuplot::Builder. They are exported by default.
+        - POD update on Gnuplot::Builder.
+
 0.03    2014-02-24
         - No change to the code.
         - OK, I give up giving all modules the same version number.

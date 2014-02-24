@@ -6,7 +6,7 @@ use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 use Gnuplot::Builder::Process;
 
-our $VERSION = "0.03";
+our $VERSION = "0.10";
 
 our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp);
 
@@ -87,7 +87,7 @@ It eliminates global variables, which gnuplot uses extensively.
 
 =item *
 
-B<Thin>. L<Gnuplot::Builder> just builds script texts and streams to a gnuplot process.
+B<Thin>. L<Gnuplot::Builder> just builds a script text and streams it into a gnuplot process.
 Its behavior is extremely predictable and easy to debug.
 
 =item *
@@ -105,7 +105,7 @@ Use L<Devel::REPL> or L<Reply> or whatever you like instead of the plain old gnu
 
 =head1 USAGE GUIDE
 
-L<Gnuplot::Builder> is meant to be used in interactive shells.
+L<Gnuplot::Builder> module is meant to be used in interactive shells.
 It exports some easy-to-type functions by default.
 
 For batch scripts, I recommend using L<Gnuplot::Builder::Script> and L<Gnuplot::Builder::Dataset> directly.
