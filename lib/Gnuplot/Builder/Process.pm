@@ -77,6 +77,11 @@ sub writer {
     return sub {
         print $write_handle (@_);
     };
+    ## If we are serious about avoiding dead-lock, we must use
+    ## select() to check writability first and to read from the
+    ## read_handle. But I guess the dead-lock happens only if the
+    ## user inputs too much data and the gnuplot outputs too much
+    ## data to STDOUT/STDERR. That's rare.
 }
 
 ## Close the input channel. You can call this method multiple times.
