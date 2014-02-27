@@ -84,6 +84,7 @@ sub close_input {
     my ($self) = @_;
     return if not defined $self->{write_handle};
     my $write_handle = $self->{write_handle};
+    print $write_handle "\n";
     foreach my $statement (qq{set print "-"}, qq{print '$END_SCRIPT_MARK'}, qq{exit}) {
         print $write_handle ($statement, "\n");
     }
