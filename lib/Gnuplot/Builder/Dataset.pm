@@ -204,6 +204,8 @@ Gnuplot::Builder::Dataset - object-oriented builder for gnuplot dataset
 
 =head1 DESCRIPTION
 
+B<< This is a beta release. API may change in the future. >>
+
 L<Gnuplot::Builder::Dataset> is a builder object for gnuplot dataset (the data to be plotted).
 
 Like L<Gnuplot::Builder::Script>, this module stores dataset parameters in a hash-like structure.
