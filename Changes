@@ -1,5 +1,13 @@
 Revision history for Gnuplot-Builder
 
+0.12    2014-03-02
+        [BUG FIX]
+        - Script plotting methods: if async => 1 and the gnuplot
+          process writes large data to STDOUT, the process wouldn't
+          finish because it exhausts the write buffer. This is fixed
+          now that the output is redirected to the null device if
+          async => 1.
+
 0.11    2014-02-24
         - Now Gnuplot::Builder inherits Exporter (instead of importing import()),
           because I want to call export_to_level() on that.
