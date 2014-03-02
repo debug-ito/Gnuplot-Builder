@@ -154,6 +154,34 @@ sub terminator_guard {
 }
 
 
+#### #### #### #### #### #### #### #### #### #### #### #### #### 
+
+package Gnuplot::Builder::Process::MockTool;
+use strict;
+use warnings;
+
+## tools for a process who mocks gnuplot, i.e., the process who
+## communicates with Gnuplot::Builder::Process.
+
+
+## Receive data from Gnuplot::Builder::Process and execute the $code
+## with the received data.
+sub receive_from_builder {
+    my ($input_handle, $output_handle, $code) = @_;
+    while(defined(my $line = <$input_handle>)) {
+        $code->($line);
+
+        ## Windows does not signal EOF on $input_handle so we must
+        ## detect the end of script by ourselves.
+        if(index($line, $END_SCRIPT_MARK) != -1) {
+            print $output_handle $END_SCRIPT_MARK;
+            $code->("exit\n");
+            last;
+        }
+    }
+}
+
+
 1;
 
 __END__
