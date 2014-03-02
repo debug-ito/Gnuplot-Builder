@@ -1,5 +1,9 @@
 Revision history for Gnuplot-Builder
 
+0.13    2014-03-02
+        - Project-local update. Fix output of
+          Process::MockTool::receive_from_builder().
+
 0.12    2014-03-02
         [BUG FIX]
         - Script plotting methods: if async => 1 and the gnuplot

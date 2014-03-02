@@ -46,7 +46,8 @@ foo
 bar
 print '-'
 print '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@'
-@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@exit
+@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@
+exit
 EXP
     waitpid $mock_pid, 0;
 }

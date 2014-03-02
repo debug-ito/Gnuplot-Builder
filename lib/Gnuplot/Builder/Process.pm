@@ -174,7 +174,7 @@ sub receive_from_builder {
         ## Windows does not signal EOF on $input_handle so we must
         ## detect the end of script by ourselves.
         if(index($line, $END_SCRIPT_MARK) != -1) {
-            print $output_handle $END_SCRIPT_MARK;
+            print $output_handle "$END_SCRIPT_MARK\n";
             $code->("exit\n");
             last;
         }
