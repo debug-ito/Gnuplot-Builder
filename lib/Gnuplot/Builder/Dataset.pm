@@ -2,7 +2,7 @@ package Gnuplot::Builder::Dataset;
 use strict;
 use warnings;
 use Gnuplot::Builder::PrototypedData;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken blessed);
 use Carp;
 use overload '""' => 'to_string';
 
@@ -129,7 +129,7 @@ sub set_parent {
         $self->{pdata}->set_parent(undef);
         return $self;
     }
-    if(!ref($parent) || !$parent->isa("Gnuplot::Builder::Dataset")) {
+    if(!blessed($parent) || !$parent->isa("Gnuplot::Builder::Dataset")) {
         croak "parent must be a Gnuplot::Builder::Dataset";
     }
     $self->{parent} = $parent;

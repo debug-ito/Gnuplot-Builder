@@ -4,7 +4,7 @@ use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use Gnuplot::Builder::Process;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken blessed);
 use Carp;
 use overload '""' => "to_string";
 
@@ -156,7 +156,7 @@ sub set_parent {
         $self->{pdata}->set_parent(undef);
         return $self;
     }
-    if(!ref($parent) || !$parent->isa("Gnuplot::Builder::Script")) {
+    if(!blessed($parent) || !$parent->isa("Gnuplot::Builder::Script")) {
         croak "parent must be a Gnuplot::Builder::Script"
     }
     $self->{parent} = $parent;
