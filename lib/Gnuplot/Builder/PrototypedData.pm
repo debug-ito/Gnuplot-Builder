@@ -106,13 +106,13 @@ sub has_own_entry { return $_[0]->{list}->exists($_[1]) }
 
 sub set_parent { $_[0]->{parent} = $_[1] }
 
-sub parent { return $_[0]->{parent} }
+sub get_parent { return $_[0]->{parent} }
 
 sub _create_inheritance_stack {
     my ($self) = @_;
     my @pdata_stack = ($self);
     my $current = $self;
-    while(defined(my $parent = $current->parent)) {
+    while(defined(my $parent = $current->get_parent)) {
         push(@pdata_stack, $parent);
         $current = $parent;
     }
@@ -145,7 +145,7 @@ sub get_resolved_entry {
     my ($self, $key) = @_;
     my $pdata_with_key = $self;
     while(defined($pdata_with_key) && !$pdata_with_key->has_own_entry($key)) {
-        $pdata_with_key = $pdata_with_key->parent;
+        $pdata_with_key = $pdata_with_key->get_parent;
     }
     return () if not defined $pdata_with_key;
     my $raw_value = $pdata_with_key->{list}->get($key);
@@ -170,7 +170,7 @@ sub get_resolved_attribute {
     my ($self, $name) = @_;
     my $pdata_with_attr = $self;
     while(defined($pdata_with_attr) && !$pdata_with_attr->has_own_attribute($name)) {
-        $pdata_with_attr = $pdata_with_attr->parent;
+        $pdata_with_attr = $pdata_with_attr->get_parent;
     }
     return undef if not defined $pdata_with_attr;
     my $raw_value = $pdata_with_attr->{attributes}{$name};
@@ -324,7 +324,7 @@ if the corresponding evaluator exists. It returns C<undef> if it cannot find the
 
 =head2 $pdata->set_parent($parent)
 
-=head2 $parent = $pdata->parent()
+=head2 $parent = $pdata->get_parent()
 
 =head1 AUTHOR
 

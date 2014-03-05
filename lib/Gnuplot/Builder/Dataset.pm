@@ -137,7 +137,9 @@ sub set_parent {
     return $self;
 }
 
-sub parent { return $_[0]->{parent} }
+sub get_parent { return $_[0]->{parent} }
+
+*parent = *get_parent;
 
 sub new_child {
     my ($self) = @_;
@@ -602,7 +604,7 @@ Set C<$parent_dataset> as the C<$dataset>'s parent.
 
 If C<$parent_dataset> is C<undef>, C<$dataset> doesn't have parent anymore.
 
-=head2 $parent_dataset = $dataset->parent()
+=head2 $parent_dataset = $dataset->get_parent()
 
 Return the C<$dataset>'s parent.
 

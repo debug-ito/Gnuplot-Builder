@@ -164,7 +164,9 @@ sub set_parent {
     return $self;
 }
 
-sub parent { return $_[0]->{parent} }
+sub get_parent { return $_[0]->{parent} }
+
+*parent = *get_parent;
 
 sub new_child {
     my ($self) = @_;
@@ -845,7 +847,7 @@ Set C<$parent_builder> as the C<$builder>'s parent.
 
 If C<$parent_builder> is C<undef>, C<$builder> doesn't have a parent anymore.
 
-=head2 $parent_builder = $builder->parent()
+=head2 $parent_builder = $builder->get_parent()
 
 Return the C<$builder>'s parent. It returns C<undef> if C<$builder> does not have a parent.
 

@@ -16,17 +16,17 @@ use testlib::DatasetUtil qw(get_data);
     $parent[1]->set_data("1 111");
 
     my $child = Gnuplot::Builder::Dataset->new(undef, with => "lines");
-    is $child->parent, undef, "parent() returns undef it's not a child";
+    is $child->get_parent, undef, "parent() returns undef it's not a child";
     is $child->to_string, "with lines", "no inheritance for params";
     is get_data($child), "", "no inheritance for data";
 
     identical $child->set_parent($parent[0]), $child, "set_parent() retunrs the dataset";
-    identical $child->parent, $parent[0], "parent() returns the parent";
+    identical $child->get_parent, $parent[0], "parent() returns the parent";
     is $child->to_string, "cos(x) title 'parent 0' with lines", "inherit params from parent0";
     is get_data($child), "0 100", "inherit data from parent0";
 
     $child->set_parent($parent[1]);
-    identical $child->parent, $parent[1], "now parent is parent1";
+    identical $child->get_parent, $parent[1], "now parent is parent1";
     is $child->to_string, "sin(x) title 'parent 1' with lines", "inherit params from parent1";
     is get_data($child), "1 111", "inherit data from parent1";
 }
