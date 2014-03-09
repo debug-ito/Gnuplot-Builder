@@ -1,5 +1,12 @@
 Revision history for Gnuplot-Builder
 
+0.15    2014-03-09
+        [API CHANGES]
+        - Script, Dataset: you can now call get_option() method in scalar context.
+          It returns the first value for the option name, or undef if the option
+          is empty. It used to return the number of values in some cases, but
+          this behavior is modified.
+
 0.14    2014-03-09
         [API CHANGES]
         - Mostly backward-compatible API changes.
