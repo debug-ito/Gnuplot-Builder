@@ -100,6 +100,8 @@ sub set_option {
     return $self;
 }
 
+*set = *set_option;
+
 sub setq_option {
     my ($self, @options) = @_;
     $self->{pdata}->set_entry(
@@ -107,6 +109,13 @@ sub setq_option {
         quote => 1,
     );
     return $self;
+}
+
+*setq = *setq_option;
+
+sub unset {
+    my ($self, @opt_names) = @_;
+    return $self->set_option(map {$_ => undef} @opt_names);
 }
 
 sub get_option {
@@ -191,15 +200,15 @@ Gnuplot::Builder::Dataset - object-oriented builder for gnuplot dataset
     
     my $unit_scale = 0.001;
     my $file_data = Gnuplot::Builder::Dataset->new_file("sampled_data1.dat");
-    $file_data->set_option(
+    $file_data->set(
         using => sub { "1:(\$2 * $unit_scale)" },
         title => '"sample 1"',
         with  => 'linespoints lw 2'
     );
     
     my $another_file_data = $file_data->new_child;
-    $another_file_data->set_file("sampled_data2.dat");    ## override parent's setting
-    $another_file_data->setq_option(title => "sample 2"); ## override parent's setting
+    $another_file_data->set_file("sampled_data2.dat");  ## override parent's setting
+    $another_file_data->setq(title => "sample 2");      ## override parent's setting
     
     $builder->plot($file_data, $another_file_data);
 
@@ -249,26 +258,26 @@ In the above example, only the third dataset has its inline data.
 
 =head1 CLASS METHODS
 
-=head2 $dataset = Gnuplot::Builder::Dataset->new($source, @set_option_args)
+=head2 $dataset = Gnuplot::Builder::Dataset->new($source, @set_args)
 
 The general-purpose constructor. All arguments are optional.
-C<$source> is the source string of this dataset. C<@set_option_args> are the option settings.
+C<$source> is the source string of this dataset. C<@set_args> are the option settings.
 
-This method is equivalent to C<< new()->set_source($source)->set_option(@set_option_args) >>.
+This method is equivalent to C<< new()->set_source($source)->set(@set_args) >>.
 
-=head2 $dataset = Gnuplot::Builder::Dataset->new_file($filename, @set_option_args)
+=head2 $dataset = Gnuplot::Builder::Dataset->new_file($filename, @set_args)
 
 The constructor for datasets whose source is a file.
 C<$filename> is the name of the source file.
 
-This method is equivalent to C<< new()->set_file($filename)->set_option(@set_option_args) >>.
+This method is equivalent to C<< new()->set_file($filename)->set(@set_args) >>.
 
-=head2 $dataset = Gnuplot::Builder::Dataset->new_data($data_provider, @set_option_args)
+=head2 $dataset = Gnuplot::Builder::Dataset->new_data($data_provider, @set_args)
 
 The constructor for datasets that have inline data.
 C<$data_provider> is the inline data or a code-ref that provides it.
 
-This method is equivalent to C<< new()->set_file('-')->set_data($data_provider)->set_option(@set_option_args) >>.
+This method is equivalent to C<< new()->set_file('-')->set_data($data_provider)->set(@set_args) >>.
 
 =head1 OBJECT METHODS - BASICS
 
@@ -334,7 +343,7 @@ Methods about the options of the dataset.
 
 These methods are very similar to the methods of the same names in L<Gnuplot::Builder::Script>.
 
-=head2 $dataset = $dataset->set_option($opt_name => $opt_value, ...)
+=head2 $dataset = $dataset->set($opt_name => $opt_value, ...)
 
 Set the dataset option named C<$opt_name> to C<$opt_value>.
 You can specify more than one pairs of C<$opt_name> and C<$opt_value>.
@@ -358,7 +367,7 @@ If C<$opt_value> is a string, the option is set to that string.
 If C<$opt_value> is an array-ref, the elements in the array-ref will be concatenated with spaces when it builds the parameters.
 If the array-ref is empty, the whole option (including the name) won't appear in the parameters.
 
-    $dataset->set_option(
+    $dataset->set(
         binary => ['record=356:356:356', 'skip=512:256:256']
     );
     $dataset->to_string;
@@ -383,7 +392,7 @@ Even if you change an option value, its order is unchanged.
 
     my $scale = 0.001;
     $dataset->set_file('dataset.csv');
-    $dataset->set_option(
+    $dataset->set(
         every => undef,
         using => sub { qq{1:(\$2*$scale)} },
         title => '"data"',
@@ -392,7 +401,7 @@ Even if you change an option value, its order is unchanged.
     $dataset->to_string();
     ## => 'dataset.csv' using 1:($2*0.001) title "data" with lines lw 2
     
-    $dataset->set_option(
+    $dataset->set(
         title => undef,
         every => '::1',
     );
@@ -402,7 +411,7 @@ Even if you change an option value, its order is unchanged.
 You are free to pass any string to C<$opt_name> in any order,
 but this module does not guarantee it's syntactically correct.
 
-    $bad_dataset->set_option(
+    $bad_dataset->set(
         lw => 4,
         w  => "lp",
         ps => "variable",
@@ -413,7 +422,7 @@ but this module does not guarantee it's syntactically correct.
     
     ## The above parameters are invalid!!!
     
-    $good_dataset->set_option(
+    $good_dataset->set(
         u  => "1:2:3",
         w  => "lp",
         lw => 4,
@@ -426,25 +435,25 @@ but this module does not guarantee it's syntactically correct.
 Some dataset options such as "matrix" and "volatile" don't have arguments.
 You can set such options like this.
 
-    $dataset->set_option(
+    $dataset->set(
         matrix   => "",    ## enable
         volatile => undef, ## disable
     );
 
 Or, you can even write like this.
 
-    $dataset->set_option(
+    $dataset->set(
         "" => "matrix"
     );
 
 There is more than one way to do it.
 
-=head2 $dataset = $dataset->set_option($options)
+=head2 $dataset = $dataset->set($options)
 
-If C<set_option()> method is called with a single string argument C<$options>,
+If C<set()> method is called with a single string argument C<$options>,
 it is parsed to set options.
 
-    $dataset->set_option(<<END_OPTIONS);
+    $dataset->set(<<END_OPTIONS);
     using = 1:3
     -axes
     title = "Weight [kg]"
@@ -452,7 +461,7 @@ it is parsed to set options.
     lw    = 2
     END_OPTIONS
 
-The parsing rule is more or less the same as C<set_option()> method of L<Gnuplot::Builder::Script>.
+The parsing rule is more or less the same as C<set()> method of L<Gnuplot::Builder::Script>.
 Here is the overview.
 
 =over
@@ -476,28 +485,40 @@ Options can be explicitly disabled by the leading "-" like
 =item *
 
 If the same OPT_NAME is repeated with different OPT_VALUEs,
-it's equivalent to C<< set_option($opt_name => [$opt_value1, $opt_value2, ...]) >>.
+it's equivalent to C<< set($opt_name => [$opt_value1, $opt_value2, ...]) >>.
 
 =back
 
+=head2 $dataset = $dataset->set_option(...)
 
-=head2 $dataset = $dataset->setq_option(...)
+C<set_option()> method is alias of C<set()>.
 
-Same as C<set_option()> method except that the eventual option value is quoted.
+=head2 $dataset = $dataset->setq(...)
+
+Same as C<set()> method except that the eventual option value is quoted.
 This is useful for setting "title" and "index".
 
-    $dataset->setq_option(
+    $dataset->setq(
         title => "Sample A's result",
     );
     $dataset->to_string();
     ## => "hoge" title 'Sample A''s result'
     
-    $dataset->setq_option(
+    $dataset->setq(
         title => ""  ## same effect as "notitle"
     );
     $dataset->to_string();
     ## => "hoge" title ''
 
+=head2 $dataset = $dataset->setq_option(...)
+
+C<setq_option()> method is alias of C<setq()>.
+
+=head2 $dataset = $dataset->unset($opt_name ...)
+
+Short-cut for C<< set($opt_name => undef) >>. It disables the dataset option.
+
+You can specify more than one C<$opt_name>s.
 
 =head2 @opt_values = $dataset->get_option($opt_name)
 
