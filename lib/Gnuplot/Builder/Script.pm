@@ -578,17 +578,19 @@ You can specify more that one C<$opt_name>s.
 
 =head2 @opt_values = $builder->get_option($opt_name)
 
-Get the option values for C<$opt_name>.
+Get the option values for C<$opt_name>. In list context, it returns all values for C<$opt_name>.
+In scalar context, it returns only the first value.
 
 If C<$opt_name> is set in the C<$builder>, it returns its values.
 If a code-ref is set to the C<$opt_name>, it is evaluated and its results are returned.
 
 If C<$opt_name> is not set in the C<$builder>, the values of C<$builder>'s parent are returned.
-If C<$builder> does not have parent, it returns an empty list.
+If C<$builder> does not have parent, it returns an empty list in list context or C<undef> in scalar context.
 
-Always receive the result of this method by an array, because it may return both C<< (undef) >> and C<< () >>.
-Returning an C<undef> means the option is "unset" explicitly,
+This method may return both C<< (undef) >> and C<< () >>.
+Returning C<< (undef) >> means the option is "unset" explicitly,
 while returning an empty list means no "set" or "unset" sentence for the option.
+If you want to distinguish those two cases, you must call C<get_option()> in list context.
 
 
 =head2 $builder = $builder->delete_option($opt_name, ...)

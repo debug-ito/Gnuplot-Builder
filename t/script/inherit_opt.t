@@ -40,6 +40,10 @@ EXP
     is_deeply [$child->get_option("undef")], [undef], "get parent's undef";
     is_deeply [$child->get_option("code")], ["from parent"], "get parent's code";
     is scalar(@parent_code_args), 1, "code called once";
+    is scalar($child->get_option("string")), "hoge", "get parent's string (scalar)";
+    is scalar($child->get_option("array")), 1, "get parent's array (scalar)";
+    is scalar($child->get_option("undef")), undef, "get parent's undef (scalar)";
+    is scalar($child->get_option("code")), "from parent", "get parent's code (scalar)";
     @parent_code_args = ();
 
     my @child_code_args = ();
@@ -71,6 +75,10 @@ EXP
     is_deeply [$child->get_option("undef")], [], "get child's undef";
     is_deeply [$child->get_option("code")], ["from child"], "get child's code";
     is scalar(@child_code_args), 1, "child code called once";
+    is scalar($child->get_option("string")), undef, "get child's string (scalar)";
+    is scalar($child->get_option("array")), "not array", "get child's array (scalar)";
+    is scalar($child->get_option("undef")), undef, "get child's undef (scalar)";
+    is scalar($child->get_option("code")), "from child", "get child's code (scalar)";
     @parent_code_args = @child_code_args = ();
 
     $child->delete_option("undef", "code");
@@ -92,6 +100,10 @@ EXP
     is_deeply [$child->get_option("undef")], [undef], "get parent's undef";
     is_deeply [$child->get_option("code")], ["from parent"], "get parent's code";
     is scalar(@parent_code_args), 1, "parent code called once";
+    is scalar($child->get_option("string")), undef, "get child's string (scalar)";
+    is scalar($child->get_option("array")), "not array", "get child's array (scalar)";
+    is scalar($child->get_option("undef")), undef, "get parent's undef (scalar)";
+    is scalar($child->get_option("code")), "from parent", "get parent's code (scalar)";
     @parent_code_args = @child_code_args = ();
 }
 

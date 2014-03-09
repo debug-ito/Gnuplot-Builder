@@ -19,6 +19,7 @@ set a A
 set c C
 EXP
     is_deeply [$builder->get_option("b")], [], "get_option() should return an empty list for deleted option";
+    is scalar($builder->get_option("b")), undef, "get_option() should return undef for deleted option in scalar context";
 
     $builder->set(b => "B2");
     is $builder->to_string(), <<EXP, "if the deleted option is set again, it's at the bottom.";

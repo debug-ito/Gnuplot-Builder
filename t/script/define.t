@@ -34,6 +34,12 @@ EXP
     is_deeply [$builder->get_definition("f(x)")], ["sin(x)"], "get code-ref";
     is_deeply [$builder->get_definition("d")], [], "get non-existent";
     is $called, 1, "called once";
+    is scalar($builder->get_definition("a")), 10, "get single definition (scalar)";
+    is scalar($builder->get_definition("b")), 20, "get multiple occurrences (scalar)";
+    is scalar($builder->get_definition("c")), undef, "get undef (scalar)";
+    is scalar($builder->get_definition("f(x)")), "sin(x)", "get code-ref (scalar)";
+    is scalar($builder->get_definition("d")), undef, "get non-existent (scalar)";
+    is $called, 2, "called again";
 
     identical $builder->delete_definition("b"), $builder, "delete_definition() should return the object";
     is_deeply [$builder->get_definition("b")], [], "b no longer exists";
