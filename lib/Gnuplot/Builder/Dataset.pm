@@ -195,9 +195,12 @@ Gnuplot::Builder::Dataset - object-oriented builder for gnuplot dataset
 
     use Gnuplot::Builder::Script;
     use Gnuplot::Builder::Dataset;
-    
+        
     my $builder = Gnuplot::Builder::Script->new;
     
+    my $func_data = Gnuplot::Builder::Dataset->new('sin(x)');
+    $func_data->set(title => '"function"', with => "lines");
+        
     my $unit_scale = 0.001;
     my $file_data = Gnuplot::Builder::Dataset->new_file("sampled_data1.dat");
     $file_data->set(
@@ -205,13 +208,20 @@ Gnuplot::Builder::Dataset - object-oriented builder for gnuplot dataset
         title => '"sample 1"',
         with  => 'linespoints lw 2'
     );
-    
+        
     my $another_file_data = $file_data->new_child;
     $another_file_data->set_file("sampled_data2.dat");  ## override parent's setting
     $another_file_data->setq(title => "sample 2");      ## override parent's setting
     
-    $builder->plot($file_data, $another_file_data);
-
+    my $inline_data = Gnuplot::Builder::Dataset->new_data(<<INLINE_DATA);
+    1.0  3.2
+    1.4  3.0
+    1.9  4.3
+    2.2  3.9
+    INLINE_DATA
+    $inline_data->set(using => "1:2", title => '"sample 3"');
+        
+    $builder->plot($func_data, $file_data, $another_file_data, $inline_data);
 
 =head1 DESCRIPTION
 
