@@ -1,5 +1,20 @@
 Revision history for Gnuplot-Builder
 
+0.14    2014-03-09
+        [API CHANGES]
+        - Mostly backward-compatible API changes.
+        - Script, Dataset now have get_parent() method for better consistency
+          with other methods. parent() method is deprecated, but supported for
+          backward-compatibility.
+        - Add set(), setq() and unset() methods to Dataset as aliases of
+          *_option() methods for better symmetry to Script API.
+        [BUG FIX]
+        - Script, Dataset: set_parent() now uses blessed() function to check
+          the argument. It's safer.
+        [DOCUMENTATION]
+        - Mention Gnuplot::Builder::Wgnuplot.
+        - Improve SYNOPSIS for Dataset.
+
 0.13    2014-03-02
         - Project-local update. Fix output of
           Process::MockTool::receive_from_builder().
