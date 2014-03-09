@@ -147,9 +147,12 @@ sub get_resolved_entry {
     while(defined($pdata_with_key) && !$pdata_with_key->has_own_entry($key)) {
         $pdata_with_key = $pdata_with_key->get_parent;
     }
-    return () if not defined $pdata_with_key;
+    if(!defined($pdata_with_key)) {
+        return wantarray ? () : undef;
+    }
     my $raw_value = $pdata_with_key->{list}->get($key);
-    return _normalize_value($raw_value, $self->{entry_evaluator}, $key);
+    my @normalized_values = _normalize_value($raw_value, $self->{entry_evaluator}, $key);
+    return wantarray ? @normalized_values : $normalized_values[0];
 }
 
 sub each_resolved_entry {
@@ -288,6 +291,11 @@ If true, the values are quoted.
 
 Get the values from the PKL. It resolves inheritance and evaluates code-ref values.
 If there is no such key in C<$pdata> or any of its ancestors, it returns an empty list.
+
+=head2 $value = $pdata->get_resolved_entry($key)
+
+In scalar context, C<get_resolved_entry()> returns the first value for C<$key>.
+If it would return an empty list in list context, it returns C<undef> in scalar context.
 
 =head2 $pdata->each_resolved_entry($code)
 
