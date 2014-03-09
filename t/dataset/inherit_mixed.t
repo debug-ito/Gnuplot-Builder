@@ -42,6 +42,23 @@ use testlib::DatasetUtil qw(get_data);
         q{"-" using 1:2 every ::1 title '' with lp lt 3 lw 1 pt 1 ps 3},
             "child params OK: set source again, override every, disable axes, add ps";
     is get_data($child), "1 1", "child data ok. It's inherited from parent";
+
+    foreach my $child_case (
+        {name => "using", exp => ["1:2"]},
+        {name => "every", exp => ["::1"]},
+        {name => "axes",  exp => [undef]},
+        {name => "title", exp => [q{''}]},
+        {name => "with",  exp => ["lp"]},
+        {name => "lt",    exp => [3]},
+        {name => "lw",    exp => [1]},
+        {name => "pt",    exp => [1]},
+        {name => "lt",    exp => [3]},
+        {name => "ps",    exp => [3]},
+        {name => "non-existent", exp => []}
+    ) {
+        is_deeply [$child->get_option($child_case->{name})], $child_case->{exp}, "get_option($child_case->{name}) on child OK";
+        is scalar($child->get_option($child_case->{name})), $child_case->{exp}[0], "get_option($child_case->{name}) on child OK in scalar context";
+    }
 }
 
 done_testing;

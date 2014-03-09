@@ -533,11 +533,14 @@ You can specify more than one C<$opt_name>s.
 =head2 @opt_values = $dataset->get_option($opt_name)
 
 Return the option values for the name C<$opt_name>.
+In list context, it returns all values for C<$opt_name>.
+In scalar context, it returns only the first value.
 
 If a code-ref is set to the C<$opt_name>, it's evaluated and its results are returned.
 
 If the option is not set in C<$dataset>, the value of its parent is returned.
-If none of the ancestors doesn't have the option, it returns an empty list.
+If none of the ancestors doesn't have the option, it returns an empty list in list context
+or C<undef> in scalar context.
 
 =head2 $dataset = $dataset->delete_option($opt_name, ...)
 

@@ -48,6 +48,7 @@ OPT
     $dataset->set_option($options);
     is $dataset->to_string(), q{f(x) using 1:4 2:3:5}, "to_string(): multiple occurrences are aggregated.";
     is_deeply [$dataset->get_option("using")], ["1:4", "2:3:5"], "get_option(): multiple occurrences are aggregated.";
+    is scalar($dataset->get_option("using")), "1:4", "get_option(): return first value in scalar context";
 }
 
 done_testing;

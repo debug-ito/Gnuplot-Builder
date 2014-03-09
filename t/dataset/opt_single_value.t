@@ -6,46 +6,46 @@ use Gnuplot::Builder::Dataset;
 
 foreach my $case (
     {method => 'set_option', label => "undef", val => undef,
-     exp_str => "f(x)", exp_get => [undef]},
+     exp_str => "f(x)", exp_get => [undef], exp_get_s => undef},
     {method => 'set_option', label => "string", val => "bar",
-     exp_str => "f(x) foo bar", exp_get => ["bar"]},
+     exp_str => "f(x) foo bar", exp_get => ["bar"], exp_get_s => "bar"},
     {method => 'set_option', label => "empty string", val => "",
-     exp_str => 'f(x) foo', exp_get => ['']},
+     exp_str => 'f(x) foo', exp_get => [''], exp_get_s => ''},
     {method => 'set_option', label => "array-ref", val => ["bar", "buzz"],
-     exp_str => 'f(x) foo bar buzz', exp_get => ["bar", "buzz"]},
+     exp_str => 'f(x) foo bar buzz', exp_get => ["bar", "buzz"], exp_get_s => "bar"},
     {method => 'set_option', label => "array-ref with undef", val => [undef],
-     exp_str => 'f(x)', exp_get => [undef]},
+     exp_str => 'f(x)', exp_get => [undef], exp_get_s => undef},
     {method => 'set_option', label => "array-ref empty", val => [],
-     exp_str => 'f(x)', exp_get => []},
+     exp_str => 'f(x)', exp_get => [], exp_get_s => undef},
     {method => 'set_option', label => "code", val => sub { "BAR" },
-     exp_str => "f(x) foo BAR", exp_get => ["BAR"]},
+     exp_str => "f(x) foo BAR", exp_get => ["BAR"], exp_get_s => "BAR"},
     {method => 'set_option', label => "code returning undef", val => sub { undef },
-     exp_str => 'f(x)', exp_get => [undef]},
+     exp_str => 'f(x)', exp_get => [undef], exp_get_s => undef},
     {method => 'set_option', label => "code returning list", val => sub { ("BAR", "BUZZ") },
-     exp_str => 'f(x) foo BAR BUZZ', exp_get => ["BAR", "BUZZ"]},
+     exp_str => 'f(x) foo BAR BUZZ', exp_get => ["BAR", "BUZZ"], exp_get_s => "BAR"},
     {method => 'set_option', label => 'code returning empty list', val => sub { () },
-     exp_str => 'f(x)', exp_get => []},
+     exp_str => 'f(x)', exp_get => [], exp_get_s => undef},
 
     {method => 'setq_option', label => "undef", val => undef,
-     exp_str => "f(x)", exp_get => [undef]},
+     exp_str => "f(x)", exp_get => [undef], exp_get_s => undef},
     {method => 'setq_option', label => "string", val => "bar",
-     exp_str => "f(x) foo 'bar'", exp_get => [q{'bar'}]},
+     exp_str => "f(x) foo 'bar'", exp_get => [q{'bar'}], exp_get_s => q{'bar'}},
     {method => 'setq_option', label => "empty string", val => "",
-     exp_str => "f(x) foo ''", exp_get => [q{''}]},
+     exp_str => "f(x) foo ''", exp_get => [q{''}], exp_get_s => q{''}},
     {method => 'setq_option', label => "array-ref", val => ["bar", "buzz"],
-     exp_str => "f(x) foo 'bar' 'buzz'", exp_get => [q{'bar'}, q{'buzz'}]},
+     exp_str => "f(x) foo 'bar' 'buzz'", exp_get => [q{'bar'}, q{'buzz'}], exp_get_s => q{'bar'}},
     {method => 'setq_option', label => "array-ref with undef", val => [undef],
-     exp_str => 'f(x)', exp_get => [undef]},
+     exp_str => 'f(x)', exp_get => [undef], exp_get_s => undef},
     {method => 'setq_option', label => "array-ref empty", val => [],
-     exp_str => 'f(x)', exp_get => []},
+     exp_str => 'f(x)', exp_get => [], exp_get_s => undef},
     {method => 'setq_option', label => "code", val => sub { "BAR" },
-     exp_str => "f(x) foo 'BAR'", exp_get => [q{'BAR'}]},
+     exp_str => "f(x) foo 'BAR'", exp_get => [q{'BAR'}], exp_get_s => q{'BAR'}},
     {method => 'setq_option', label => "code returning undef", val => sub { undef },
-     exp_str => 'f(x)', exp_get => [undef]},
+     exp_str => 'f(x)', exp_get => [undef], exp_get_s => undef},
     {method => 'setq_option', label => "code returning list", val => sub { ("BAR", "BUZZ") },
-     exp_str => "f(x) foo 'BAR' 'BUZZ'", exp_get => [q{'BAR'}, q{'BUZZ'}]},
+     exp_str => "f(x) foo 'BAR' 'BUZZ'", exp_get => [q{'BAR'}, q{'BUZZ'}], exp_get_s => q{'BAR'}},
     {method => 'setq_option', label => 'code returning empty list', val => sub { () },
-     exp_str => 'f(x)', exp_get => []},
+     exp_str => 'f(x)', exp_get => [], exp_get_s => undef},
 ) {
     my $label = "$case->{method} $case->{label}";
     my $method = $case->{method};
@@ -53,6 +53,7 @@ foreach my $case (
     identical $dataset->$method(foo => $case->{val}), $dataset, "$label: $method() returns the dataset";
     is $dataset->to_string, $case->{exp_str}, "$label: to_string() OK";
     is_deeply [$dataset->get_option("foo")], $case->{exp_get}, "$label: get_option() OK";
+    is scalar($dataset->get_option("foo")), $case->{exp_get_s}, "$label: get_option() in scalar context OK";
 }
 
 {
@@ -80,6 +81,10 @@ foreach my $case (
         is_deeply [$dataset->get_option("fizz")], [$case->{exp}], "$method: get_option() OK";
         is $called, 1, "$method: called once";
         $called = 0;
+
+        is scalar($dataset->get_option("fizz")), $case->{exp}, "$method: get_option() in scalar context OK";
+        is $called, 1, "$method: called once";
+        $called = 0;
     }
 }
 
@@ -91,6 +96,7 @@ foreach my $case (
     );
     is $dataset->to_string, q{'hoge' binary record=356:356:356 skip=512:256:256}, "to_string() ok";
     is_deeply [$dataset->get_option('binary')], ['record=356:356:356', 'skip=512:256:256'], "get_option() ok";
+    is scalar($dataset->get_option("binary")), 'record=356:356:356', 'get_option() in scalar context OK';
 }
 
 done_testing;
