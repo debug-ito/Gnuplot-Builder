@@ -673,7 +673,7 @@ Methods for plotting.
 All plotting methods are non-mutator, that is, they don't change the state of the C<$builder>.
 This means you can plot different datasets with the same settings.
 
-Some plotting methods run a gnuplot process background, and let it do the plotting work.
+By default, plotting methods run a gnuplot process background, and let it do the plotting work.
 The variable C<@Gnuplot::Builder::Process::COMMAND> is used to start the gnuplot process.
 See L<Gnuplot::Builder::Process> for detail.
 
@@ -812,6 +812,247 @@ Same as C<plot()> method except it uses "splot" command.
 =head2 $result = $builder->splot_with(%args)
 
 Same as C<plot_with()> method except it uses "splot" command.
+
+=head2 $result = $builder->multiplot($option, $code)
+
+Build the script, input the script into a new gnuplot process,
+start a new multiplot context and execute the C<$code> in the context.
+This method lets a gnuplot process do the actual job.
+
+C<$option> is the option string for "set multiplot" command. C<$option> is optional.
+
+Mandatory argument C<$code> is a code-ref that is executed immediately.
+The C<$code> is called like
+
+    $code->($writer)
+
+where C<$writer> is a code-ref that you can call to write any data to the gnuplot process.
+
+The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR.
+
+The script written to the C<$writer> is enclosed by "set multiplot" and "unset multiplot" commands,
+and passed to the gnuplot process.
+So the following example creates a multiplot figure of sin(x) and cos(x).
+
+    $builder->multiplot('layout 2,1', sub {
+        my $writer = shift;
+        $writer->("plot sin(x)\n");
+        $writer->("plot cos(x)\n");
+    });
+
+If you call plotting methods (including C<multiplot()> itself) without explicit writer in the C<$code> block,
+those methods won't start a gnuplot new process.
+Instead they write the script to the C<$writer> that is given by the first C<multiplot()> method.
+
+    $builder->multiplot(sub {
+        my $writer = shift;
+        my $another_builder = Gnuplot::Builder::Script->new;
+        
+        $another_builder->plot("sin(x)");   ## This is the same as below
+        $another_builder->plot_with(
+            dataset => "sin(x)",
+            writer => $writer
+        );
+    });
+
+So, if you stick to using L<Gnuplot::Builder::Script> in the C<$code>, you don't need to use C<$writer> explicitly.
+
+=head2 $result = $builder->multiplot_with(%args)
+
+Multiplot with more functionalities than C<multiplot()> method.
+
+Fields in C<%args> are
+
+=over
+
+=item C<do> => CODE-REF (mandatory)
+
+A code-ref that is executed in the multiplot context.
+
+=item C<option> => OPTION_STR (optional, default: "")
+
+An option string for "set multiplot" command.
+
+=item C<output> => OUTPUT_FILENAME (optional)
+
+If set, "set output" command is printed just before "set multiplot" command.
+
+See C<plot_with()> method for detail.
+
+=item C<writer> => CODE-REF (optional)
+
+A code-ref to receive the whole script string.
+If set, the return value C<$result> will be an empty string.
+
+See C<plot_with()> method for detail.
+
+=item C<async> => BOOL (optional, default: false)
+
+If set to true, it won't wait for the gnuplot process to finish.
+In this case, the return value C<$result> will be an empty string.
+
+See C<plot_with()> method for detail.
+
+=back
+
+    my $builder = Gnuplot::Builder::Script->new;
+    $builder->set(mxtics => 5, mytics => 5, term => "png");
+    
+    my $script = "";
+    $builder->multiplot_with(
+        output => "multi.png",
+        writer => sub { $script .= $_[0] },
+        option => 'title "multiplot test" layout 2,1',
+        do => sub {
+            my $another_builder = Gnuplot::Builder::Script->new;
+            $another_builder->setq(title => "sin")->plot("sin(x)");
+            $aonther_builder->setq(title => "cos")->plot("cos(x)");
+        }
+    );
+    
+    $script;
+    ## => set mxtics 5
+    ## => set mytics 5
+    ## => set term png
+    ## => set output 'multi.png'
+    ## => set multiplot title "multiplot test" layout 2,1
+    ## => set title 'sin'
+    ## => plot sin(x)
+    ## => set title 'cos'
+    ## => plot cos(x)
+    ## => unset multiplot
+    ## => set output
+
+=head2 $result = $builder->run($command, ...)
+
+Build the script, input the script into a new gnuplot process
+and input the C<$command>s to the process as well.
+This method lets a gnuplot process do the actual job.
+
+C<run()> method is a low-level method of C<plot()>, C<splot()>, C<multiplot()> etc.
+You should use other plotting methods if possible.
+
+C<$command> is either a string or a code-ref.
+You can specify more than one C<$command>s, which are executed sequentially.
+
+=over
+
+=item *
+
+If C<$command> is a string, it is input to the process as a gnuplot sentence.
+
+=item *
+
+If C<$command> is a code-ref, it is immediately called like
+
+    $command->($writer)
+
+where C<$writer> is a code-ref that you can call to write any data to the gnuplot process.
+
+=back
+
+The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR.
+
+C<run()> method is useful when you want to execute "plot" command more than once in a single gnuplot process.
+For example,
+
+    my $builder = Gnuplot::Builder::Script->new(<<SET);
+    term = gif size 500,500 animate
+    output = "waves.gif"
+    SET
+    
+    my $FRAME_NUM = 10;
+    $builder->run(sub {
+        my $writer = shift;
+        foreach my $phase_index (0 .. ($FRAME_NUM-1)) {
+            my $phase_deg = 360.0 * $phase_index / $FRAME_NUM;
+            $writer->("plot sin(x + $phase_deg / 180.0 * pi)\n");
+        }
+    });
+
+The above example generates an animated GIF of a traveling sin wave.
+
+Like the C<$code> argument for C<multiplot()> method,
+if you call plotting methods (including C<run()> itself) without explicit writer inside C<$command> code block,
+those methods won't start a new gnuplot process.
+Instead they write the script to the C<$writer> given by the first C<run()> method.
+
+So you can rewrite the C<run()> method of the above example to
+
+    $builder->run(sub {
+        my $another_builder = Gnuplot::Builder::Script->new;
+        foreach my $phase_index (0 .. ($FRAME_NUM-1)) {
+            my $phase_deg = 360.0 * $phase_index / $FRAME_NUM;
+            $another_builder->plot("sin(x + $phase_deg / 180.0 * pi)");
+        }
+    });
+
+
+C<run()> method may also be useful if you want to enclose some sentences with pairs of sentences.
+For example,
+
+    $builder->run(
+        "set multiplot layout 2,2",
+        "do for [name in  'A B C D'] {",
+        sub {
+            my $another_builder = Gnuplot::Builder::Script->new;
+            $another_builder->define(filename => "name . '.dat'");
+            $another_builder->plot('filename u 1:2');
+        },
+        "}",
+        "unset multiplot"
+    );
+
+Well, maybe this is not a good example, though. In this case I would use C<multiplot()> and iteration in Perl.
+There is more than one way to do it.
+
+
+=head2 $result = $builder->run_with(%args)
+
+Run the script with more functionalities than C<run()> method.
+
+=over
+
+=item C<do> => COMMANDS (optional)
+
+A command or an array-ref of commands to be executed.
+See C<run()> for specification of commands.
+
+=item C<writer> => CODE-REF (optional)
+
+A code-ref to receive the whole script string. If set, the return value C<$result> will be an empty string.
+
+See C<plot_with()> method for detail.
+
+=item C<async> => BOOL (optional, default: false)
+
+If set to true, it won't wait for the gnuplot process to finish. In this case, the return value C<$result> will be an empty string.
+
+See C<plot_with()> method for detail.
+
+=back
+
+    my $builder = Gnuplot::Builder::Script->new;
+    my $script = "";
+    
+    $builder->run_with(
+        writer => sub { $script .= $_[0] },
+        do => [
+            "cd 'subdir1'",
+            sub {
+                foreach my $name (qw(a b c d)) {
+                    $builder->plot("'$name.dat' u 1:2 title '$name'");
+                }
+            }
+        ]
+    );
+    
+    $script;
+    ## => cd 'subdir1'
+    ## => plot 'a.dat' u 1:2 title 'a'
+    ## => plot 'b.dat' u 1:2 title 'b'
+    ## => plot 'c.dat' u 1:2 title 'c'
+    ## => plot 'd.dat' u 1:2 title 'd'
 
 
 =head1 OBJECT METHODS - INHERITANCE
