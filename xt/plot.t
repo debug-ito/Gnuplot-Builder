@@ -3,17 +3,9 @@ use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
 use Time::HiRes qw(time);
+use lib "xt";
+use testlib::XTUtil qw(if_no_file);
 
-sub if_no_file {
-    my ($filename, $code) = @_;
-  SKIP: {
-        if(-f $filename) {
-            skip "File $filename exists. Remove it first.", 1;
-        }
-        note("--- output $filename");
-        $code->($filename);
-    }
-}
 
 if_no_file "test_plot.png", sub {
     my $filename = shift;

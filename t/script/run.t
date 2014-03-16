@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
+use Gnuplot::Builder::Dataset;
 
 my @test_cases = (
     {
@@ -83,31 +84,45 @@ EXP
         args => {
             do => [
                 sub { $_[0]->("set "); $_[0]->("term"); $_[0]->(" png") },
+                sub { $_[0]->(" size 100,"); $_[0]->("100\n") },
                 sub { $_[0]->("set grid\n") },
                 sub { $_[0]->() },
                 sub { $_[0]->("reread") },
             ]
         },
-        exp => <<'EXP'
-set term png
+        exp => q{set term png size 100,100
 set grid
-reread
-EXP
+reread}
     },
     {
         label => "mixed code and sentences without trailing newlines",
         args => {
             do => [
-                "aaa"
+                "aaa",
+                sub { $_[0]->("bbb") },
+                "ccc",
+                sub { $_[0]->("ddd") },
             ]
-        }
+        },
+        exp => q{aaa
+bbbccc
+ddd}
     },
     {
         label => "async has no effect",
+        args => {
+            async => 1,
+            do => [
+                "hoge",
+                sub { $_[0]->("foo\n") }
+            ]
+        },
+        exp => <<'EXP'
+hoge
+foo
+EXP
     }
 );
-
-fail("implement the just above test cases !!");
 
 
 
@@ -199,6 +214,35 @@ plot 'a.dat' u 1:2 title 'a'
 plot 'b.dat' u 1:2 title 'b'
 plot 'c.dat' u 1:2 title 'c'
 plot 'd.dat' u 1:2 title 'd'
+EXP
+}
+
+{
+    note("--- jump out of run() due to exception");
+    my $builder = Gnuplot::Builder::Script->new;
+    my $result = "";
+    local $@;
+    eval {
+        $builder->run_with(
+            writer => sub { $result .= $_[0] },
+            do => [
+                "print 'hogehoge'",
+                sub { $builder->plot("sin(x) title 'sin'") },
+                sub {
+                    $builder->plot("cos(x) title 'cos'");
+                    die "BOOM!";
+                    $builder->plot("tan(x) title 'tan'");
+                },
+                "print 'foobar'"
+            ]
+        );
+        fail("this should not be executed");
+    };
+    like $@, qr{^BOOM!}, "exception thrown";
+    is $result, <<'EXP', "it should write script until it dies";
+print 'hogehoge'
+plot sin(x) title 'sin'
+plot cos(x) title 'cos'
 EXP
 }
 

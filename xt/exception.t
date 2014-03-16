@@ -8,6 +8,12 @@ use Time::HiRes qw(sleep);
 
 note("--- exception during plotting.");
 
+sub wait_and_get_number_of_processes {
+    sleep 0.5;
+    Gnuplot::Builder::Script->new(term => "postscript")->plot("sin(x)"); ## to clear the died process.
+    return Gnuplot::Builder::Process->FOR_TEST_process_num();
+}
+
 foreach my $case (
     {label => "from added sentence", plotset => sub {
         my $script = Gnuplot::Builder::Script->new;
@@ -44,9 +50,7 @@ foreach my $case (
     if($@) {
         pass("$case->{label}: died");
     }
-    sleep 0.5;
-    Gnuplot::Builder::Script->new(term => "postscript")->plot("sin(x)"); ## to clear the died process.
-    is(Gnuplot::Builder::Process->FOR_TEST_process_num(), 0, "$case->{label}: no running process.");
+    is(wait_and_get_number_of_processes, 0, "$case->{label}: no running process.");
 }
 
 {
@@ -65,6 +69,29 @@ foreach my $case (
     if($@) {
         pass("plot_with() dies OK");
     }
+}
+
+
+note("--- exception from multiplot() and run()");
+foreach my $case (
+    {label => "multiplot", code => sub {
+        my $builder = Gnuplot::Builder::Script->new;
+        $builder->multiplot(sub { die "BOOM!" });
+    }},
+    {label => "run", code => sub {
+        my $builder = Gnuplot::Builder::Script->new;
+        $builder->run(sub { die "BOOM!" });
+    }}
+) {
+    local $@;
+    eval {
+        $case->{code}->();
+        fail("$case->{label}: it should die");
+    };
+    if($@) {
+        pass "$case->{label}: died";
+    }
+    is(wait_and_get_number_of_processes, 0, "$case->{label}: no running process.");
 }
 
 done_testing;

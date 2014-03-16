@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
+use lib "t";
+use testlib::ScriptUtil qw(plot_str);
 
 my @test_cases = (
     {
@@ -96,21 +98,24 @@ set multiplot
 set terminal png
 unset multiplot
 EXP
+    },
+    {
+        label => "code calling writer with empty data",
+        args => {
+            do => sub { $_[0]->(""); $_[0]->(undef); $_[0]->() }
+        },
+        exp => <<'EXP'
+set multiplot
+unset multiplot
+EXP
     }
 );
-
-fail("code calling writer with empty data");
 
 
 foreach my $case (@test_cases) {
     my $builder = Gnuplot::Builder::Script->new;
-    my $got = "";
-    my $result = $builder->multiplot_with(
-        %{$case->{args}},
-        writer => sub { $got .= $_[0] }
-    );
+    my $got = plot_str($builder, "multiplot_with", %{$case->{args}});
     is $got, $case->{exp}, "$case->{label}: multiplot_with() OK";
-    is $result, "", "$case->{label}: multiplot_with() should return an empty string if writer is present.";
 }
 
 
@@ -128,7 +133,7 @@ foreach my $case (@test_cases) {
         do => sub {
             my $another_builder = Gnuplot::Builder::Script->new;
             $another_builder->setq(title => "sin")->plot("sin(x)");
-            $aonther_builder->setq(title => "cos")->plot("cos(x)");
+            $another_builder->setq(title => "cos")->plot("cos(x)");
         }
     );
     is $script, <<'EXP', "result OK";
@@ -146,8 +151,32 @@ set output
 EXP
 }
 
+{
+    note("--- jump out of multiplot() due to exception");
+    my $builder = Gnuplot::Builder::Script->new;
+    local $@;
+    my $result = "";
+    eval {
+        $builder->multiplot_with(
+            writer => sub { $result .= $_[0] },
+            option => "layout 6,1",
+            do => sub {
+                foreach my $freq (1 .. 6) {
+                    $builder->plot("sin($freq * x) title 'f = $freq'");
+                    die "BOOM!" if $freq == 2;
+                }
+            }
+        );
+        fail("this should not be executed");
+    };
+    like $@, qr{^BOOM!}, "exception thrown";
+    is $result, <<'EXP', "it should write scripts until it dies";
+set multiplot layout 6,1
+plot sin(1 * x) title 'f = 1'
+plot sin(2 * x) title 'f = 2'
+EXP
+}
 
-fail("maybe xt: multiplot() with 1 arg and 2 args");
 fail("xt: multiplot() return error message if something is wrong. If async, there's no error message");
 
 done_testing;
