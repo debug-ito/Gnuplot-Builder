@@ -5,8 +5,8 @@ use IPC::Open3 qw(open3);
 use Carp;
 use Gnuplot::Builder::PartiallyKeyedList;
 use POSIX qw(:sys_wait_h);
-use Guard ();
 use File::Spec;
+use Try::Tiny;
 
 our @COMMAND = qw(gnuplot --persist);
 our $MAX_PROCESSES = 10;
@@ -33,6 +33,37 @@ sub _clear_zombies {
 ## PUBLIC ONLY IN TESTS: number of processes it keeps now
 sub FOR_TEST_process_num { $processes->size }
 
+## create a new gnuplot process, create a writer to it and run the
+## given code. If the code throws an exception, the process is
+## terminated. It returns the output of the gnuplot process.
+##
+## Fields in %args are:
+##
+## do (CODE-REF mandatory): the code to execute. $do->($writer).
+## 
+## async (BOOL optional, default = false): If set to true, it won't
+## wait for the gnuplot process to finish. In this case, the return
+## value is an empty string.
+sub with_new_process {
+    my ($class, %args) = @_;
+    my $code = $args{do};
+    croak "do parameter is mandatory" if !defined($code);
+    my $async = $args{async};
+    my $process = $class->_new(capture => !$async);
+    my $result = "";
+    try {
+        $code->($process->_writer);
+        $process->_close_input();
+        if(!$async) {
+            $result = $process->_wait_to_finish();
+        }
+    }catch {
+        my $e = shift;
+        $process->_terminate();
+        die $e;
+    };
+    return $result;
+}
 
 ## create a new gnuplot process. it blocks if the number of processes
 ## has reached $MAX_PROCESSES.
@@ -42,7 +73,7 @@ sub FOR_TEST_process_num { $processes->size }
 ## capture (BOOL optional, default: false): If true, it keeps the
 ## STDOUT and STDERR of the process so that it can read them
 ## afterward. Otherwise, it just discards the output.
-sub new {
+sub _new {
     my ($class, %args) = @_;
     _clear_zombies();
     while($MAX_PROCESSES > 0 && $processes->size() >= $MAX_PROCESSES) {
@@ -63,14 +94,18 @@ sub new {
         pid => $pid,
         write_handle => $write_handle,
         read_handle => $read_handle,
-        result => undef,
     }, $class;
     $processes->set($pid, $self);
     return $self;
 }
 
+
+######## 
+######## OBJECT METHODS
+######## 
+
 ## Return the writer code-ref for this process.
-sub writer {
+sub _writer {
     my ($self) = @_;
     croak "Input end is already closed" if not defined $self->{write_handle};
     my $write_handle = $self->{write_handle};
@@ -85,7 +120,7 @@ sub writer {
 }
 
 ## Close the input channel. You can call this method multiple times.
-sub close_input {
+sub _close_input {
     my ($self) = @_;
     return if not defined $self->{write_handle};
     my $write_handle = $self->{write_handle};
@@ -107,13 +142,16 @@ sub _waitpid {
 
 ## Blocks until the process finishes. It automatically close the input
 ## channel if necessary.
-sub wait_to_finish {
+##
+## If "capture" attribute is true, it returns the output of the
+## gnuplot process. Otherwise it returns an empty string.
+sub _wait_to_finish {
     my ($self) = @_;
-    $self->close_input();
-    
+    $self->_close_input();
+
+    my $result = "";
     my $read_handle = $self->{read_handle};
     if(defined $read_handle) {
-        my $result = "";
         while(defined(my $line = <$read_handle>)) {
             $result .= $line;
 
@@ -133,26 +171,16 @@ sub wait_to_finish {
                 last;
             }
         }
-        $self->{result} = $result;
         close $read_handle;
     }
     $self->_waitpid(1);
+    return $result;
 }
 
-## Get the result of the finished process. Valid only after calling
-## wait_to_finish().
-sub result { $_[0]->{result} }
-
-## Return a Guard object. When the Guard is DESTROYed, the gnuplot
-## process is forced to terminate. Call cancel() method on the guard
-## to cancel the termination.
-sub terminator_guard {
+sub _terminate {
     my ($self) = @_;
-    return Guard::guard {
-        kill 'TERM', $self->{pid};
-    };
+    kill 'TERM', $self->{pid};
 }
-
 
 #### #### #### #### #### #### #### #### #### #### #### #### #### 
 

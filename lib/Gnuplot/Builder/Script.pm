@@ -223,35 +223,26 @@ sub _draw_with {
     }
     croak "at least one dataset is required" if !@$dataset;
     my $output = $args{output};
-    my $writer = $args{writer};
     my $async = $args{async};
-    my ($gnuplot_process, $terminator_guard);
-    if(!defined($writer)) {
-        $gnuplot_process = Gnuplot::Builder::Process->new(capture => !$async);
-        $writer = $gnuplot_process->writer;
-        $terminator_guard = $gnuplot_process->terminator_guard; ## stop the process if aborted.
-    }
-    
-    $writer->($self->to_string);
-    if(defined $output) {
-        $writer->("set output " . quote_gnuplot_str($output) . "\n");
-    }
-    my ($params, $dataset_objects) = _collect_dataset_params($dataset);
-    $writer->("$plot_command " . join(",", @$params) . "\n");
-    _write_inline_data($writer, $dataset_objects);
-    if(defined $output) {
-        $writer->("set output\n");
-    }
-
-    my $result = "";
-    if(defined $gnuplot_process) {
-        $gnuplot_process->close_input();
-        if(!$async) {
-            $gnuplot_process->wait_to_finish();
-            $result = $gnuplot_process->result;
+    my $do = sub {
+        my $writer = shift;
+        $writer->($self->to_string);
+        if(defined $output) {
+            $writer->("set output " . quote_gnuplot_str($output) . "\n");
         }
+        my ($params, $dataset_objects) = _collect_dataset_params($dataset);
+        $writer->("$plot_command " . join(",", @$params) . "\n");
+        _write_inline_data($writer, $dataset_objects);
+        if(defined $output) {
+            $writer->("set output\n");
+        }
+    };
+    my $result = "";
+    if(defined($args{writer})) {
+        $do->($args{writer});
+    }else {
+        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
     }
-    $terminator_guard->cancel if defined $terminator_guard;
     return $result;
 }
 
