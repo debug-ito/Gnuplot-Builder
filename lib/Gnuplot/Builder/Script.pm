@@ -389,8 +389,6 @@ Gnuplot::Builder::Script - object-oriented builder for gnuplot script
 
 =head1 DESCRIPTION
 
-B<< This is a beta release. API may change in the future. >>
-
 L<Gnuplot::Builder::Script> is a builder object for a gnuplot script.
 
 The advantages of this module over just printing script text are:

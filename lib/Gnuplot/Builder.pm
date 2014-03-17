@@ -68,8 +68,6 @@ Gnuplot::Builder - object-oriented gnuplot script builder
 
 =head1 DESCRIPTION
 
-B<< This is a beta release. API may change in the future. >>
-
 L<Gnuplot::Builder> is a gnuplot script builder. Its advantages include:
 
 =over
