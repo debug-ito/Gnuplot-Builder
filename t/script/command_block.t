@@ -46,6 +46,7 @@ EXP
         exp => <<'EXP',
 set foo bar
 set multiplot
+set foo bar
 plot cos(x)
 unset multiplot
 EXP
@@ -79,7 +80,7 @@ EXP
         code => sub {
             my $writer = shift;
             my $dataset = Gnuplot::Builder::Dataset->new_data(sub {
-                my $writer = shift;
+                my ($dataset, $writer) = @_;
                 $writer->("$_ " . ($_ * 10) . "\n") foreach 1..3;
             });
             $dataset->write_data_to($writer);
@@ -186,10 +187,10 @@ foreach my $case (@test_cases) {
     foreach my $method (qw(multiplot_with run_with)) {
         my $exp_script = $case->{exp};
         if($method eq "multiplot_with") {
-            $exp_script = "set multiplot\n$exp_script\nunset multiplot\n";
+            $exp_script = "set multiplot\n${exp_script}unset multiplot\n";
         }
         my $got_script = plot_str($builder, $method, do => $case->{code});
-        is $got_script, $exp_script, "$case->{label}: script ok";
+        is $got_script, $exp_script, "method: $method, $case->{label}: script ok";
     }
 }
 
