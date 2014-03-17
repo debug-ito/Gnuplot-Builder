@@ -49,6 +49,7 @@ if_no_file "test_multiplot_error.png", sub {
         $writer->("plot cos(x) title 'multiplot error'");
     });
     isnt $result, "", "gnuplot process should output some error message";
+    note("Process output: $result");
 };
 
 
@@ -63,9 +64,10 @@ foreach my $case (
     )->multiplot_with(async => $case->{async}, do => sub {
         my $writer = shift;
         $writer->("print 'hogehoge'\n");
-        $writer->("print 'foobar'");
+        $writer->("print 'foobar'\n");
+        $writer->("plot sin(x) title 'multiplot $case->{label}'");
     });
-    is $got, $case->{exp}, "$case->{case}: return value of multiplot_with() OK";
+    is $got, $case->{exp}, "$case->{label}: return value of multiplot_with() OK";
 }
 
 
