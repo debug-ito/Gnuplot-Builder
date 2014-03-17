@@ -1,6 +1,6 @@
 package testlib::Dataset;
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 
 sub new {

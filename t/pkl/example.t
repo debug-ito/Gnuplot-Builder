@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use lib "t";
 use testlib::PKLUtil qw(expect_pkl);
 use Test::More;

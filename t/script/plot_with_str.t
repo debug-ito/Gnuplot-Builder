@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use lib "t";
 use testlib::ScriptUtil qw(plot_str);
 use Test::More;

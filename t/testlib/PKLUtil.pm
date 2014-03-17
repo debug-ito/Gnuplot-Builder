@@ -1,6 +1,6 @@
 package testlib::PKLUtil;
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Exporter qw(import);
 use Test::More;
 use Test::Builder;

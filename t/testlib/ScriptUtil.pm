@@ -1,6 +1,6 @@
 package testlib::ScriptUtil;
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 use Test::Builder;
 use Exporter qw(import);

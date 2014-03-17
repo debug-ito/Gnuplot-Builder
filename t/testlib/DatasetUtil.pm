@@ -1,6 +1,6 @@
 package testlib::DatasetUtil;
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::Builder;
 use Test::Identity;
 use Exporter qw(import);

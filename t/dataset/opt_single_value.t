@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 use Test::Identity;
 use Gnuplot::Builder::Dataset;

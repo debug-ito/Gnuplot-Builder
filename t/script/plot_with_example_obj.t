@@ -1,6 +1,6 @@
 package My::Data;
 use strict;
-use warnings;
+use warnings FATAL => "all";
 
 sub new {
     my ($class, $x_data, $y_data) = @_;
@@ -19,7 +19,7 @@ sub write_data_to {
 
 package main;
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 use lib "t";
 use testlib::ScriptUtil qw(plot_str);

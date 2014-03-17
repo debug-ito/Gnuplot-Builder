@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
@@ -22,7 +22,7 @@ my @test_cases = (
         },
         exp => <<'EXP'
 set multiplot layout 2,2
-do for [name in 'A B C D'] {
+do for [name in  'A B C D'] {
 filename = name . '.dat'
 plot filename u 1:2
 }
@@ -31,7 +31,7 @@ EXP
     },
     {
         label => "single code",
-        args => { do => sub { $_[0]->writer("plot sin(x)\n") } },
+        args => { do => sub { $_[0]->("plot sin(x)\n") } },
         exp => <<'EXP'
 plot sin(x)
 EXP
