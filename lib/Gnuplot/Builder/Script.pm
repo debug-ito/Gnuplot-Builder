@@ -251,29 +251,6 @@ sub _draw_with {
         writer => $args{writer},
         async => $args{async}
     );
-
-    ## my $output = $args{output};
-    ## my $async = !!$args{async};
-    ## my $do = sub {
-    ##     my $writer = shift;
-    ##     $writer->($self->to_string);
-    ##     if(defined $output) {
-    ##         $writer->("set output " . quote_gnuplot_str($output) . "\n");
-    ##     }
-    ##     my ($params, $dataset_objects) = _collect_dataset_params($dataset);
-    ##     $writer->("$plot_command " . join(",", @$params) . "\n");
-    ##     _write_inline_data($writer, $dataset_objects);
-    ##     if(defined $output) {
-    ##         $writer->("set output\n");
-    ##     }
-    ## };
-    ## my $result = "";
-    ## if(defined($args{writer})) {
-    ##     $do->($args{writer});
-    ## }else {
-    ##     $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
-    ## }
-    ## return $result;
 }
 
 sub plot_with {
@@ -942,8 +919,8 @@ So the following example creates a multiplot figure of sin(x) and cos(x).
     });
 
 If you call plotting methods (including C<multiplot()> itself) without explicit writer in the C<$code> block,
-those methods won't start a gnuplot new process.
-Instead they write the script to the C<$writer> that is given by the first C<multiplot()> method.
+those methods won't start a new gnuplot process.
+Instead they write the script to the C<$writer> that is given by the enclosing C<multiplot()> method.
 
     $builder->multiplot(sub {
         my $writer = shift;
@@ -1076,7 +1053,7 @@ The above example generates an animated GIF of a traveling sin wave.
 Like the C<$code> argument for C<multiplot()> method,
 if you call plotting methods (including C<run()> itself) without explicit writer inside C<$command> code block,
 those methods won't start a new gnuplot process.
-Instead they write the script to the C<$writer> given by the first C<run()> method.
+Instead they write the script to the C<$writer> given by the enclosing C<run()> method.
 
 So you can rewrite the C<run()> method of the above example to
 
@@ -1104,7 +1081,7 @@ For example,
         "unset multiplot"
     );
 
-Well, maybe this is not a good example, though. In this case I would use C<multiplot()> and iteration in Perl.
+Well, maybe this is not a good example, though. In this case I would rather use C<multiplot()> and iteration in Perl.
 There is more than one way to do it.
 
 
