@@ -60,7 +60,7 @@ EXP
     },
     {
         label => "code calling writer with empty data",
-        args => { do => sub { $_[0]->(""); $_[0]->(); $_[0]->(undef) } },
+        args => { do => sub { $_[0]->(""); } },
         exp => ""
     },
     {
@@ -86,7 +86,7 @@ EXP
                 sub { $_[0]->("set "); $_[0]->("term"); $_[0]->(" png") },
                 sub { $_[0]->(" size 100,"); $_[0]->("100\n") },
                 sub { $_[0]->("set grid\n") },
-                sub { $_[0]->() },
+                sub { $_[0]->("") },
                 sub { $_[0]->("reread") },
             ]
         },
