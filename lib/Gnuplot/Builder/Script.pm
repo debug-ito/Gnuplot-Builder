@@ -4,7 +4,7 @@ use warnings;
 use Gnuplot::Builder::PrototypedData;
 use Gnuplot::Builder::Util qw(quote_gnuplot_str);
 use Gnuplot::Builder::Process;
-use Scalar::Util qw(weaken blessed);
+use Scalar::Util qw(weaken blessed refaddr);
 use Carp;
 use overload '""' => "to_string";
 
@@ -213,37 +213,60 @@ sub _write_inline_data {
     }
 }
 
+sub _wrap_commands_with_output {
+    my ($commands_ref, $output_filename) = @_;
+    if(defined($output_filename)) {
+        unshift @$commands_ref, "set output " . quote_gnuplot_str($output_filename);
+        push @$commands_ref, "set output";
+    }
+}
+
 sub _draw_with {
     my ($self, %args) = @_;
     my $plot_command = $args{command};
     my $dataset = $args{dataset};
-    croak "dataset is mandatory" if not defined $dataset;
+    croak "dataset parameter is mandatory" if not defined $dataset;
     if(ref($dataset) ne "ARRAY") {
         $dataset = [$dataset];
     }
     croak "at least one dataset is required" if !@$dataset;
-    my $output = $args{output};
-    my $async = $args{async};
-    my $do = sub {
+
+    my $plotter = sub {
         my $writer = shift;
-        $writer->($self->to_string);
-        if(defined $output) {
-            $writer->("set output " . quote_gnuplot_str($output) . "\n");
-        }
         my ($params, $dataset_objects) = _collect_dataset_params($dataset);
         $writer->("$plot_command " . join(",", @$params) . "\n");
         _write_inline_data($writer, $dataset_objects);
-        if(defined $output) {
-            $writer->("set output\n");
-        }
     };
-    my $result = "";
-    if(defined($args{writer})) {
-        $do->($args{writer});
-    }else {
-        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
-    }
-    return $result;
+    my @commands = ($plotter);
+    _wrap_commands_with_output($args{output});
+    return $self->run_with(
+        do => \@commands,
+        writer => $args{writer},
+        async => $args{async}
+    );
+
+    ## my $output = $args{output};
+    ## my $async = !!$args{async};
+    ## my $do = sub {
+    ##     my $writer = shift;
+    ##     $writer->($self->to_string);
+    ##     if(defined $output) {
+    ##         $writer->("set output " . quote_gnuplot_str($output) . "\n");
+    ##     }
+    ##     my ($params, $dataset_objects) = _collect_dataset_params($dataset);
+    ##     $writer->("$plot_command " . join(",", @$params) . "\n");
+    ##     _write_inline_data($writer, $dataset_objects);
+    ##     if(defined $output) {
+    ##         $writer->("set output\n");
+    ##     }
+    ## };
+    ## my $result = "";
+    ## if(defined($args{writer})) {
+    ##     $do->($args{writer});
+    ## }else {
+    ##     $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
+    ## }
+    ## return $result;
 }
 
 sub plot_with {
@@ -264,6 +287,77 @@ sub plot {
 sub splot {
     my ($self, @dataset) = @_;
     return $self->_draw_with(command => "splot", dataset => \@dataset);
+}
+
+sub multiplot_with {
+    my ($self, %args) = @_;
+    my $do = $args{do};
+    croak "do parameter is mandatory" if not defined $do;
+    croak "do parameter must be a code-ref" if ref($do) ne "CODE";
+    my $multiplot_command =
+        (defined($args{option}) && $args{option} ne "")
+            ? "set multiplot $args{option}" : "set multiplot";
+    my @commands = ($multiplot_command, $do, "unset multiplot");
+    _wrap_commands_with_output(\@commands, $args{output});
+    return $self->run_with(
+        do => \@commands,
+        writer => $args{writer},
+        async => $args{async}
+    );
+}
+
+sub multiplot {
+    my ($self, $option, $code) = @_;
+    if(@_ == 2) {
+        $code = $option;
+        $option = "";
+    }
+    croak "code parameter is mandatory" if not defined $code;
+    croak "code parameter must be a code-ref" if ref($code) ne "CODE";
+    return $self->multiplot_with(do => $code, option => $option);
+}
+
+our $_context_writer = undef;
+
+sub run_with {
+    my ($self, %args) = @_;
+    my $commands = $args{do};
+    if(!defined($commands)) {
+        $commands = [];
+    }elsif(ref($commands) ne "ARRAY") {
+        $commands = [$commands];
+    }
+    my $async = !!$args{async};
+    my $do = sub {
+        my $writer = shift;
+        (!defined($_context_writer) || refaddr($_context_writer) != refaddr($writer))
+            and local $_context_writer = $writer;
+        
+        $writer->($self->to_string);
+        foreach my $command (@$commands) {
+            if(ref($command) eq "CODE") {
+                $command->($writer);
+            }else {
+                $command = "$command";
+                $writer->($command);
+                $writer->("\n") if $command !~ /\n$/;
+            }
+        }
+    };
+    my $result = "";
+    if(defined($args{writer})) {
+        $do->($args{writer});
+    }elsif(defined($_context_writer)) {
+        $do->($_context_writer);
+    }else {
+        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
+    }
+    return $result;
+}
+
+sub run {
+    my ($self, @commands) = @_;
+    return $self->run_with(do => \@commands);
 }
 
 1;
