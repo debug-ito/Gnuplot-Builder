@@ -1,5 +1,12 @@
 Revision history for Gnuplot-Builder
 
+0.20    2014-03-17
+        [API CHANGES]
+        - Add multiplot(), multiplot_with(), run(), run_with() methods to Script.
+        [DEPENDENCY CHANGES]
+        - Drop dependency on Guard.
+        - Add dependency on Try::Tiny.
+
 0.15    2014-03-09
         [API CHANGES]
         - Script, Dataset: you can now call get_option() method in scalar context.
