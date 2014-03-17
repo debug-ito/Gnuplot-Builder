@@ -193,8 +193,8 @@ sub _collect_dataset_params {
     return (\@params_str, \@dataset_objects);
 }
 
-sub _write_inline_data {
-    my ($writer, $dataset_objects_arrayref) = @_;
+sub _wrap_writer_to_detect_empty_data {
+    my ($writer) = @_;
     my $ended_with_newline = 0;
     my $data_written = 0;
     my $wrapped_writer = sub {
@@ -204,11 +204,18 @@ sub _write_inline_data {
         $ended_with_newline = ($nonempty_data[-1] =~ /\n$/);
         $writer->(join("", @nonempty_data));
     };
+    return ($wrapped_writer, \$data_written, \$ended_with_newline);
+}
+
+sub _write_inline_data {
+    my ($writer, $dataset_objects_arrayref) = @_;
+    my ($wrapped_writer, $data_written_ref, $ended_with_newline_ref) =
+        _wrap_writer_to_detect_empty_data($writer);
     foreach my $dataset (@$dataset_objects_arrayref) {
-        $data_written = $ended_with_newline = 0;
+        $$data_written_ref = $$ended_with_newline_ref = 0;
         $dataset->write_data_to($wrapped_writer);
-        next if !$data_written;
-        $writer->("\n") if !$ended_with_newline;
+        next if !$$data_written_ref;
+        $writer->("\n") if !$$ended_with_newline_ref;
         $writer->("e\n");
     }
 }
@@ -238,7 +245,7 @@ sub _draw_with {
         _write_inline_data($writer, $dataset_objects);
     };
     my @commands = ($plotter);
-    _wrap_commands_with_output($args{output});
+    _wrap_commands_with_output(\@commands, $args{output});
     return $self->run_with(
         do => \@commands,
         writer => $args{writer},
@@ -294,10 +301,19 @@ sub multiplot_with {
     my $do = $args{do};
     croak "do parameter is mandatory" if not defined $do;
     croak "do parameter must be a code-ref" if ref($do) ne "CODE";
+    my $wrapped_do = sub {
+        my $writer = shift;
+        my ($wrapped_writer, $data_written_ref, $ended_with_newline_ref) =
+            _wrap_writer_to_detect_empty_data($writer);
+        $do->($wrapped_writer);
+        if($$data_written_ref && !$$ended_with_newline_ref) {
+            $writer->("\n");
+        }
+    };
     my $multiplot_command =
         (defined($args{option}) && $args{option} ne "")
             ? "set multiplot $args{option}" : "set multiplot";
-    my @commands = ($multiplot_command, $do, "unset multiplot");
+    my @commands = ($multiplot_command, $wrapped_do, "unset multiplot");
     _wrap_commands_with_output(\@commands, $args{output});
     return $self->run_with(
         do => \@commands,

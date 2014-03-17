@@ -177,6 +177,4 @@ plot sin(2 * x) title 'f = 2'
 EXP
 }
 
-fail("xt: multiplot() return error message if something is wrong. If async, there's no error message");
-
 done_testing;
