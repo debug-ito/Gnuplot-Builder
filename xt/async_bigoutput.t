@@ -12,8 +12,7 @@ use Gnuplot::Builder::Process;
     );
     $script->plot_with(dataset => "sin(x)", async => 1);
     sleep 1;
-    $script->set(samples => 100);
-    $script->plot("sin(x)"); ## try to reap the first process
+    Gnuplot::Builder::Process->FOR_TEST_clear_zombies;
     is(Gnuplot::Builder::Process->FOR_TEST_process_num, 0, "all processes finished.");
 }
 

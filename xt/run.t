@@ -46,7 +46,8 @@ foreach my $case (
 
 {
     note("--- nested plotting methods share the same process ");
-    Gnuplot::Builder::Script->new(term => "postscript")->plot("sin(x)"); ## reap processes
+    sleep 1;
+    Gnuplot::Builder::Process->FOR_TEST_clear_zombies;
     my $builder = Gnuplot::Builder::Script->new(
         term => "wxt size 1000,700",
     );

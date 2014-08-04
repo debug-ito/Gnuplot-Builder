@@ -10,7 +10,7 @@ note("--- exception during plotting.");
 
 sub wait_and_get_number_of_processes {
     sleep 0.5;
-    Gnuplot::Builder::Script->new(term => "postscript")->plot("sin(x)"); ## to clear the died process.
+    Gnuplot::Builder::Process->FOR_TEST_clear_zombies();
     return Gnuplot::Builder::Process->FOR_TEST_process_num();
 }
 

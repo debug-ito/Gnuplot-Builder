@@ -37,6 +37,7 @@ sub fork_mock_gnuplot {
     ## finish
     print $to_mock "print '-'\n";
     print $to_mock q{print '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@'}, "\n";
+    print $to_mock "pause mouse close\n";
     print $to_mock "exit\n";
 
     my $result = do { local $/; <$from_mock> };
@@ -47,6 +48,7 @@ bar
 print '-'
 print '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@'
 @@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@
+pause mouse close
 exit
 EXP
     waitpid $mock_pid, 0;

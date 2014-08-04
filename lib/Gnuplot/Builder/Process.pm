@@ -12,6 +12,7 @@ our @COMMAND = qw(gnuplot --persist);
 our $MAX_PROCESSES = 10;
 
 my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
+my @SCRIPT_AFTER_END = (qq{pause mouse close}, qq{exit});
 my $processes = Gnuplot::Builder::PartiallyKeyedList->new;
 
 sub _clear_zombies {
@@ -32,6 +33,9 @@ sub _clear_zombies {
 
 ## PUBLIC ONLY IN TESTS: number of processes it keeps now
 sub FOR_TEST_process_num { $processes->size }
+
+## PUBLIC ONLY TESTS
+*FOR_TEST_clear_zombies = *_clear_zombies;
 
 ## create a new gnuplot process, create a writer to it and run the
 ## given code. If the code throws an exception, the process is
@@ -125,7 +129,7 @@ sub _close_input {
     return if not defined $self->{write_handle};
     my $write_handle = $self->{write_handle};
     print $write_handle "\n";
-    foreach my $statement (qq{set print "-"}, qq{print '$END_SCRIPT_MARK'}, qq{exit}) {
+    foreach my $statement (qq{set print "-"}, qq{print '$END_SCRIPT_MARK'}, @SCRIPT_AFTER_END) {
         print $write_handle ($statement, "\n");
     }
     close $self->{write_handle};
@@ -173,7 +177,8 @@ sub _wait_to_finish {
         }
         close $read_handle;
     }
-    $self->_waitpid(1);
+    ## Do not actually wait for the process to finish, because it can
+    ## be a long-lasting process with plot windows.
     return $result;
 }
 
@@ -203,7 +208,7 @@ sub receive_from_builder {
         ## detect the end of script by ourselves.
         if(index($line, $END_SCRIPT_MARK) != -1) {
             print $output_handle "$END_SCRIPT_MARK\n";
-            $code->("exit\n");
+            $code->("$_\n") foreach @SCRIPT_AFTER_END;
             last;
         }
     }
