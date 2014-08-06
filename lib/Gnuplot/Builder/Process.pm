@@ -20,9 +20,9 @@ sub _get_env {
 
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 10);
+our $PAUSE_FINISH = 1;
 
 my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
-my @SCRIPT_AFTER_END = (qq{pause mouse close}, qq{exit});
 my $processes = Gnuplot::Builder::PartiallyKeyedList->new;
 
 sub _clear_zombies {
@@ -133,13 +133,22 @@ sub _writer {
     ## data to STDOUT/STDERR. That's rare.
 }
 
+## lexical sub because MockTool uses it, too.
+my $_finishing_commands = sub {
+    if($PAUSE_FINISH) {
+        return ('pause mouse close', 'exit');
+    }else {
+        return ('exit');
+    }
+};
+
 ## Close the input channel. You can call this method multiple times.
 sub _close_input {
     my ($self) = @_;
     return if not defined $self->{write_handle};
     my $write_handle = $self->{write_handle};
     print $write_handle "\n";
-    foreach my $statement (qq{set print "-"}, qq{print '$END_SCRIPT_MARK'}, @SCRIPT_AFTER_END) {
+    foreach my $statement (qq{set print "-"}, qq{print '$END_SCRIPT_MARK'}, $_finishing_commands->()) {
         print $write_handle ($statement, "\n");
     }
     close $self->{write_handle};
@@ -218,7 +227,7 @@ sub receive_from_builder {
         ## detect the end of script by ourselves.
         if(index($line, $END_SCRIPT_MARK) != -1) {
             print $output_handle "$END_SCRIPT_MARK\n";
-            $code->("$_\n") foreach @SCRIPT_AFTER_END;
+            $code->("$_\n") foreach $_finishing_commands->();
             last;
         }
     }
@@ -268,6 +277,16 @@ By default, it's C<10>.
 
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.
+
+=head2 $PAUSE_FINISH
+
+If set to true, L<Gnuplot::Builder> sends "pause mouse close" command to the gnuplot process
+just before finishing the script.
+
+By default, it's C<1> (true).
+
+You can also set this variable by the environment variable
+C<PERL_GNUPLOT_BUILDER_PROCESS_PAUSE_FINISH>.
 
 =head1 AUTHOR
 

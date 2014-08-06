@@ -19,3 +19,7 @@ on 'configure' => sub {
     requires 'Module::Build::Pluggable', '0.09';
     requires 'Module::Build::Pluggable::CPANfile', '0.02';
 };
+
+on 'develop' => sub {
+    requires 'File::Temp' => "0";
+};
