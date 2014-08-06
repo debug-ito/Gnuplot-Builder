@@ -8,8 +8,18 @@ use POSIX qw(:sys_wait_h);
 use File::Spec;
 use Try::Tiny;
 
-our @COMMAND = qw(gnuplot --persist);
-our $MAX_PROCESSES = 10;
+sub _get_env {
+    my ($basename, @default) = @_;
+    my $name = "PERL_GNUPLOT_BUILDER_PROCESS_$basename";
+    if(defined($ENV{$name}) && $ENV{$name} ne "") {
+        return $ENV{$name};
+    }else {
+        return wantarray ? @default : $default[0];
+    }
+}
+
+our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
+our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 10);
 
 my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
 my @SCRIPT_AFTER_END = (qq{pause mouse close}, qq{exit});
@@ -246,12 +256,18 @@ The command and arguments to run a gnuplot process.
 
 By default, it's C<("gnuplot", "--persist")>.
 
+You can also set this variable by the environment variable
+C<PERL_GNUPLOT_BUILDER_PROCESS_COMMAND>.
+
 =head2 $MAX_PROCESSES
 
 Maximum number of gnuplot processes that can run in parallel.
 If C<$MAX_PROCESSES> <= 0, the number of processes is unlimited.
 
 By default, it's C<10>.
+
+You can also set this variable by the environment variable
+C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.
 
 =head1 AUTHOR
 
