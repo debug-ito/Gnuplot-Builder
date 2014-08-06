@@ -139,7 +139,7 @@ sub _close_input {
 sub _waitpid {
     my ($self, $blocking) = @_;
     my $result = waitpid($self->{pid}, $blocking ? 0 : WNOHANG);
-    if($result == $self->{pid}) {
+    if($result == $self->{pid} || $result == -1) {
         $processes->delete($self->{pid});
     }
 }
