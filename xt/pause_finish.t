@@ -16,8 +16,6 @@ sub get_echo {
     return $data;
 }
 
-is $Gnuplot::Builder::Process::PAUSE_FINISH, 1, "by default, PAUSE_FINISH is 1";
-
 {
     note("-- when PAUSE_FINISH = 0");
     local $Gnuplot::Builder::Process::PAUSE_FINISH = 0;
