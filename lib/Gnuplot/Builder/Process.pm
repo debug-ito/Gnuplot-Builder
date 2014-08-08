@@ -20,7 +20,7 @@ sub _get_env {
 
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 10);
-our $PAUSE_FINISH = 1;
+our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 1);
 
 my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
 my $processes = Gnuplot::Builder::PartiallyKeyedList->new;
@@ -44,8 +44,16 @@ sub _clear_zombies {
 ## PUBLIC ONLY IN TESTS: number of processes it keeps now
 sub FOR_TEST_process_num { $processes->size }
 
-## PUBLIC ONLY TESTS
+## PUBLIC ONLY IN TESTS
 *FOR_TEST_clear_zombies = *_clear_zombies;
+
+## PUBLIC ONLY IN TESTS
+sub FOR_TEST_wait_all {
+    while($processes->size > 0) {
+        my $proc = $processes->get_at(0);
+        $proc->_waitpid(1);
+    }
+}
 
 ## create a new gnuplot process, create a writer to it and run the
 ## given code. If the code throws an exception, the process is
