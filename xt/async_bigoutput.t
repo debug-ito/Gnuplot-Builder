@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
+use lib "xt";
+use testlib::XTUtil qw(check_process_finish);
 
 {
     my $script = Gnuplot::Builder::Script->new(
@@ -16,6 +18,7 @@ use Gnuplot::Builder::Process;
     is(Gnuplot::Builder::Process->FOR_TEST_process_num, 0, "all processes finished.");
 }
 
+check_process_finish;
 
 done_testing;
 

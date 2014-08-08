@@ -4,7 +4,7 @@ use Test::More;
 use Gnuplot::Builder::Script;
 use Time::HiRes qw(time);
 use lib "xt";
-use testlib::XTUtil qw(if_no_file);
+use testlib::XTUtil qw(if_no_file check_process_finish);
 
 
 if_no_file "test_plot.png", sub {
@@ -83,4 +83,5 @@ foreach my $term (
     }
 }
 
+check_process_finish;
 done_testing;

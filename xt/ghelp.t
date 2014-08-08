@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use Gnuplot::Builder;
+use lib "xt";
+use testlib::XTUtil qw(check_process_finish);
 
 foreach my $case (
     {label => "no arg", args => [], exp => qr{Gnuplot}},
@@ -25,5 +27,7 @@ foreach my $case (
     note("--- example");
     is ghelp("style data"), ghelp("style", "data"), "multiple args are just joined by white spaces";
 }
+
+check_process_finish;
 
 done_testing;

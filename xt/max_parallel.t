@@ -4,6 +4,8 @@ use Test::More;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 use Time::HiRes qw(time);
+use lib "xt";
+use testlib::XTUtil qw(check_process_finish);
 
 sub plot_time {
     my $builder = shift;
@@ -50,5 +52,6 @@ sleep 4;
     is process_num(), 1, "1 process running";
 }
 
+check_process_finish;
 
 done_testing;

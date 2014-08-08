@@ -4,7 +4,7 @@ use Test::More;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 use lib "xt";
-use testlib::XTUtil qw(if_no_file);
+use testlib::XTUtil qw(if_no_file check_process_finish);
 
 if_no_file "test_example_gif_animation.gif", sub {
     my $filename = shift;
@@ -73,4 +73,5 @@ SET
     is(Gnuplot::Builder::Process->FOR_TEST_process_num, 1, "1 process is shared by all the plotting methods.");
 }
 
+check_process_finish;
 done_testing;

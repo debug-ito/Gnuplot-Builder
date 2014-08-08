@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
 use lib "xt";
-use testlib::XTUtil qw(if_no_file);
+use testlib::XTUtil qw(if_no_file check_process_finish);
 
 if_no_file "test_multiplot_noopt.png", sub {
     my $filename = shift;
@@ -70,7 +70,6 @@ foreach my $case (
     is $got, $case->{exp}, "$case->{label}: return value of multiplot_with() OK";
 }
 
+check_process_finish;
 
 done_testing;
-
-

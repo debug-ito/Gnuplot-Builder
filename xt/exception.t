@@ -5,6 +5,8 @@ use Gnuplot::Builder::Process;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 use Time::HiRes qw(sleep);
+use lib "xt";
+use testlib::XTUtil qw(check_process_finish);
 
 note("--- exception during plotting.");
 
@@ -93,5 +95,7 @@ foreach my $case (
     }
     is(wait_and_get_number_of_processes, 0, "$case->{label}: no running process.");
 }
+
+check_process_finish;
 
 done_testing;
