@@ -66,7 +66,7 @@ if_no_file "test_print.png", sub {
     $builder->setq(output => $filename, title => "print test");
     my $ret = $builder->plot("cos(x)");
     cond_check sub {
-        is , <<EXP, "gnuplot process output by print command OK";
+        is $ret, <<EXP, "gnuplot process output by print command OK";
 hoge hoge
 foo bar
 EXP
