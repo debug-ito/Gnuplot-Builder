@@ -5,13 +5,15 @@ use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 use Time::HiRes qw(time);
 use lib "xt";
-use testlib::XTUtil qw(check_process_finish);
+use testlib::XTUtil qw(check_process_finish cond_check);
 
 sub plot_time {
     my $builder = shift;
     my $before = time;
-    is $builder->plot_with(dataset => "sin(x)", async => 1), "",
-        "async plot always returns an empty string";
+    my $ret = $builder->plot_with(dataset => "sin(x)", async => 1);
+    cond_check sub {
+        is $ret, "", "async plot always returns an empty string";
+    };
     return time() - $before;
 }
 

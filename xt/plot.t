@@ -4,7 +4,7 @@ use Test::More;
 use Gnuplot::Builder::Script;
 use Time::HiRes qw(time);
 use lib "xt";
-use testlib::XTUtil qw(if_no_file check_process_finish);
+use testlib::XTUtil qw(if_no_file check_process_finish cond_check);
 
 
 if_no_file "test_plot.png", sub {
@@ -18,7 +18,10 @@ xlabel = "x label"
 ylabel = "y label"
 SET
     $builder->setq(output => $filename);
-    is $builder->plot("sin(2 * pi * x)"), "", "gnuplot process should output nothing.";
+    my $ret = $builder->plot("sin(2 * pi * x)");
+    cond_check sub {
+        is $ret, "", "gnuplot process should output nothing.";
+    };
     ok((-f $filename), "$filename output OK");
 };
 
@@ -35,7 +38,8 @@ ylabel = "y label"
 zlabel = "z label"
 SET
     $builder->setq(output => $filename);
-    is $builder->splot("sin(x*x + y*y) / (x*x + y*y)"), "", "gnuplot process should output nothing";
+    my $ret = $builder->splot("sin(x*x + y*y) / (x*x + y*y)");
+    is $ret, "", "gnuplot process should output nothing";
     ok((-f $filename), "$filename output OK");
 };
 
@@ -47,7 +51,9 @@ if_no_file "test_error.png", sub {
     $builder->set(term => "png size 200,200");
     $builder->setq(output => $filename);
     my $result = $builder->plot("sin(x)");
-    isnt $result, "", "gnuplot process should output some error messages";
+    cond_check sub {
+        isnt $result, "", "gnuplot process should output some error messages";
+    };
     note("gnuplot error message: $result");
 };
 
@@ -58,10 +64,13 @@ if_no_file "test_print.png", sub {
     $builder->add(qq{print "foo bar"});
     $builder->set(term => "png size 700,500");
     $builder->setq(output => $filename, title => "print test");
-    is $builder->plot("cos(x)"), <<EXP, "gnuplot process output by print command OK";
+    my $ret = $builder->plot("cos(x)");
+    cond_check sub {
+        is , <<EXP, "gnuplot process output by print command OK";
 hoge hoge
 foo bar
 EXP
+    };
 };
 
 foreach my $term (
@@ -71,14 +80,19 @@ foreach my $term (
     {
         note("--- $term terminal: no error");
         my $before_time = time;
-        is $builder->plot("cos(x)"), "", "$term: gnuplot process should output nothing";
+        my $ret = $builder->plot("cos(x)");
+        cond_check sub {
+            is $ret, "", "$term: gnuplot process should output nothing";
+        };
         my $wait_time = time - $before_time;
         cmp_ok $wait_time, "<", 1, "$term: plot() should return immediately";
     }
     {
         note("--- $term terminal: with error");
         my $result = $builder->plot('sin(x) ps 4 with lp title "FOOBAR"');
-        isnt $result, "", "$term: gnuplot process should output some error messages";
+        cond_check sub {
+            isnt $result, "", "$term: gnuplot process should output some error messages";
+        };
         note("$term: gnuplot error message: $result");
     }
 }

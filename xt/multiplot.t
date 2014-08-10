@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Gnuplot::Builder::Script;
 use lib "xt";
-use testlib::XTUtil qw(if_no_file check_process_finish);
+use testlib::XTUtil qw(if_no_file check_process_finish cond_check);
 
 if_no_file "test_multiplot_noopt.png", sub {
     my $filename = shift;
@@ -15,26 +15,32 @@ if_no_file "test_multiplot_noopt.png", sub {
         size => "1, 0.4",
         origin => "0, 0"
     );
-    is(Gnuplot::Builder::Script->new(
+    my $ret = Gnuplot::Builder::Script->new(
         term => "png size 500,500",
         output => "'$filename'"
     )->multiplot(sub {
         $upper->plot("sin(x) title 'sin(x) upper'");
         $lower->plot("cos(x) title 'cos(x) lower'");
-    }), "", "gnuplot process should output no message");
+    });
+    cond_check sub {
+        is($ret, "", "gnuplot process should output no message");
+    };
     ok((-f $filename), "$filename created");
 };
 
 if_no_file "test_multiplot_opt.png", sub {
     my $filename = shift;
-    is(Gnuplot::Builder::Script->new(
+    my $ret = Gnuplot::Builder::Script->new(
         term => "png size 700,500",
         output => "'$filename'"
     )->multiplot("layout 1,2", sub {
         my $builder = Gnuplot::Builder::Script->new;
         $builder->plot("sin(x) title 'sin(x) left'");
         $builder->plot("cos(x) title 'cos(x) right'");
-    }), "", "gnuplot process should output no message");
+    });
+    cond_check sub {
+        is($ret, "", "gnuplot process should output no message");
+    };
     ok((-f $filename), "$filename created");
 };
 
@@ -48,7 +54,9 @@ if_no_file "test_multiplot_error.png", sub {
         $writer->("set hoge foo bar\n");
         $writer->("plot cos(x) title 'multiplot error'");
     });
-    isnt $result, "", "gnuplot process should output some error message";
+    cond_check sub {
+        isnt $result, "", "gnuplot process should output some error message";
+    };
     note("Process output: $result");
 };
 
@@ -67,7 +75,9 @@ foreach my $case (
         $writer->("print 'foobar'\n");
         $writer->("plot sin(x) title 'multiplot $case->{label}'");
     });
-    is $got, $case->{exp}, "$case->{label}: return value of multiplot_with() OK";
+    cond_check sub {
+        is $got, $case->{exp}, "$case->{label}: return value of multiplot_with() OK";
+    };
 }
 
 check_process_finish;

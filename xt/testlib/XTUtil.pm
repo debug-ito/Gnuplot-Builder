@@ -2,10 +2,11 @@ package testlib::XTUtil;
 use strict;
 use warnings;
 use Test::More;
+use Test::Builder;
 use Exporter qw(import);
 use Gnuplot::Builder::Process;
 
-our @EXPORT_OK = qw(if_no_file check_process_finish);
+our @EXPORT_OK = qw(if_no_file check_process_finish cond_check);
 
 sub if_no_file {
     my ($filename, $code) = @_;
@@ -29,6 +30,15 @@ sub check_process_finish {
         note("result of ps:");
         note($ps);
     }
+}
+
+sub cond_check {
+    my ($check_sub) = @_;
+    if($^O eq 'MSWin32') {
+        note("Check is skipped in Windows");
+        return;
+    }
+    $check_sub->();
 }
 
 1;

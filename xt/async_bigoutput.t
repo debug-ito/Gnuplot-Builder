@@ -21,5 +21,3 @@ use testlib::XTUtil qw(check_process_finish);
 check_process_finish;
 
 done_testing;
-
-
