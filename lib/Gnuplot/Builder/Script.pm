@@ -367,25 +367,24 @@ Gnuplot::Builder::Script - object-oriented builder for gnuplot script
 
     use Gnuplot::Builder::Script;
     
-    my $builder = Gnuplot::Builder::Script->new(<<EOT);
-    terminal = png size 500,500 enhanced
-    grid     = x y
-    xrange   = [-10:10]
-    yrange   = [-1:1]
-    xlabel   = x offset 0,1
-    ylabel   = y offset 1,0
-    output   = "sin_wave.png"
-    -key
-    EOT
-    
-    $builder->define('f(x) = sin(pi * x)');
-    $builder->plot("f(x)");                 ## output sin_wave.png
+    my $builder = Gnuplot::Builder::Script->new();
+    $builder->set(
+        terminal => 'png size 500,500 enhanced',
+        grid     => 'x y',
+        xrange   => '[-10:10]',
+        yrange   => '[-1:1]',
+        xlabel   => '"x" offset 0,1',
+        ylabel   => '"y" offset 1,0',
+    );
+    $builder->setq(output => 'sin_wave.png');
+    $builder->unset("key");
+    $builder->define('f(x)' => 'sin(pi * x)');
+    $builder->plot("f(x)"); ## output sin_wave.png
     
     my $child = $builder->new_child;
-    $child->define('f(x) = cos(pi * x)');   ## override parent's setting
-    $child->set('output = "cos_wave.png"'); ## override parent's setting
-    $child->plot("f(x)");                   ## output cos_wave.png
-
+    $child->define('f(x)' => 'cos(pi * x)'); ## override parent's setting
+    $child->setq(output => 'cos_wave.png');  ## override parent's setting
+    $child->plot("f(x)");                    ## output cos_wave.png
 
 =head1 DESCRIPTION
 
