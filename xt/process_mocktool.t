@@ -37,20 +37,20 @@ sub fork_mock_gnuplot {
     ## finish
     print $to_mock "print '-'\n";
     print $to_mock q{print '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@'}, "\n";
-    print $to_mock "pause mouse close\n";
+    print $to_mock "pause mouse close\n" if $Gnuplor::Builder::Process::PAUSE_FINISH;
     print $to_mock "exit\n";
 
     my $result = do { local $/; <$from_mock> };
-    is $result, <<'EXP', "receive_from_builder ends with the END_MARK";
+    my $exp = sprintf(<<'EXP', $Gnuplor::Builder::Process::PAUSE_FINISH ? "\npause mouse close" : "");
 hoge
 foo
 bar
 print '-'
 print '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@'
-@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@
-pause mouse close
+@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@%s
 exit
 EXP
+    is $result, $exp, "receive_from_builder ends with the END_MARK";
     waitpid $mock_pid, 0;
 }
 
