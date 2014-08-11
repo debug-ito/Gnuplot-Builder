@@ -216,6 +216,7 @@ By default, it's OFF.
 
 The above configurations can be set via environment variables.
 See L<Gnuplot::Builder::Process> for detail.
+Note that B<< the default values for these configurations may be changed in future releases. >>
 
 I recommend "persist: OFF, pause: ON" B<< unless you use "qt" terminal >>.
 This makes a fully-functional plot window whose process gracefully exits

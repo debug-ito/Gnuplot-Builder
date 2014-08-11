@@ -265,6 +265,8 @@ by all L<Gnuplot::Builder::Script> objects.
 
 You can configure its package variables to change its behavior.
 
+B<< The default values for these variables may be changed in future releases. >>
+
 =head1 PACKAGE VARIABLES
 
 =head2 @COMMAND
