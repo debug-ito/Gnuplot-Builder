@@ -20,7 +20,7 @@ sub _get_env {
 
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 10);
-our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 1);
+our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
 
 my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
 my $processes = Gnuplot::Builder::PartiallyKeyedList->new;
@@ -291,7 +291,7 @@ C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.
 If set to true, L<Gnuplot::Builder> sends "pause mouse close" command to the gnuplot process
 just before finishing the script.
 
-By default, it's C<1> (true).
+By default, it's C<0> (false).
 
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_PAUSE_FINISH>.
