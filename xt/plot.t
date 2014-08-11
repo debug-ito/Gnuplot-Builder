@@ -73,9 +73,21 @@ EXP
     };
 };
 
-foreach my $term (
-    $^O eq 'MSWin32' ? ("windows", "wxt") : ("x11", "wxt")
-) {
+
+my @tested_terms = ("wxt");
+if($^O eq 'MSWin32') {
+    push @tested_terms, "windows";
+}else {
+    push @tested_terms, "x11";
+}
+if($ENV{GNUPLOT_BUILDER_TEST_QT}) {
+    note("qt term will be tested");
+    push @tested_terms, "qt";
+}else {
+    diag("If you want to test qt term, set GNUPLOT_BUILDER_TEST_QT environement variable");
+}
+
+foreach my $term (@tested_terms) {
     my $builder = Gnuplot::Builder::Script->new(term => "$term");
     {
         note("--- $term terminal: no error");
