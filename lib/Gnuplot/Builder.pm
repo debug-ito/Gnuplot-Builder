@@ -111,6 +111,10 @@ Batch scripts using L<Gnuplot::Builder> are fine in Windows.
 In interactive shells, plot windows might not persist when you use regular L<Gnuplot::Builder>.
 As a workaround, try L<Gnuplot::Builder::Wgnuplot>.
 
+=head2 Plot Windows
+
+L<Gnuplot::Builder> supports plots in interactive windows.
+See L</CONFIGURATION FOR PLOT WINDOWS> for known issues about that.
 
 =head1 EXPORTED FUNCTIONS
 
@@ -149,6 +153,84 @@ C<@help_args> is the arguments for the "help" command. They are joined with whit
     ## or you can say
     
     ghelp("style", "data");
+
+=head1 CONFIGURATION FOR PLOT WINDOWS
+
+L<Gnuplot::Builder> supports plots in interactive windows (terminals
+such as "x11", "windows" etc). However, plot windows are very tricky,
+so you might have to configure L<Gnuplot::Builder> in advance.
+
+=head2 Design Goals
+
+In terms of plot windows, L<Gnuplot::Builder> aims to achieve the following goals.
+
+=over
+
+=item *
+
+Plotting methods should return immediately, without waiting for plot windows to close.
+
+=item *
+
+Plot windows should persist even after the Perl process using L<Gnuplot::Builder> exits.
+
+=item *
+
+Plot windows should be fully interactive. It should allow zooming and clipping etc.
+
+=back
+
+=head2 Configuration Patterns and Their Problems
+
+The best configuration to achieve the above goals depends on
+your platform OS, version of your gnuplot, the terminal to use and the libraries it uses.
+Unfortunately there is no one-size-fits-all solution.
+
+If you use Windows, just use L<Gnuplot::Builder::Wgnuplot>.
+
+Otherwise, you have two configuration points.
+
+=over
+
+=item persist mode
+
+Whether or not gnuplot's "persist" mode should be used.
+This is configured by C<@Gnuplot::Builder::Process::COMMAND> variable.
+
+    @Gnuplot::Builder::Process::COMMAND = qw(gnuplot);           ## persist OFF
+    @Gnuplot::Builder::Process::COMMAND = qw(gnuplot --persist); ## persist ON
+
+By default, it's ON.
+
+=item pause mode
+
+Whether or not "pause mouse close" command should be used.
+This is configured by C<$Gnuplot::Builder::Process::PAUSE_FINISH> variable.
+
+    $Gnuplot::Builder::Process::PAUSE_FINISH = 0; ## pause OFF
+    $Gnuplot::Builder::Process::PAUSE_FINISH = 1; ## pause ON
+
+By default, it's OFF.
+
+=back
+
+The above configurations can be set via environment variables.
+See L<Gnuplot::Builder::Process> for detail.
+
+I recommend "persist: OFF, pause: ON" B<< unless you use "qt" terminal >>.
+This makes a fully-functional plot window whose process gracefully exits
+when you close the window.
+
+Do not use the pause mode if you use "qt" terminal.
+This is because, as of gnuplot 4.6.5, "qt" terminal doesn't respond to the "pause" command,
+leading to a never-ending process.
+This process-leak can be dangerous, so the "pause" mode is OFF by default.
+
+The second best is "persist: ON, pause: OFF".
+However, plot windows of "x11" or "qt" terminals in "persist" mode lack interactive functionality
+such as zooming and clipping.
+"wxt" terminal may be unstable (it crashes or freezes) in some environments.
+
 
 
 =head1 REPOSITORY
