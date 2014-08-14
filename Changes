@@ -1,5 +1,16 @@
 Revision history for Gnuplot-Builder
 
+0.21    2014-08-14
+        [ENHANCEMENT]
+        - Add $Gnuplot::Builder::Process::PAUSE_FINISH option parameter.
+          This helps create fully functional plot windows, but it can cause
+          never-ending gnuplot processes in some cases. Use with care.
+        - Now Gnuplot::Builder::Process::* options can be set via environment
+          variables.
+        [DOCUMENTATION]
+        - Update SYNOPSIS of Gnuplot::Builder::Script.
+        - Add section about plot windows to Gnuplot::Builder. It's really tricky.
+
 0.20    2014-03-17
         [API CHANGES]
         - Add multiplot(), multiplot_with(), run(), run_with() methods to Script.
