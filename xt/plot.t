@@ -39,7 +39,9 @@ zlabel = "z label"
 SET
     $builder->setq(output => $filename);
     my $ret = $builder->splot("sin(x*x + y*y) / (x*x + y*y)");
-    is $ret, "", "gnuplot process should output nothing";
+    cond_check sub {
+        is $ret, "", "gnuplot process should output nothing";
+    };
     ok((-f $filename), "$filename output OK");
 };
 
