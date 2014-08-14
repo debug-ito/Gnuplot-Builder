@@ -194,7 +194,7 @@ Otherwise, you have two configuration points.
 
 =item persist mode
 
-Whether or not gnuplot's "persist" mode should be used.
+Whether or not gnuplot's "persist" mode is used.
 This is configured by C<@Gnuplot::Builder::Process::COMMAND> variable.
 
     @Gnuplot::Builder::Process::COMMAND = qw(gnuplot);           ## persist OFF
@@ -204,7 +204,7 @@ By default, it's ON.
 
 =item pause mode
 
-Whether or not "pause mouse close" command should be used.
+Whether or not "pause mouse close" command is used.
 This is configured by C<$Gnuplot::Builder::Process::PAUSE_FINISH> variable.
 
     $Gnuplot::Builder::Process::PAUSE_FINISH = 0; ## pause OFF
@@ -219,7 +219,7 @@ See L<Gnuplot::Builder::Process> for detail.
 Note that B<< the default values for these configurations may be changed in future releases. >>
 
 I recommend "persist: OFF, pause: ON" B<< unless you use "qt" terminal >>.
-This makes a fully-functional plot window whose process gracefully exits
+This makes a fully functional plot window whose process gracefully exits
 when you close the window.
 
 Do not use the pause mode if you use "qt" terminal.
