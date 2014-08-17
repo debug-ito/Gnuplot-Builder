@@ -1,5 +1,9 @@
 Revision history for Gnuplot-Builder
 
+0.22    2014-08-17
+        [PACKAGING]
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
 0.21    2014-08-14
         [ENHANCEMENT]
         - Add $Gnuplot::Builder::Process::PAUSE_FINISH option parameter.
