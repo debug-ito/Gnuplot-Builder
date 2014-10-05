@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Gnuplot::Builder ();
 use lib "xt";
-use testlib::XTUtil qw(if_no_file);
+use testlib::XTUtil qw(if_no_file cond_check);
 
 sub check_tap_logs {
     my (@tap_logs) = @_;
@@ -98,5 +98,23 @@ if_no_file "test_tap_run.png", sub {
     ok(!-e $filename, "$filename should be created because of 'writer' option");
     is scalar(@tap_logs), 0, "no tap log should be recorded because of 'writer' option";
 }
+
+if_no_file "test_tap_module.png", sub {
+    my $filename = shift;
+    note("--- Tap module");
+    my $output = `perl ./xt/testlib/plotter.pl '$filename'`;
+    is $output, "", "no output because Tap is not in effect";
+    ok(-e $filename, "$filename is generated");
+    unlink($filename) or die "Cannot remove $filename: $!";
+    
+    $output = `perl -MGnuplot::Builder::Tap ./xt/testlib/plotter.pl '$filename'`;
+    like $output, qr/set +term/, "set term in output";
+    like $output, qr/set +xrange/, "set xrange in output";
+    like $output, qr/set +title/, "set title in output";
+    like $output, qr/set +xlabel/, "set xlabel in output";
+    like $output, qr/set +ylabel/, "set ylabel in output";
+    like $output, qr/set +output/, "set output in output";
+    like $output, qr/plot +x \* x/, "plot x * x in output";
+};
 
 done_testing;

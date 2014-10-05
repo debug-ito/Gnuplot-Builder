@@ -318,6 +318,8 @@ and C<$body> is an object describing the event.
 Currently C<$event> is always C<"write">, which is called every time some data is written to the gnuplot process.
 C<$body> is the written string.
 
+To set C<$TAP> from outside the program, use L<Gnuplot::Builder::Tap>.
+
 =head1 AUTHOR
 
 Toshio Ito, C<< <toshioito at cpan.org> >>
