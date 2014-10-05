@@ -1,5 +1,12 @@
 Revision history for Gnuplot-Builder
 
+0.23    2014-10-05
+        [ENHANCEMENT]
+        - Add $Gnuplot::Builder::Process::TAP package variable. This is useful for debugging.
+        - Add Gnuplot::Builder::Tap module. This is even more useful for debugging.
+        [DOCUMENTATION]
+        - Comment about gnuplot 4.6.6.
+
 0.22    2014-08-17
         [PACKAGING]
         - Migrate to Module::Build::Prereqs::FromCPANfile.
