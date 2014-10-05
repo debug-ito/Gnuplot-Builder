@@ -780,6 +780,8 @@ If C<$dataset> is a string, it's treated as the dataset parameters for "plot" co
 
 =item *
 
+The above code plots "sin(x)" and "cos(x)" curves and data points in the file "datafile.dat".
+
 If C<$dataset> is an object, it must implement C<params_string()> and C<write_data_to()> methods (like L<Gnuplot::Builder::Dataset>).
 
 C<params_string()> method is supposed to return a string of the dataset parameters,
