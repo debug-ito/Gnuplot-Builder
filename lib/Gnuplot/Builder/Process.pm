@@ -298,6 +298,21 @@ By default, it's C<0> (false).
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_PAUSE_FINISH>.
 
+=head2 $TAP
+
+A subroutine reference to tap the IPC with the gnuplot process. This is useful for debugging.
+
+If set, the subroutine reference is called for each event.
+
+    $TAP->($pid, $event, $body)
+
+where C<$pid> is the PID of the gnuplot process,
+C<$event> is a string describing the event type,
+and C<$body> is an object describing the event.
+
+Currently C<$event> is always C<"write">, which is called every time some data is written to the gnuplot process.
+C<$body> is the written string.
+
 =head1 AUTHOR
 
 Toshio Ito, C<< <toshioito at cpan.org> >>
