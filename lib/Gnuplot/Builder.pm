@@ -218,20 +218,22 @@ The above configurations can be set via environment variables.
 See L<Gnuplot::Builder::Process> for detail.
 Note that B<< the default values for these configurations may be changed in future releases. >>
 
-I recommend "persist: OFF, pause: ON" B<< unless you use "qt" terminal >>.
+I recommend "persist: OFF, pause: ON" B<< unless you use "qt" terminal with gnuplot 4.6.5 or below >>.
 This makes a fully functional plot window whose process gracefully exits
 when you close the window.
 
-Do not use the pause mode if you use "qt" terminal.
+If you use "qt" terminal with gnuplot 4.6.5 or below,
+use "persist: ON, pause: OFF".
 This is because, as of gnuplot 4.6.5, "qt" terminal doesn't respond to the "pause" command,
 leading to a never-ending process.
 This process-leak can be dangerous, so the "pause" mode is OFF by default.
+This bug is fixed in gnuplot 4.6.6.
 
-The second best is "persist: ON, pause: OFF".
+The default setting "persist: ON, pause: OFF" doesn't cause process-leak in all environments I tested.
 However, plot windows of "x11" or "qt" terminals in "persist" mode lack interactive functionality
 such as zooming and clipping.
+This is gnuplot's limitation in "persist" mode.
 "wxt" terminal may be unstable (it crashes or freezes) in some environments.
-
 
 
 =head1 REPOSITORY
