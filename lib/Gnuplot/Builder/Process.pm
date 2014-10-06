@@ -320,6 +320,13 @@ C<$body> is the written string.
 
 To set C<$TAP> from outside the program, use L<Gnuplot::Builder::Tap>.
 
+Example:
+
+    local $Gnuplot::Builder::Process::TAP = sub {
+        my ($pid, $event, $body) = @_;
+        warn "PID:$pid, EVENT:$event, BODY:$body";
+    };
+
 =head1 AUTHOR
 
 Toshio Ito, C<< <toshioito at cpan.org> >>

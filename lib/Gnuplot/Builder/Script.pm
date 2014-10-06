@@ -379,12 +379,12 @@ Gnuplot::Builder::Script - object-oriented builder for gnuplot script
     $builder->setq(output => 'sin_wave.png');
     $builder->unset("key");
     $builder->define('f(x)' => 'sin(pi * x)');
-    $builder->plot("f(x)"); ## output sin_wave.png
+    print $builder->plot("f(x)"); ## output sin_wave.png
     
     my $child = $builder->new_child;
     $child->define('f(x)' => 'cos(pi * x)'); ## override parent's setting
     $child->setq(output => 'cos_wave.png');  ## override parent's setting
-    $child->plot("f(x)");                    ## output cos_wave.png
+    print $child->plot("f(x)");              ## output cos_wave.png
 
 =head1 DESCRIPTION
 

@@ -59,7 +59,7 @@ Gnuplot::Builder - object-oriented gnuplot script builder
     );
     $script->define('f(x)' => 'sin(x) / x');
     
-    $script->plot(
+    print $script->plot(
         gfile('result.dat',
               using => '1:2:3', title => "'Measured'", with => "yerrorbars"),
         gfunc('f(x)', title => "'Theoretical'", with => "lines")
@@ -110,6 +110,14 @@ Batch scripts using L<Gnuplot::Builder> are fine in Windows.
 
 In interactive shells, plot windows might not persist when you use regular L<Gnuplot::Builder>.
 As a workaround, try L<Gnuplot::Builder::Wgnuplot>.
+
+=head2 Debugging
+
+Because L<Gnuplot::Builder> is a very thin module,
+it does not guarantee to build valid gnuplot scripts.
+You need to debug your script when you got an invalid script.
+See L</DEBUGGING TIPS> for detail.
+
 
 =head2 Plot Windows
 
@@ -235,6 +243,43 @@ such as zooming and clipping.
 This is gnuplot's limitation in "persist" mode.
 "wxt" terminal may be unstable (it crashes or freezes) in some environments.
 
+=head1 DEBUGGING TIPS
+
+Plotting methods of L<Gnuplot::Builder::Script> returns the output from the gnuplot process.
+Always print the return value, because it contains an error message when something is wrong.
+
+    my $script = Gnuplot::Builder::Script->new();
+    ## my $script = gscript();   ## same
+    
+    print $script->plot("sin(x)");
+
+Sometimes you need to peek the script text written to the gnuplot process.
+To do that, run your program with L<Gnuplot::Builder::Tap> loaded.
+
+    $ perl -MGnuplot::Builder::Tap your_program.pl
+
+Or you can set C<$Gnuplot::Builder::Process::TAP> variable. See L<Gnuplot::Builder::Process> for detail.
+
+=head2 Common Errors
+
+=over
+
+=item *
+
+Quote string literals explicitly.
+
+    $script->set(xlabel => 'hogehoge');   ## NG!
+    $script->set(xlabel => '"hogehoge"'); ## OK
+    $script->setq(xlabel => 'hogehoge');  ## OK
+
+=item *
+
+Arrange dataset options in valid order.
+
+    $dataset = gfile('data.txt', with => "linespoints", using => "1:3"); ## NG!
+    $dataset = gfile('data.txt', using => "1:3", with => "linespoints"); ## OK
+
+=back
 
 =head1 REPOSITORY
 

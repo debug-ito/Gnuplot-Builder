@@ -221,7 +221,7 @@ Gnuplot::Builder::Dataset - object-oriented builder for gnuplot dataset
     INLINE_DATA
     $inline_data->set(using => "1:2", title => '"sample 3"');
         
-    $builder->plot($func_data, $file_data, $another_file_data, $inline_data);
+    print $builder->plot($func_data, $file_data, $another_file_data, $inline_data);
 
 =head1 DESCRIPTION
 
