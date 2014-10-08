@@ -18,6 +18,7 @@ sub _get_env {
     }
 }
 
+our $ASYNC = _get_env("ASYNC", 0);
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 10);
 our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
@@ -71,7 +72,7 @@ sub with_new_process {
     my ($class, %args) = @_;
     my $code = $args{do};
     croak "do parameter is mandatory" if !defined($code);
-    my $async = $args{async};
+    my $async = defined($args{async}) ? $args{async} : $ASYNC;
     my $process = $class->_new(capture => !$async);
     my $result = "";
     try {

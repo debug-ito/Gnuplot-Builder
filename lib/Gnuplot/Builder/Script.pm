@@ -320,7 +320,7 @@ sub run_with {
     }elsif(ref($commands) ne "ARRAY") {
         $commands = [$commands];
     }
-    my $async = !!$args{async};
+    my $async = $args{async};
     my $do = sub {
         my $writer = shift;
         (!defined($_context_writer) || refaddr($_context_writer) != refaddr($writer))

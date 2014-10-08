@@ -6,6 +6,8 @@ use Test::Builder;
 use Exporter qw(import);
 use Gnuplot::Builder::Process;
 
+$Gnuplot::Builder::Process::ASYNC = 0;
+
 our @EXPORT_OK = qw(if_no_file check_process_finish cond_check);
 
 sub if_no_file {
