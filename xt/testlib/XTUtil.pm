@@ -23,7 +23,7 @@ sub if_no_file {
 
 sub check_process_finish {
     note("wait for all managed sub-processes to finish");
-    Gnuplot::Builder::Process::FOR_TEST_wait_all();
+    Gnuplot::Builder::Process->wait_all();
     note("Gnuplot::Builder params:");
     note("  COMMAND: " . (join " ", @Gnuplot::Builder::Process::COMMAND));
     note("  PAUSE_FINISH: $Gnuplot::Builder::Process::PAUSE_FINISH");

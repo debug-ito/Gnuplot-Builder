@@ -49,8 +49,8 @@ sub FOR_TEST_process_num { $processes->size }
 ## PUBLIC ONLY IN TESTS
 *FOR_TEST_clear_zombies = *_clear_zombies;
 
-## PUBLIC ONLY IN TESTS
-sub FOR_TEST_wait_all {
+## Documented public method.
+sub wait_all {
     while($processes->size > 0) {
         my $proc = $processes->get_at(0);
         $proc->_waitpid(1);
@@ -271,9 +271,17 @@ by all L<Gnuplot::Builder::Script> objects.
 
 You can configure its package variables to change its behavior.
 
-B<< The default values for these variables may be changed in future releases. >>
+=head1 CLASS METHODS
+
+=head2 Gnuplot::Builder::Process->wait_all()
+
+Wait for all gnuplot processes to finish.
+
+If there is no gnuplot process running, this method returns immediately.
 
 =head1 PACKAGE VARIABLES
+
+B<< The default values for these variables may be changed in future releases. >>
 
 =head2 $ASYNC
 
