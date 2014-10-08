@@ -30,5 +30,10 @@ use Gnuplot::Builder;
     is $inline_data, "1 10\n2 20\n", "inline data OK";
 }
 
+{
+    gwait();
+    ok "gwait() returns";
+}
+
 done_testing;
 

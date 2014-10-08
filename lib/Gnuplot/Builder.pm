@@ -8,7 +8,7 @@ use Gnuplot::Builder::Process;
 
 our $VERSION = "0.23";
 
-our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp);
+our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp gwait);
 
 sub gscript {
     return Gnuplot::Builder::Script->new(@_);
@@ -38,6 +38,10 @@ sub ghelp {
     });
 }
 
+sub gwait {
+    return Gnuplot::Builder::Process->wait_all();
+}
+
 1;
 __END__
 
@@ -64,6 +68,8 @@ Gnuplot::Builder - object-oriented gnuplot script builder
               using => '1:2:3', title => "'Measured'", with => "yerrorbars"),
         gfunc('f(x)', title => "'Theoretical'", with => "lines")
     );
+    
+    gwait();
 
 
 =head1 DESCRIPTION
@@ -161,6 +167,11 @@ C<@help_args> is the arguments for the "help" command. They are joined with whit
     ## or you can say
     
     ghelp("style", "data");
+
+=head2 gwait()
+
+Wait for all gnuplot processes to finish.
+It's just an alias for C<< Gnuplot::Builder::Process->wait_all() >>.
 
 =head1 CONFIGURATION FOR PLOT WINDOWS
 
