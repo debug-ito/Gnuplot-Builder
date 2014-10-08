@@ -844,14 +844,14 @@ If not set, it won't print "set output" commands.
 
 =item C<writer> => CODE-REF (optional)
 
-A code-ref to receive the whole script string.
+A code-ref to receive the whole script string instead of the gnuplot process.
 If set, it is called one or more times with the script string that C<$builder> builds.
-In this case, the return value C<$result> will be an empty string.
+In this case, the return value C<$result> will be an empty string, because no gnuplot process is started.
 
 If not set, C<$builder> streams the script into the gnuplot process.
 The return value C<$result> will be the data the gnuplot process writes to STDOUT and STDERR.
 
-=item C<async> => BOOL (optional, default: false)
+=item C<async> => BOOL (optional, default: C<$Gnuplot::Builder::Process::ASYNC>)
 
 If set to true, it won't wait for the gnuplot process to finish.
 In this case, the return value C<$result> will be an empty string.
@@ -861,8 +861,9 @@ However, the maximum number of gnuplot processes are limited to
 the variable C<$Gnuplot::Builder::Process::MAX_PROCESSES>.
 See L<Gnuplot::Builder::Process> for detail.
 
-If set to false, which is the default, it waits for the gnuplot process to finish
-and return its output.
+If set to false, it waits for the gnuplot process to finish and return its output.
+
+By default it's false, but you can change the default by C<$Gnuplot::Builder::Process::ASYNC> package variable.
 
 =back
 
@@ -963,7 +964,7 @@ If set, the return value C<$result> will be an empty string.
 
 See C<plot_with()> method for detail.
 
-=item C<async> => BOOL (optional, default: false)
+=item C<async> => BOOL (optional, default: C<$Gnuplot::Builder::Process::ASYNC>)
 
 If set to true, it won't wait for the gnuplot process to finish.
 In this case, the return value C<$result> will be an empty string.
@@ -1101,7 +1102,7 @@ A code-ref to receive the whole script string. If set, the return value C<$resul
 
 See C<plot_with()> method for detail.
 
-=item C<async> => BOOL (optional, default: false)
+=item C<async> => BOOL (optional, default: C<$Gnuplot::Builder::Process::ASYNC>)
 
 If set to true, it won't wait for the gnuplot process to finish. In this case, the return value C<$result> will be an empty string.
 

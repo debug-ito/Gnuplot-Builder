@@ -274,6 +274,16 @@ B<< The default values for these variables may be changed in future releases. >>
 
 =head1 PACKAGE VARIABLES
 
+=head2 $ASYNC
+
+If set to true, plotting methods of L<Gnuplot::Builder::Script> run in the asynchronous mode by default.
+See L<Gnuplot::Builder::Script> for detail.
+
+By default, it's C<0> (false).
+
+You can also set this variable by the environment variable
+C<PERL_GNUPLOT_BUILDER_PROCESS_ASYNC>.
+
 =head2 @COMMAND
 
 The command and arguments to run a gnuplot process.
