@@ -20,7 +20,7 @@ sub _get_env {
 
 our $ASYNC = _get_env("ASYNC", 0);
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
-our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 10);
+our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 2);
 our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
 our $TAP = undef;
 
@@ -307,7 +307,7 @@ C<PERL_GNUPLOT_BUILDER_PROCESS_COMMAND>.
 Maximum number of gnuplot processes that can run in parallel.
 If C<$MAX_PROCESSES> <= 0, the number of processes is unlimited.
 
-By default, it's C<10>.
+By default, it's C<2>.
 
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.

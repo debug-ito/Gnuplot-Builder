@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+
+BEGIN { delete $ENV{PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES}; }
+
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 use Time::HiRes qw(time);
@@ -19,7 +22,7 @@ sub plot_time {
 
 sub process_num { Gnuplot::Builder::Process::FOR_TEST_process_num }
 
-is $Gnuplot::Builder::Process::MAX_PROCESSES, 10, "by default, max is 10";
+is $Gnuplot::Builder::Process::MAX_PROCESSES, 2, "by default, max is 2";
 
 {
     note("--- limit max processes");
