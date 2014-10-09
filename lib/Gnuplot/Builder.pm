@@ -100,6 +100,11 @@ This is useful for hierarchical configuration.
 B<Interactive>. L<Gnuplot::Builder> works well both in batch scripts and in interactive shells.
 Use L<Devel::REPL> or L<Reply> or whatever you like instead of the plain old gnuplot interative shell.
 
+=item *
+
+B<Parallel>. L<Gnuplot::Builder>'s policy is "one gnuplot process for one plot".
+You can run more than one gnuplot processes in parallel to boost the plotting through-put.
+
 =back
 
 =head1 USAGE GUIDE
@@ -117,18 +122,17 @@ Batch scripts using L<Gnuplot::Builder> are fine in Windows.
 In interactive shells, plot windows might not persist when you use regular L<Gnuplot::Builder>.
 As a workaround, try L<Gnuplot::Builder::Wgnuplot>.
 
+=head2 Plot Windows
+
+L<Gnuplot::Builder> supports plots in interactive windows.
+See L</CONFIGURATION FOR PLOT WINDOWS> for known issues about that.
+
 =head2 Debugging
 
 Because L<Gnuplot::Builder> is a very thin module,
 it does not guarantee to build valid gnuplot scripts.
 You need to debug your script when you got an invalid script.
 See L</DEBUGGING TIPS> for detail.
-
-
-=head2 Plot Windows
-
-L<Gnuplot::Builder> supports plots in interactive windows.
-See L</CONFIGURATION FOR PLOT WINDOWS> for known issues about that.
 
 =head1 EXPORTED FUNCTIONS
 
@@ -257,7 +261,7 @@ This is gnuplot's limitation in "persist" mode.
 =head1 DEBUGGING TIPS
 
 Plotting methods of L<Gnuplot::Builder::Script> returns the output from the gnuplot process.
-Always print the return value, because it contains an error message when something is wrong.
+Always show the return value, because it contains an error message when something is wrong.
 
     my $script = Gnuplot::Builder::Script->new();
     ## my $script = gscript();   ## same
