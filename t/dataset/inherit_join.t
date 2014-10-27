@@ -1,0 +1,38 @@
+use strict;
+use warnings FATAL => "all";
+use Test::More;
+use Gnuplot::Builder::Dataset;
+
+{
+    note("--- inherit and delete");
+    my $parent = Gnuplot::Builder::Dataset->new;
+    my $child = $parent->new_child;
+
+    $parent->set_join(p_only => ":", both => "!");
+    $child->set_join(c_only => "-", both => "=");
+    $child->set_option(
+        map { $_ => [1,2,3] } qw(p_only c_only both neither)
+    );
+    is $child->to_string, q{p_only 1:2:3 c_only 1-2-3 both 1=2=3 neither 1 2 3}, "inheritance OK";
+
+    $child->delete_join("both");
+    is $child->to_string, q{p_only 1:2:3 c_only 1-2-3 both 1!2!3 neither 1 2 3}, "parent's 'both' is visible after child->delete_join()";
+
+    $parent->delete_join("both");
+    is $child->to_string, q{p_only 1:2:3 c_only 1-2-3 both 1 2 3 neither 1 2 3}, "now join for 'both' is back to default after parent->delete_join()";
+}
+
+{
+    note("--- override with undef");
+    my $parent = Gnuplot::Builder::Dataset->new;
+    my $child = $parent->new_child;
+    $parent->set_join(foo => ":");
+    $parent->set_option(foo => [1,2,3]);
+    $child->set_join(foo => undef);
+    $child->set_option(foo => [4,5,6]);
+
+    is $parent->to_string, 'foo 1:2:3';
+    is $child->to_string, 'foo 4 5 6', "child overrides parent's join by undef";
+}
+
+done_testing;
