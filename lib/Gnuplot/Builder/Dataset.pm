@@ -10,6 +10,7 @@ sub new {
     my ($class, $source, @set_option_args) = @_;
     my $self = bless {
         pdata => undef,
+        pdata_join => undef,
         parent => undef,
     }, $class;
     $self->_init_pdata();
@@ -45,6 +46,7 @@ sub _init_pdata {
             return $coderef->($self);
         } },
     );
+    $self->{pdata_join} = Gnuplot::Builder::PrototypedData->new();
 }
 
 sub to_string {
@@ -55,7 +57,12 @@ sub to_string {
         my ($name, $values_arrayref) = @_;
         my @values = grep { defined($_) } @$values_arrayref;
         return if !@values;
-        push @words, $name, @values;
+        my $join = $self->{pdata_join}->get_resolved_attribute($name);
+        if(defined $join) {
+            push @words, $name, join($join, @values);
+        }else {
+            push @words, $name, @values;
+        }
     });
     return join " ", grep { defined($_) && $_ ne "" } @words;
 }
@@ -136,6 +143,7 @@ sub set_parent {
     if(!defined($parent)) {
         $self->{parent} = undef;
         $self->{pdata}->set_parent(undef);
+        $self->{pdata_join}->set_parent(undef);
         return $self;
     }
     if(!blessed($parent) || !$parent->isa("Gnuplot::Builder::Dataset")) {
@@ -143,6 +151,7 @@ sub set_parent {
     }
     $self->{parent} = $parent;
     $self->{pdata}->set_parent($parent->{pdata});
+    $self->{pdata_join}->set_parent($parent->{pdata_join});
     return $self;
 }
 
@@ -178,6 +187,24 @@ sub write_data_to {
 sub delete_data {
     my ($self) = @_;
     $self->{pdata}->delete_attribute("data");
+    return $self;
+}
+
+sub set_join {
+    my ($self, %joins) = @_;
+    foreach my $name (keys %joins) {
+        $self->{pdata_join}->set_attribute(
+            key => $name, value => $joins{$name}, quote => 0
+        );
+    }
+    return $self;
+}
+
+sub delete_join {
+    my ($self, @names) = @_;
+    foreach my $name (@names) {
+        $self->{pdata_join}->delete_attribute($name);
+    }
     return $self;
 }
 
@@ -621,7 +648,7 @@ If none of them have inline data, C<$writer> is not called at all.
 
 Delete the inline data setting from the C<$dataset>.
 
-=head1 OBJECT METHODS - JOIN ATTRIBUTE
+=head1 OBJECT METHODS - JOIN
 
 B<< This feature is currently experimental. There may be incompatible API changes in the future. >>
 

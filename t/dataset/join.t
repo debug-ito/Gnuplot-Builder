@@ -1,6 +1,7 @@
 use strict;
 use warnings FATAL => "all";
 use Test::More;
+use Test::Identity;
 use Gnuplot::Builder::Dataset;
 
 {
@@ -41,9 +42,9 @@ use Gnuplot::Builder::Dataset;
     );
     foreach my $case (@testcases) {
         my $dataset = Gnuplot::Builder::Dataset->new;
-        $dataset->set_join(foo => $case->{join});
+        identical $dataset->set_join(foo => $case->{join}), $dataset, "$case->{label}: set_join() returns the invocant.";
         $dataset->set_option(foo => $case->{opt});
-        is $dataset->to_string, $case->{exp}, "$case->{label}: OK";
+        is $dataset->to_string, $case->{exp}, "$case->{label}: to_string() OK";
     }
 }
 

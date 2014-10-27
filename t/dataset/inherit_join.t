@@ -1,6 +1,7 @@
 use strict;
 use warnings FATAL => "all";
 use Test::More;
+use Test::Identity;
 use Gnuplot::Builder::Dataset;
 
 {
@@ -15,10 +16,10 @@ use Gnuplot::Builder::Dataset;
     );
     is $child->to_string, q{p_only 1:2:3 c_only 1-2-3 both 1=2=3 neither 1 2 3}, "inheritance OK";
 
-    $child->delete_join("both");
+    identical $child->delete_join("both"), $child, "delete_join() returns the invocant";
     is $child->to_string, q{p_only 1:2:3 c_only 1-2-3 both 1!2!3 neither 1 2 3}, "parent's 'both' is visible after child->delete_join()";
 
-    $parent->delete_join("both");
+    identical $parent->delete_join("both"), $parent, "delete_join() returns the invocant";
     is $child->to_string, q{p_only 1:2:3 c_only 1-2-3 both 1 2 3 neither 1 2 3}, "now join for 'both' is back to default after parent->delete_join()";
 }
 
