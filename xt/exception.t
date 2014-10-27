@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Fatal;
 use Gnuplot::Builder::Process;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
@@ -44,33 +45,23 @@ foreach my $case (
     }},
 ) {
     my ($script, @datasets) = $case->{plotset}->();
-    local $@;
-    eval {
+    like exception {
         $script->plot(@datasets);
-        fail("$case->{label}: it should die");
-    };
-    if($@) {
-        pass("$case->{label}: died");
-    }
+    }, qr{BOOM!}, "$case->{label}: died";
     is(wait_and_get_number_of_processes, 0, "$case->{label}: no running process.");
 }
 
 {
     note("--- when writer for plot_with() dies.");
-    local $@;
     my $script = Gnuplot::Builder::Script->new;
-    eval {
+    like exception {
         $script->plot_with(
             dataset => "sin(x)",
             writer => sub {
                 die "BOOM!";
             }
         );
-        fail("plot_with() should die");
-    };
-    if($@) {
-        pass("plot_with() dies OK");
-    }
+    }, qr/BOOM!/, "plot_with() dies OK";
 }
 
 
@@ -85,14 +76,9 @@ foreach my $case (
         $builder->run(sub { die "BOOM!" });
     }}
 ) {
-    local $@;
-    eval {
+    like exception {
         $case->{code}->();
-        fail("$case->{label}: it should die");
-    };
-    if($@) {
-        pass "$case->{label}: died";
-    }
+    }, qr/BOOM!/, "$case->{label}: died";
     is(wait_and_get_number_of_processes, 0, "$case->{label}: no running process.");
 }
 
