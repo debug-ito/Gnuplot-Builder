@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 
 use Gnuplot::Builder::JoinDict;
@@ -8,7 +8,7 @@ my $dict = Gnuplot::Builder::JoinDict->new(
     separator => ', ',
     content => [x => 640, y => 480]
 );
-is "$dict", '640, 408';
+is "$dict", '640, 480';
     
 is $dict->get("x"), 640;
 is $dict->get("y"), 480;

@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use warnings FATAL => "all";
 use Test::More;
 use Test::Fatal;
 use Scalar::Util qw(refaddr);
@@ -90,8 +90,8 @@ sub str_ok {
         {in => "_b", exp => undef}, {in => "c", exp => 3},
         {in => "d", exp => 4}, {in => "this does not exist", exp => undef}
     ) {
-        is $orig->get($case->{input}), $case->{exp}, "get: $case->{in}: OK";
-        is $clone->get($case->{input}), $case->{exp}, "get: $case->{in}: clone OK";
+        is $orig->get($case->{in}), $case->{exp}, "get: $case->{in}: OK";
+        is $clone->get($case->{in}), $case->{exp}, "get: $case->{in}: clone OK";
     }
 }
 

@@ -1,6 +1,64 @@
 package Gnuplot::Builder::JoinDict;
 use strict;
 use warnings;
+use Gnuplot::Builder::PartiallyKeyedList;
+use Carp;
+use overload '""' => "to_string";
+
+sub new {
+    my ($class, %args) = @_;
+    my $self = bless {
+        separator => defined($args{separator}) ? $args{separator} : "",
+        pkl => Gnuplot::Builder::PartiallyKeyedList->new,
+    }, $class;
+    my $content = $args{content};
+    $content = [] if not defined $content;
+    croak "content must be an array-ref" if ref($content) ne "ARRAY";
+    $self->_set_destructive(@$content);
+    return $self;
+}
+
+sub to_string {
+    my ($self) = @_;
+    return join($self->{separator},
+                grep { defined($_) } $self->{pkl}->get_all);
+}
+
+sub get {
+    my ($self, $key) = @_;
+    return undef if not defined $key;
+    return $self->{pkl}->get($key);
+}
+
+sub set {
+    my ($self, @content) = @_;
+    return $self->clone->_set_destructive(@content);
+}
+
+sub _set_destructive {
+    my ($self, @content) = @_;
+    croak "odd number of elements in content" if @content % 2 != 0;
+    foreach my $i (0 .. (@content / 2 - 1)) {
+        my ($key, $value) = @content[2*$i, 2*$i+1];
+        croak "undefined key in content" if not defined $key;
+        $self->{pkl}->set($key, $value);
+    }
+    return $self;
+}
+
+sub clone {
+    my ($self) = @_;
+    my $clone = ref($self)->new(separator => $self->{separator});
+    $clone->{pkl}->merge($self->{pkl});
+    return $clone;
+}
+
+sub delete {
+    my ($self, @keys) = @_;
+    my $clone = $self->clone;
+    $clone->{pkl}->delete($_) foreach grep { defined($_) } @keys;
+    return $clone;
+}
 
 
 1;
