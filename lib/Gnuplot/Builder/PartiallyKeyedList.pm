@@ -39,6 +39,11 @@ sub get_at {
     return ($self->{keys}[$index], $self->{values}[$index]);
 }
 
+sub get_all {
+    my ($self) = @_;
+    return @{$self->{values}};
+}
+
 sub exists {
     my ($self, $key) = @_;
     croak "key must be defined" if not defined $key;
@@ -197,6 +202,10 @@ This method can return both keyed and non-keyed entries.
 For non-keyed entries, the return value C<$key> is C<undef>.
 
 Complexity of C<< get_at(0) >> is guaranteed to be O(1).
+
+=head2 @values = $pkl->get_all()
+
+Get the list of all values.
 
 =head2 $does_exist = $pkl->exists($key)
 
