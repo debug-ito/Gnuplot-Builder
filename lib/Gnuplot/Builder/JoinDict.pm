@@ -10,7 +10,9 @@ sub new {
     my $self = bless {
         separator => defined($args{separator}) ? $args{separator} : "",
         pkl => Gnuplot::Builder::PartiallyKeyedList->new,
+        filter => $args{filter},
     }, $class;
+    croak "filter must be a code-ref" if defined($self->{filter}) && ref($self->{filter}) ne "CODE";
     my $content = $args{content};
     $content = [] if not defined $content;
     croak "content must be an array-ref" if ref($content) ne "ARRAY";
@@ -20,8 +22,13 @@ sub new {
 
 sub to_string {
     my ($self) = @_;
-    return join($self->{separator},
-                grep { defined($_) } $self->{pkl}->get_all_values);
+    my $vals = defined($self->{filter})
+        ? $self->{filter}->($self, [$self->{pkl}->get_all_keys], [$self->{pkl}->get_all_values])
+        : [$self->{pkl}->get_all_values];
+    if(ref($vals) ne "ARRAY") {
+        croak "filter must return an array-ref";
+    }
+    return join($self->{separator}, grep { defined($_) } @$vals);
 }
 
 sub get {
@@ -48,7 +55,7 @@ sub _set_destructive {
 
 sub clone {
     my ($self) = @_;
-    my $clone = ref($self)->new(separator => $self->{separator});
+    my $clone = ref($self)->new(separator => $self->{separator}, filter => $self->{filter});
     $clone->{pkl}->merge($self->{pkl});
     return $clone;
 }
@@ -152,7 +159,7 @@ For example,
         separator => " & ", content => [x => 10, y => 20],
         filter => sub {
             my ($dict, $keys, $values) = @_;
-            return [map { "$keys->[$i]=$values->[$i]" } 0 .. $#$keys]
+            return [map { "$keys->[$_]=$values->[$_]" } 0 .. $#$keys]
         }
     );
     "$dict"; ## => x=10 & y=20

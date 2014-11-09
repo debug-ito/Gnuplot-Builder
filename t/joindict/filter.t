@@ -8,6 +8,18 @@ use testlib::RefUtil qw(is_different);
 use Gnuplot::Builder::JoinDict;
 
 {
+    note("--- example");
+    my $dict = Gnuplot::Builder::JoinDict->new(
+        separator => " & ", content => [x => 10, y => 20],
+        filter => sub {
+            my ($dict, $keys, $values) = @_;
+            return [map { "$keys->[$_]=$values->[$_]" } 0 .. $#$keys]
+        }
+    );
+    is "$dict", "x=10 & y=20", "example OK";
+}
+
+{
     note("--- filter sub environment");
     my $called = 0;
     my $dict; $dict = Gnuplot::Builder::JoinDict->new(
@@ -75,7 +87,7 @@ foreach my $case (
     is "$clone", "20:40", "clone() inherit filter ok";
 
     my $set = $parent->set(y => 200, z => 300);
-    is "$set", "20,400,600", "set() inherit filter ok";
+    is "$set", "20:400:600", "set() inherit filter ok";
 
     my $del = $parent->delete("x");
     is "$del", "40", "delete() inherit filter ok";
