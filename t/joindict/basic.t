@@ -2,14 +2,9 @@ use strict;
 use warnings FATAL => "all";
 use Test::More;
 use Test::Fatal;
-use Scalar::Util qw(refaddr);
+use lib "t";
+use testlib::RefUtil qw(is_different);
 use Gnuplot::Builder::JoinDict;
-
-sub is_different {
-    my ($obj1, $obj2, $msg) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    isnt refaddr($obj1), refaddr($obj2), $msg;
-}
 
 sub str_ok {
     my ($dict, $exp, $msg) = @_;
