@@ -64,7 +64,7 @@ sub to_string {
             push @words, $name, @values;
         }
     });
-    return join " ", grep { defined($_) && $_ ne "" } @words;
+    return join " ", grep { defined($_) && "$_" ne "" } @words;
 }
 
 *params_string = *to_string;
@@ -385,7 +385,7 @@ You can specify more than one pairs of C<$opt_name> and C<$opt_value>.
 
 C<$opt_name> is the name of the option (e.g. "using" and "every").
 
-C<$opt_value> is either C<undef>, a string, an array-ref of strings or a code-ref.
+C<$opt_value> is either C<undef>, a string, an array-ref of strings, a code-ref or a blessed object.
 
 =over
 
@@ -418,6 +418,12 @@ C<$dataset> and C<$opt_name> are passed to the code-ref.
 
 Then, the option is generated as if C<< $opt_name => \@returned_values >> was set.
 You can return an C<undef> or an empty list to disable the option.
+
+=item *
+
+If C<$opt_value> is a blessed object, it's stringification (i.e. C<< "$opt_value" >>) is evaluated when C<$dataset> builds the parameters.
+You can retrieve the object by C<get_option()> method.
+
 
 =back
 
@@ -562,6 +568,8 @@ In list context, it returns all values for C<$opt_name>.
 In scalar context, it returns only the first value.
 
 If a code-ref is set to the C<$opt_name>, it's evaluated and its results are returned.
+
+If a blessed object is set to the C<$opt_name>, that object is returned.
 
 If the option is not set in C<$dataset>, the value of its parent is returned.
 If none of the ancestors doesn't have the option, it returns an empty list in list context

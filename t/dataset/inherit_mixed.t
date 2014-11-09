@@ -3,13 +3,17 @@ use warnings FATAL => "all";
 use Test::More;
 use Test::Identity;
 use Gnuplot::Builder::Dataset;
+use Gnuplot::Builder::JoinDict;
 use lib "t";
 use testlib::DatasetUtil qw(get_data);
 
 {
     my $grand = Gnuplot::Builder::Dataset->new;
+    my $using_val = Gnuplot::Builder::JoinDict->new(
+        separator => ":", content => [x => 1, y => 2]
+    );
     $grand->set_option(
-        using => "1:2",
+        using => $using_val,
         every => undef,
         axes  => "x1y1",
         title => q{''},
@@ -44,7 +48,6 @@ use testlib::DatasetUtil qw(get_data);
     is get_data($child), "1 1", "child data ok. It's inherited from parent";
 
     foreach my $child_case (
-        {name => "using", exp => ["1:2"]},
         {name => "every", exp => ["::1"]},
         {name => "axes",  exp => [undef]},
         {name => "title", exp => [q{''}]},
@@ -59,6 +62,7 @@ use testlib::DatasetUtil qw(get_data);
         is_deeply [$child->get_option($child_case->{name})], $child_case->{exp}, "get_option($child_case->{name}) on child OK";
         is scalar($child->get_option($child_case->{name})), $child_case->{exp}[0], "get_option($child_case->{name}) on child OK in scalar context";
     }
+    identical scalar($child->get_option("using")), $using_val, "get_option(using) on child returns the grand-parent's object";
 }
 
 done_testing;
