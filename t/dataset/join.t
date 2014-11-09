@@ -1,8 +1,13 @@
 use strict;
-use warnings FATAL => "all";
+use warnings;
 use Test::More;
 use Test::Identity;
 use Gnuplot::Builder::Dataset;
+
+my @warnings = ();
+$SIG{__WARN__} = sub {
+    push @warnings, $_[0]
+};
 
 {
     note("--- example");
@@ -83,5 +88,8 @@ use Gnuplot::Builder::Dataset;
     $dataset->set(foo => [qw(F O O)], bar => [qw(B A R)], buzz => [qw(B U Z Z)]);
     is $dataset->to_string, 'foo F@@@O@@@O bar B|A|R buzz B U Z Z';
 }
+
+cmp_ok scalar(@warnings), ">", 0, "at least 1 warning should be emitted";
+is scalar(grep { /join/i && /deprecated/i } @warnings), scalar(@warnings), "... they are all related to deprecation of join";
 
 done_testing;

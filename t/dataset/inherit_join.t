@@ -1,8 +1,13 @@
 use strict;
-use warnings FATAL => "all";
+use warnings;
 use Test::More;
 use Test::Identity;
 use Gnuplot::Builder::Dataset;
+
+my @warnings = ();
+$SIG{__WARN__} = sub {
+    push @warnings, $_[0]
+};
 
 {
     note("--- inherit and delete");
@@ -35,5 +40,8 @@ use Gnuplot::Builder::Dataset;
     is $parent->to_string, 'foo 1:2:3';
     is $child->to_string, 'foo 4 5 6', "child overrides parent's join by undef";
 }
+
+cmp_ok scalar(@warnings), ">", 0, "at least 1 warning should be emitted";
+is scalar(grep { /join/i && /deprecated/i } @warnings), scalar(@warnings), "... they are all related to deprecation of join";
 
 done_testing;
