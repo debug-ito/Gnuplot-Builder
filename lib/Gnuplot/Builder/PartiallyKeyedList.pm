@@ -194,12 +194,17 @@ Get the value for the C<$key>.
 
 If C<$key> doesn't exist in C<$pkl>, it returns C<undef>.
 
+=head2 $value = $pkl->get_at($index)
+
 =head2 ($key, $value) = $pkl->get_at($index)
 
 Get an entry at C<$index>. C<$index> starts with 0.
 
 This method can return both keyed and non-keyed entries.
 For non-keyed entries, the return value C<$key> is C<undef>.
+
+In scalar context, it returns C<$value> only.
+In list context, it returns C<$key> and C<$value>.
 
 Complexity of C<< get_at(0) >> is guaranteed to be O(1).
 

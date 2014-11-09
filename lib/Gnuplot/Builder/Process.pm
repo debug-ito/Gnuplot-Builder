@@ -102,7 +102,7 @@ sub _new {
         ## wait for the first process to finish. it's not the smartest
         ## way, but is it possible to wait for specific set of
         ## processes?
-        my ($pid, $proc) = $processes->get_at(0);
+        my $proc = $processes->get_at(0);
         $proc->_waitpid(1);
     }
     my $capture = $args{capture};
