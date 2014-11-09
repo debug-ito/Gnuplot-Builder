@@ -131,6 +131,31 @@ The separator string that is used when joining.
 The content of the C<$dict>.
 The array-ref must contain key-value pairs. Keys must not be C<undef>.
 
+=item C<filter> => CODE_REF (optional)
+
+If set, this code-ref is called when the C<$dict> is stringified (i.e. C<< $dict->to_string >> is called).
+The code-ref is supposed to modify the values in C<$dict> to produce the final result of stringification.
+
+    $modified_values_ref = $filter->($dict, $keys_ref, $values_ref)
+
+where C<$dict> is the L<Gnuplot::Builder::JoinDict> object,
+C<$keys_ref> is the array-ref of keys and C<$values_ref> is the array-ref of values.
+The filter must return an array-ref C<$modified_values_ref>.
+
+For example,
+
+    my $dict = Gnuplot::Builder::JoinDict->new(
+        separator => " & ", content => [x => 10, y => 20],
+        filter => sub {
+            my ($dict, $keys, $values) = @_;
+            return [map { "$keys->[$i]=$values->[$i]" } 0 .. $#$keys]
+        }
+    );
+    "$dict"; ## => x=10 & y=20
+
+You can modify C<$keys_ref> and C<$values_ref> in the filter.
+C<$dict> is not modified if you do that.
+
 =back
 
 =head1 OBJECT METHODS
@@ -165,6 +190,10 @@ If C<$dict> doesn't have C<$key>, it's just ignored.
 =head2 $new_dict = $dict->clone()
 
 Create and return a clone of C<$dict>.
+
+=head2 $separator = $dict->separator()
+
+Get the separator.
 
 =head1 OVERLOAD
 
