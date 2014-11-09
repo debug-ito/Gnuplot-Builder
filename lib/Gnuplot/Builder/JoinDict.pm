@@ -214,6 +214,6 @@ When you evaluate a C<$dict> as a string, it executes C<< $dict->to_string() >>.
 
 =head1 AUTHOR
 
-Toshio Ito, C<< debug.ito [at] gmail.com >>
+Toshio Ito, C<< toshioito at cpan.org >>
 
 =cut
