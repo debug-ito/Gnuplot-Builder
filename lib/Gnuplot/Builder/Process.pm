@@ -28,7 +28,7 @@ my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
 my $processes = Gnuplot::Builder::PartiallyKeyedList->new;
 
 sub _clear_zombies {
-    $_->_waitpid(0) foreach $processes->get_all(); ## cannot use each() method because _waitpid() manipulates $processes...
+    $_->_waitpid(0) foreach $processes->get_all_values(); ## cannot use each() method because _waitpid() manipulates $processes...
 }
 
 {

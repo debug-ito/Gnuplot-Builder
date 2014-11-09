@@ -21,7 +21,7 @@ sub new {
 sub to_string {
     my ($self) = @_;
     return join($self->{separator},
-                grep { defined($_) } $self->{pkl}->get_all);
+                grep { defined($_) } $self->{pkl}->get_all_values);
 }
 
 sub get {

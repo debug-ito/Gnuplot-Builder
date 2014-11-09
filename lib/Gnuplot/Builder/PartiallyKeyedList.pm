@@ -39,7 +39,7 @@ sub get_at {
     return ($self->{keys}[$index], $self->{values}[$index]);
 }
 
-sub get_all {
+sub get_all_values {
     my ($self) = @_;
     return @{$self->{values}};
 }
@@ -203,7 +203,7 @@ For non-keyed entries, the return value C<$key> is C<undef>.
 
 Complexity of C<< get_at(0) >> is guaranteed to be O(1).
 
-=head2 @values = $pkl->get_all()
+=head2 @values = $pkl->get_all_values()
 
 Get the list of all values.
 
