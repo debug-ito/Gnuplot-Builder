@@ -60,6 +60,10 @@ sub delete {
     return $clone;
 }
 
+sub separator {
+    my ($self) = @_;
+    return $self->{separator};
+}
 
 1;
 __END__

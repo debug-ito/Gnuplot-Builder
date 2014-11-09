@@ -21,9 +21,17 @@ sub str_ok {
 
 {
     note('--- default');
-    str_ok(Gnuplot::Builder::JoinDict->new(), "", "no arg OK");
-    str_ok(Gnuplot::Builder::JoinDict->new(separator => "###"), "", "no content OK");
-    str_ok(Gnuplot::Builder::JoinDict->new(content => [x => 1, y => 2, z => 3]), "123", "no separator OK");
+    my $no_arg = Gnuplot::Builder::JoinDict->new();
+    str_ok($no_arg, "", "no arg OK");
+    is $no_arg->separator, "", "no arg separator() OK";
+    
+    my $no_content = Gnuplot::Builder::JoinDict->new(separator => "###");
+    str_ok($no_content, "", "no content OK");
+    is $no_content->separator, "###", "no content separator() OK";
+
+    my $no_separator = Gnuplot::Builder::JoinDict->new(content => [x => 1, y => 2, z => 3]);
+    str_ok($no_separator, "123", "no separator OK");
+    is $no_separator->separator, "", "no separator separator() OK";
 }
 
 {
@@ -48,6 +56,7 @@ sub str_ok {
         separator => ":",
         content => [a => 1, b => 2, _b => undef, c => 3, d => 4]
     );
+    is $orig->separator, ":", "orig separator() OK";
     
     note('--- set()');
     foreach my $case (
@@ -60,7 +69,8 @@ sub str_ok {
         my $new = $orig->set(@{$case->{input}});
         is_different $new, $orig, "$case->{label}: set() returns a new object";
         str_ok $orig, "1:2:3:4", "$case->{label}: set() keeps the original intact";
-        str_ok $new, $case->{exp}, "$case->{exp}: set() result OK";
+        str_ok $new, $case->{exp}, "$case->{label}: set() result OK";
+        is $new->separator, ":", "$case->{label}: set() new separator OK";
     }
 
     note('--- delete()');
@@ -74,6 +84,7 @@ sub str_ok {
         is_different $new, $orig, "$case->{label}: delete() returns a new object";
         str_ok $orig, "1:2:3:4", "$case->{label}: delete() keeps the original intact";
         str_ok $new, $case->{exp}, "$case->{label}: delete() result OK";
+        is $new->separator, ":", "$case->{label}: delete() new separator OK";
     }
 
     note('--- delete() -> set()');
@@ -83,6 +94,7 @@ sub str_ok {
     my $clone = $orig->clone;
     is_different $clone, $orig, "clone is a different object";
     str_ok $clone, "$orig", "clone string OK";
+    is $clone->separator, ":", "clone separator OK";
     
     note('--- get()');
     foreach my $case (
