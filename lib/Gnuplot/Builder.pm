@@ -6,7 +6,7 @@ use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 use Gnuplot::Builder::Process;
 
-our $VERSION = "0.25";
+our $VERSION = "0.26";
 
 our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp gwait);
 

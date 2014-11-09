@@ -1,5 +1,18 @@
 Revision history for Gnuplot-Builder
 
+0.26    2014-11-09
+        [INCOMPATIBLE API CHANGE]
+        - Experimental methods Dataset#set_join() and delete_join()
+          are now deprecated. Use JoinDict instead. Sorry about that.
+        [ENHANCEMENT]
+        - Add Gnuplot::Builder::JoinDict to replace set_join() feature.
+        - Script#set() and Dataset#set() now officially support blessed objects
+          for option values.
+        - Add PartiallyKeyedList#get_all_values() method.
+        [DOCUMENTATION]
+        - Document that PartiallyKeyedList#get_at() method returns the value
+          in scalar context.
+
 0.25    2014-10-27
         [ENHANCEMENT]
         - Add Gnuplot::Builder::Dataset#set_join() and delete_join() methods.
