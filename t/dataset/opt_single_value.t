@@ -64,29 +64,32 @@ foreach my $case (
     );
     foreach my $case (
         {label => "single", method => "set_option",
-         val => $val, exp => q{'data' u 1:2}, extract => sub { $_[0] }},
+         val => $val, exp => q{'data' u 1:2}},
         {label => "in array", method => "set_option",
-         val => ["foo", $val], exp => q{'data' u foo 1:2}, extract => sub { $_[1] }},
+         val => [$val, "foo"], exp => q{'data' u 1:2 foo}},
         {label => "from code", method => "set_option",
-         val => sub { ("foo", $val) }, exp => q{'data' u foo 1:2}, extract => sub { $_[1] }},
+         val => sub { ($val, "foo") }, exp => q{'data' u 1:2 foo}},
 
         {label => "single", method => "setq_option",
-         val => $val, exp => q{'data' u '1:2'}, extract => sub { $_[0] }},
+         val => $val, exp => q{'data' u '1:2'}},
         {label => "in array", method => "setq_option",
-         val => ["foo", $val], exp => q{'data' u 'foo' '1:2'}, extract => sub { $_[1] }},
+         val => [$val, "foo"], exp => q{'data' u '1:2' 'foo'}},
         {label => "from code", method => "setq_option",
-         val => sub { ("foo", $val) }, exp => q{'data' u 'foo' '1:2'}, extract => sub { $_[1] }},
+         val => sub { ($val, "foo") }, exp => q{'data' u '1:2' 'foo'}},
     ) {
         my $dataset = Gnuplot::Builder::Dataset->new_file('data');
         my $method = $case->{method};
         $dataset->$method(u => $case->{val});
         is $dataset->to_string, $case->{exp}, "$case->{label}: $case->{method}: to_string() OK";
 
-        my $got_object = $case->{extract}->($dataset->get_option("u"));
+        my @got_list = $dataset->get_option("u");
+        my $got_scalar = $dataset->get_option("u");
         if($case->{method} eq "set_option") {
-            identical $got_object, $val, "$case->{label}: $case->{method}: get_option() returns the object";
+            identical $got_list[0], $val, "$case->{label}: $case->{method}: get_option() in list returns the object";
+            identical $got_scalar, $val, "$case->{label}: $case->{method}: get_option() in scalar returns the object";
         }else {
-            ok !ref($got_object), "$case->{label}: $case->{method}: get_option() returns a stringified and quoted object";
+            ok !ref($got_list[0]), "$case->{label}: $case->{method}: get_option() in list returns a stringified and quoted object";
+            ok !ref($got_scalar), "$case->{label}: $case->{method}: get_option() in scalar returns a stringified and quoted object";
         }
     }
 }
