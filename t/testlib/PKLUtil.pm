@@ -19,7 +19,8 @@ sub expect_pkl {
     foreach my $index (0 .. ($pkl->size - 1)) {
         is_deeply([$pkl->get_at($index)], $exp->[$index], "... get_at($index) OK");
     }
-    is_deeply([$pkl->get_all_values()], [map { $_->[1] } @$exp], "... get_all() OK");
+    is_deeply([$pkl->get_all_values()], [map { $_->[1] } @$exp], "... get_all_values() OK");
+    is_deeply([$pkl->get_all_keys()], [map { $_->[0] } @$exp], "... get_all_keys() OK");
 }
 
 1;

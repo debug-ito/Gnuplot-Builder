@@ -39,6 +39,11 @@ sub get_at {
     return ($self->{keys}[$index], $self->{values}[$index]);
 }
 
+sub get_all_keys {
+    my ($self) = @_;
+    return @{$self->{keys}};
+}
+
 sub get_all_values {
     my ($self) = @_;
     return @{$self->{values}};
@@ -207,6 +212,10 @@ In scalar context, it returns C<$value> only.
 In list context, it returns C<$key> and C<$value>.
 
 Complexity of C<< get_at(0) >> is guaranteed to be O(1).
+
+=head2 @keys = $pkl->get_all_keys()
+
+Get the list of all keys.
 
 =head2 @values = $pkl->get_all_values()
 

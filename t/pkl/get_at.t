@@ -1,6 +1,8 @@
 use strict;
 use warnings FATAL => "all";
 use Test::More;
+use lib "t";
+use testlib::PKLUtil qw(expect_pkl);
 use Gnuplot::Builder::PartiallyKeyedList;
 
 my $list = Gnuplot::Builder::PartiallyKeyedList->new();
@@ -10,6 +12,8 @@ $list->set(b => 30);
 $list->add(40);
 $list->add(50);
 $list->set(c => 60);
+
+expect_pkl($list, [[undef, 10], [a => 20], [b => 30], [undef, 40], [undef, 50], [c => 60]], "PKL ok");
 
 foreach my $case (
     { index => 0, exp => [undef, 10] },
