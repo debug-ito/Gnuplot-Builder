@@ -110,7 +110,7 @@ sub _create_statement {
     }else {
         confess "Unknown key prefix: $prefix";
     }
-    return join(" ", grep { $_ ne "" } @words);
+    return join(" ", grep { "$_" ne "" } @words);
 }
 
 sub to_string {
@@ -457,7 +457,7 @@ Methods to manipulate gnuplot options (the "set" and "unset" commands).
 Set a gnuplot option named C<$opt_name> to C<$opt_value>.
 You can set more than one name-value pairs.
 
-C<$opt_value> is either C<undef>, a string, an array-ref of strings or a code-ref.
+C<$opt_value> is either C<undef>, a string, an array-ref of strings, a code-ref or a blessed object.
 
 =over
 
@@ -508,6 +508,11 @@ You can return single C<undef> to "unset" the option.
     $builder->set(
         xlabel => sub { qq{"Traffic [$SCALE_LABEL{$scale}bps]"} },
     );
+
+=item *
+
+If C<$opt_value> is a blessed object, it's stringification (i.e. C<< "$opt_value" >>) is evaluated when C<$builder> builds the parameters.
+You can retrieve the object by C<get_option()> method.
 
 =back
 
@@ -658,6 +663,7 @@ In scalar context, it returns only the first value.
 
 If C<$opt_name> is set in the C<$builder>, it returns its values.
 If a code-ref is set to the C<$opt_name>, it is evaluated and its results are returned.
+If a blessed object is set to the C<$opt_name>, that object is returned.
 
 If C<$opt_name> is not set in the C<$builder>, the values of C<$builder>'s parent are returned.
 If C<$builder> does not have parent, it returns an empty list in list context or C<undef> in scalar context.
