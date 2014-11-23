@@ -42,6 +42,11 @@ sub set {
     return $self->clone->_set_destructive(@content);
 }
 
+sub set_all {
+    my ($self, $value) = @_;
+    return $self->set(map { $_ => $value } $self->{pkl}->get_all_keys);
+}
+
 sub _set_destructive {
     my ($self, @content) = @_;
     croak "odd number of elements in content" if @content % 2 != 0;
@@ -190,6 +195,10 @@ You can specify more than one key-value pairs.
 
 If C<$dict> already has C<$key>, its value is replaced in C<$new_dict>.
 Otherwise, a new pair of C<$key> and C<$value> is added.
+
+=head2 $new_dict = $dict->set_all($value)
+
+Set all values to C<$value> and return the result.
 
 =head2 $new_dict = $dict->delete($key, ...)
 
