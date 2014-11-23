@@ -34,7 +34,12 @@ Gnuplot::Builder::Template - predefined Gnuplot::Builder objects as templates
 
 =head1 DESCRIPTION
 
-TODO: write description
+L<Gnuplot::Builder::Template> provides template objects useful to build some gnuplot script elements.
+These objects are structured, so you can modify their parameters partially.
+
+=head2 Compatibility
+
+TODO: how should we maintain backward-compatibility??
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -43,6 +48,10 @@ The following functions are exported only by request.
 =head2 $using_joindict = using(%params)
 
 =head2 $every_joindict = every(%params)
+
+=head1 PACKAGE VARIABLES
+
+TODO: template package variables
 
 =head1 AUTHOR
 
