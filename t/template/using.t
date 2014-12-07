@@ -8,9 +8,9 @@ foreach my $case (
     {label => "basic 3D", keys => [qw(x y z)]},
     {label => "basic polar", keys => [qw(t r)]},
     {label => "boxerrorbars (3 cols)", keys => [qw(x y ydelta)]},
-    {label => "boxerrorbars (boxwidth != -2)", keys => [qw(x y ydelta xdelta)]},
+    {label => "boxerrorbars (boxwidth != -2)", keys => [qw(x y ydelta xdelta)]}, ## is it possible? maybe we can x_width...
     {label => "boxerrorbars (boxwidth == -2)", keys => [qw(x y ylow yhigh)]},
-    {label => "boxerrorbars (5 cols)", keys => [qw(x y ylow yhigh xdelta)]},
+    {label => "boxerrorbars (5 cols)", keys => [qw(x y ylow yhigh xdelta)]}, ## is it possible? maybe we can x_width...
     {label => "boxes (3 cols)", keys => [qw(x y x_width)]},
 
     ## boxplot is tricky
@@ -60,7 +60,7 @@ foreach my $case (
 
     unshift @params, "-linecolor" => 9999;
     $using = using(@params);
-    is "$using", join(":", 0 .. $#{$case->{keys}}, 9999), "$case->{label}: using -linecolor is always at the last (as of gnuplot 4.6.6)";
+    is "$using", join(":", (0 .. $#{$case->{keys}}), 9999), "$case->{label}: using -linecolor is always at the last (as of gnuplot 4.6.6)";
 }
 
 done_testing;
