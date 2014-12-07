@@ -7,6 +7,7 @@ requires "POSIX" => "0";
 requires "Try::Tiny" => "0";
 requires "parent" => "0";
 requires "File::Spec" => "0";
+requires "Exporter" => "5.57";
 
 on 'test' => sub {
     requires 'Test::More' => "0";

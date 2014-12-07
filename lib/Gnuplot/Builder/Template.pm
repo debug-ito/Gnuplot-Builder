@@ -32,6 +32,23 @@ use warnings;
 ## まあ、頭にハイフン、中間はアンダースコア、が妥当だと思う。
 ## MixedCaseは変換ルールが曖昧になりがちだし、UPPERCASEも打ちづらい。
 
+use Exporter 5.57 qw(import);
+use Gnuplot::Builder::JoinDict;
+
+our @EXPORT_OK = qw(using);
+
+our $USING = Gnuplot::Builder::JoinDict->new(
+    separator => ":",
+    content => [
+        ## map { "-$_" => undef }
+        
+    ]
+);
+
+sub using {
+    return $USING->set(@_);
+}
+
 
 1;
 __END__
