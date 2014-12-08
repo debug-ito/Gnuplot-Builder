@@ -35,13 +35,15 @@ foreach my $case (
     ## {label => "histograms (errorbars, 3 cols)", keys => [qw(y ymin ymax)]},
 
     {label => "image 2D", keys => [qw(x y value)]},
-    {label => "image 3D", keys => [qw(x y z value)]},  ## TODO: could be more specific...
+    {label => "image 3D", keys => [qw(x y z value)]},
     ## rgbimage is subset of rgbalpha
-    {label => "rgbalpha 2D", keys => [qw(x y r g b a)]}, ## TODO: is "a" ok?
+    {label => "rgbalpha 2D", keys => [qw(x y r g b a)]},
     {label => "rgbalpha 3D", keys => [qw(x y z r g b a)]},
 
-    {label => "labels 2D", keys => [qw(x y string)]},
-    {label => "labels 3D", keys => [qw(x y z string)]},
+    {label => "labels 2D (string)", keys => [qw(x y string)]},
+    {label => "labels 2D (label)", keys => [qw(x y label)]},
+    {label => "labels 3D (string)", keys => [qw(x y z string)]},
+    {label => "labels 3D (label)", keys => [qw(x y z label)]},
     {label => "points 2D + varsize", keys => [qw(x y pointsize)]},
     {label => "points 3D + varsize", keys => [qw(x y z pointsize)]},
     {label => "vectors 2D", keys => [qw(x y xdelta ydelta)]},
