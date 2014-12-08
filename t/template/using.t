@@ -65,4 +65,12 @@ foreach my $case (
     is "$using", join(":", (0 .. $#{$case->{keys}}), 9999), "$case->{label}: using -linecolor is always at the last (as of gnuplot 4.6.6)";
 }
 
+isa_ok $Gnuplot::Builder::Template::USING, "Gnuplot::Builder::JoinDict";
+
+{
+    note("--- internal key check...");
+    my @keys = $Gnuplot::Builder::Template::USING->{pkl}->get_all_keys();
+    is(scalar(grep { $_ =~ /^-/ } @keys), scalar(@keys), "all keys begin with -");
+}
+
 done_testing;
