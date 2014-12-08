@@ -8,9 +8,9 @@ foreach my $case (
     {label => "basic 3D", keys => [qw(x y z)]},
     {label => "basic polar", keys => [qw(t r)]},
     {label => "boxerrorbars (3 cols)", keys => [qw(x y ydelta)]},
-    {label => "boxerrorbars (boxwidth != -2)", keys => [qw(x y ydelta xdelta)]}, ## is it possible? maybe we can x_width...
+    {label => "boxerrorbars (boxwidth != -2)", keys => [qw(x y ydelta x_width)]},
     {label => "boxerrorbars (boxwidth == -2)", keys => [qw(x y ylow yhigh)]},
-    {label => "boxerrorbars (5 cols)", keys => [qw(x y ylow yhigh xdelta)]}, ## is it possible? maybe we can x_width...
+    {label => "boxerrorbars (5 cols)", keys => [qw(x y ylow yhigh x_width)]},
     {label => "boxes (3 cols)", keys => [qw(x y x_width)]},
 
     ## boxplot is tricky
@@ -35,9 +35,9 @@ foreach my $case (
     ## {label => "histograms (errorbars, 3 cols)", keys => [qw(y ymin ymax)]},
 
     {label => "image 2D", keys => [qw(x y value)]},
-    {label => "image 3D", keys => [qw(x y z value)]},
+    {label => "image 3D", keys => [qw(x y z value)]},  ## TODO: could be more specific...
     ## rgbimage is subset of rgbalpha
-    {label => "rgbalpha 2D", keys => [qw(x y r g b a)]},
+    {label => "rgbalpha 2D", keys => [qw(x y r g b a)]}, ## TODO: is "a" ok?
     {label => "rgbalpha 3D", keys => [qw(x y z r g b a)]},
 
     {label => "labels 2D", keys => [qw(x y string)]},

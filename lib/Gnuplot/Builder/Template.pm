@@ -40,22 +40,25 @@ our @EXPORT_OK = qw(using);
 our $USING = Gnuplot::Builder::JoinDict->new(
     separator => ":",
     content => [
-        qw(-x -y
-           -y1 -y2
-           -z
-           -t
-           -r -g -b -a
-           -string
-           -xdelta -ydelta -zdelta -xlow -xhigh -ylow -yhigh
-           -date -open -low -high -close
-           -box_min -whisker_min -whisker_high -box_high
-           -x_width
-           -boxplot_factor
-           -radius -start_angle -end_angle
-           -major_diam -minor_diam -angle
-           -value
-           -pointsize -arrowstyle
-           -linecolor)
+        map { $_ => undef }
+        qw(
+              -x -y
+              -y1 -y2
+              -z
+              -t
+              -r -g -b -a
+              -string
+              -xdelta -ydelta -zdelta -xlow -xhigh -ylow -yhigh
+              -date -open -low -high -close
+              -box_min -whisker_min -whisker_high -box_high
+              -x_width
+              -boxplot_factor
+              -radius -start_angle -end_angle
+              -major_diam -minor_diam -angle
+              -value
+              -pointsize -arrowstyle
+              -linecolor
+      )
     ]
 );
 
