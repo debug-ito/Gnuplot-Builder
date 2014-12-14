@@ -11,8 +11,10 @@ sub new {
         separator => defined($args{separator}) ? $args{separator} : "",
         pkl => Gnuplot::Builder::PartiallyKeyedList->new,
         filter => $args{filter},
+        validator => $args{validator},
     }, $class;
     croak "filter must be a code-ref" if defined($self->{filter}) && ref($self->{filter}) ne "CODE";
+    croak "validator must be a code-ref" if defined($self->{validator}) && ref($self->{validator}) ne "CODE";
     my $content = $args{content};
     $content = [] if not defined $content;
     croak "content must be an array-ref" if ref($content) ne "ARRAY";
@@ -52,6 +54,11 @@ sub set_all {
     return $self->set(map { $_ => $value } $self->{pkl}->get_all_keys);
 }
 
+sub _validate {
+    my ($self) = @_;
+    $self->{validator}->($self) if defined $self->{validator};
+}
+
 sub _set_destructive {
     my ($self, @content) = @_;
     croak "odd number of elements in content" if @content % 2 != 0;
@@ -60,6 +67,7 @@ sub _set_destructive {
         croak "undefined key in content" if not defined $key;
         $self->{pkl}->set($key, $value);
     }
+    $self->_validate();
     return $self;
 }
 
@@ -67,6 +75,7 @@ sub clone {
     my ($self) = @_;
     my $clone = ref($self)->new(separator => $self->{separator}, filter => $self->{filter});
     $clone->{pkl}->merge($self->{pkl});
+    $clone->{validator} = $self->{validator};
     return $clone;
 }
 
@@ -74,6 +83,7 @@ sub delete {
     my ($self, @keys) = @_;
     my $clone = $self->clone;
     $clone->{pkl}->delete($_) foreach grep { defined($_) } @keys;
+    $clone->_validate();
     return $clone;
 }
 
@@ -178,7 +188,7 @@ For example,
 =item C<validator> => CODE_REF (optional)
 
 If set, this code-ref is called when some key-value pairs are set or deleted to a L<Gnuplot::Builder::JoinDict> object.
-The code-ref supposed to check the content and throw an exception when something is wrong.
+The code-ref is supposed to check the content and throw an exception when something is wrong.
 
     $validator->($dict)
 
