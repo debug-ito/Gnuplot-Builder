@@ -172,6 +172,17 @@ For example,
 You can modify C<$keys_ref> and C<$values_ref> in the filter.
 C<$dict> is not modified if you do that.
 
+=item C<validator> => CODE_REF (optional)
+
+If set, this code-ref is called when some key-value pairs are set or deleted to a L<Gnuplot::Builder::JoinDict> object.
+The code-ref supposed to check the content and throw an exception when something is wrong.
+
+    $validator->($dict)
+
+where C<$dict> is the L<Gnuplot::Builder::JoinDict> object.
+
+The validator is called when C<new()>, C<delete()>, C<set()> and C<set_all()> methods are called.
+
 =back
 
 =head1 OBJECT METHODS
