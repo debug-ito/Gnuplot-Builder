@@ -1,7 +1,7 @@
 use strict;
 use warnings FATAL => "all";
 use Test::More;
-use Gnuplot::Builder::Template qw(using);
+use Gnuplot::Builder::Template qw(gusing);
 
 foreach my $case (
     {label => "basic 2D", keys => [qw(x y)]},
@@ -61,11 +61,11 @@ foreach my $case (
 ) {
     my @params = map { @$_ } reverse map { [ "-$case->{keys}[$_]" => $_ ] } 0 .. $#{$case->{keys}};
     die "$case->{label}: something is wrong" if !$case->{label} || !@params;
-    my $using = using(@params);
+    my $using = gusing(@params);
     is "$using", join(":", 0 .. $#{$case->{keys}}), "$case->{label}: using string order OK";
 
     unshift @params, "-linecolor" => 9999;
-    $using = using(@params);
+    $using = gusing(@params);
     is "$using", join(":", (0 .. $#{$case->{keys}}), 9999), "$case->{label}: using -linecolor is always at the last (as of gnuplot 4.6.6)";
 }
 
