@@ -12,8 +12,10 @@ use Gnuplot::Builder::JoinDict;
     my $dict = Gnuplot::Builder::JoinDict->new(
         separator => " & ", content => [x => 10, y => 20],
         filter => sub {
-            my ($dict, $keys, $values) = @_;
-            return [map { "$keys->[$_]=$values->[$_]" } 0 .. $#$keys]
+            my ($dict) = @_;
+            my @keys = $dict->get_all_keys();
+            my @values = $dict->get_all_values();
+            return map { "$keys[$_]=$values[$_]" } 0 .. $#keys;
         }
     );
     is "$dict", "x=10 & y=20", "example OK";
@@ -25,13 +27,11 @@ use Gnuplot::Builder::JoinDict;
     my $dict; $dict = Gnuplot::Builder::JoinDict->new(
         separator => ":",
         filter => sub {
-            my ($inner_dict, $keys, $values) = @_;
+            my ($inner_dict) = @_;
             $called++;
-            ok((!wantarray && defined(wantarray)), "filter is in scalar context");
+            ok((wantarray), "filter is in list context");
             identical $inner_dict, $dict, "inner_dict is the containing object";
-            is_deeply $keys, [], "keys ok";
-            is_deeply $values, [], "values ok";
-            return [1,2,3];
+            return (1, 2, 3);
         }
     );
     is $called, 0, "not called yet";
@@ -45,14 +45,15 @@ use Gnuplot::Builder::JoinDict;
     my $dict = Gnuplot::Builder::JoinDict->new(
         separator => ":", content => [x => 10, y => 20],
         filter => sub {
-            my ($dict, $keys, $values) = @_;
+            my ($dict) = @_;
             $called++;
-            is_deeply $keys, [qw(x y)], "keys ok";
-            is_deeply $values, [10, 20], "values ok";
-            my $ret = [map { "$keys->[$_]=$values->[$_]" } 0 .. $#$keys];
-            @{$_[1]} = ();
-            @{$_[2]} = ();
-            return $ret;
+            my @keys = $dict->get_all_keys();
+            my @values = $dict->get_all_values();
+            is_deeply \@keys, [qw(x y)], "keys ok";
+            is_deeply \@values, [10, 20], "values ok";
+            my @ret = map { "$keys[$_]=$values[$_]" } 0 .. $#keys;
+            my $new_dict = $dict->set_all(undef);  ## try to change $dict (supposed to be impossible)
+            return @ret;
         }
     );
     is $called, 0, "not called yet";
@@ -70,7 +71,7 @@ foreach my $case (
 ) {
     my $dict = Gnuplot::Builder::JoinDict->new(
         separator => ":", content => [foo => "bar", buzz => "quux"],
-        filter => sub { $case->{ret} }
+        filter => sub { @{$case->{ret}} }
     );
     is "$dict", $case->{exp}, "$case->{label}: stringification ok";
 }
@@ -79,7 +80,7 @@ foreach my $case (
     note("--- filter inheritance via setters and clone()");
     my $parent = Gnuplot::Builder::JoinDict->new(
         separator => ":", content => [x => 10, y => 20],
-        filter => sub { [map { $_ * 2 } @{$_[2]}] },
+        filter => sub { map { $_ * 2 } $_[0]->get_all_values },
     );
     is "$parent", "20:40", "parent ok";
     my $clone = $parent->clone();
@@ -91,12 +92,6 @@ foreach my $case (
 
     my $del = $parent->delete("x");
     is "$del", "40", "delete() inherit filter ok";
-}
-
-{
-    note("--- filter returning non array-ref");
-    my $dict = Gnuplot::Builder::JoinDict->new(filter => sub { "a" });
-    like exception { "$dict" }, qr{must return an array-ref}i, "exception ok";
 }
 
 {

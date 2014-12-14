@@ -30,13 +30,10 @@ sub get_all_values {
 
 sub to_string {
     my ($self) = @_;
-    my $vals = defined($self->{filter})
-        ? $self->{filter}->($self, [$self->{pkl}->get_all_keys], [$self->{pkl}->get_all_values])
-        : [$self->{pkl}->get_all_values];
-    if(ref($vals) ne "ARRAY") {
-        croak "filter must return an array-ref";
-    }
-    return join($self->{separator}, grep { defined($_) } @$vals);
+    my @vals = defined($self->{filter})
+        ? $self->{filter}->($self)
+        : $self->{pkl}->get_all_values;
+    return join($self->{separator}, grep { defined($_) } @vals);
 }
 
 sub get {
@@ -160,25 +157,23 @@ The array-ref must contain key-value pairs. Keys must not be C<undef>.
 If set, this code-ref is called when the C<$dict> is stringified (i.e. C<< $dict->to_string >> is called).
 The code-ref is supposed to modify the values in C<$dict> to produce the final result of stringification.
 
-    $modified_values_ref = $filter->($dict, $keys_ref, $values_ref)
+    @modified_values = $filter->($dict)
 
-where C<$dict> is the L<Gnuplot::Builder::JoinDict> object,
-C<$keys_ref> is the array-ref of keys and C<$values_ref> is the array-ref of values.
-The filter must return an array-ref C<$modified_values_ref>.
+where C<$dict> is the L<Gnuplot::Builder::JoinDict> object.
+The filter must return a list C<@modified_values>.
 
 For example,
 
     my $dict = Gnuplot::Builder::JoinDict->new(
         separator => " & ", content => [x => 10, y => 20],
         filter => sub {
-            my ($dict, $keys, $values) = @_;
-            return [map { "$keys->[$_]=$values->[$_]" } 0 .. $#$keys]
+            my ($dict) = @_;
+            my @keys = $dict->get_all_keys();
+            my @values = $dict->get_all_values();
+            return map { "$keys[$_]=$values[$_]" } 0 .. $#keys;
         }
     );
     "$dict"; ## => x=10 & y=20
-
-You can modify C<$keys_ref> and C<$values_ref> in the filter.
-C<$dict> is not modified if you do that.
 
 =item C<validator> => CODE_REF (optional)
 
