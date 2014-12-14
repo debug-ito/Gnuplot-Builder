@@ -49,6 +49,7 @@ our $USING = Gnuplot::Builder::JoinDict->new(
                      | -z
     polar            | -t
     "image"          | -value
+    smooth kdensity  | -weight -bandwidth
     "rgbalpha"       | -r -g -b -a
     "labels"         | -string -label
     "vectors"        | -xdelta -ydelta -zdelta
