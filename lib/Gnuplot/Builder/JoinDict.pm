@@ -185,6 +185,8 @@ For example,
     );
     "$dict"; ## => x=10 & y=20
 
+The filter is inherited by L<Gnuplot::Builder::JoinDict> objects derived from the original one.
+
 =item C<validator> => CODE_REF (optional)
 
 If set, this code-ref is called when some key-value pairs are set or deleted to a L<Gnuplot::Builder::JoinDict> object.
@@ -195,6 +197,8 @@ The code-ref is supposed to check the content and throw an exception when someth
 where C<$dict> is the L<Gnuplot::Builder::JoinDict> object.
 
 The validator is called when C<new()>, C<delete()>, C<set()> and C<set_all()> methods are called.
+
+The validator is inherited by L<Gnuplot::Builder::JoinDict> objects derived from the original one.
 
 =back
 
