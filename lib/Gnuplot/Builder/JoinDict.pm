@@ -20,6 +20,14 @@ sub new {
     return $self;
 }
 
+sub get_all_keys {
+    return $_[0]->{pkl}->get_all_keys;
+}
+
+sub get_all_values {
+    return $_[0]->{pkl}->get_all_values
+}
+
 sub to_string {
     my ($self) = @_;
     my $vals = defined($self->{filter})
@@ -198,6 +206,14 @@ If some values are C<undef>, those values are ignored.
 Return the C<$value> for the C<$key>.
 
 If C<$dict> doesn't have C<$key>, it returns C<undef>.
+
+=head2 @keys = $dict->get_all_keys()
+
+Return all keys from C<$dict>.
+
+=head2 @values = $dict->get_all_values()
+
+Return all values from C<$dict>.
 
 =head2 $new_dict = $dict->set($key => $value, ...)
 
