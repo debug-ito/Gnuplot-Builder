@@ -47,12 +47,13 @@ our $USING = Gnuplot::Builder::JoinDict->new(
                      | -x -y
     "filledcurves"   | -y1 -y2
                      | -z
-    polar/parametric | -t
+    polar            | -t
     "image"          | -value
     "rgbalpha"       | -r -g -b -a
     "labels"         | -string -label
     "vectors"        | -xdelta -ydelta -zdelta
-    "xerrorbars"     | -xlow -xhigh -ylow -yhigh
+    "xerrorbars"     | -xlow -xhigh
+    "yerrorbars"     | -ylow -yhigh
     "financebars"    | -date -open -low -high -close
     "candlesticks"   | -box_min -whisker_min -whisker_high -box_high
     "boxes"          | -x_width
