@@ -72,9 +72,9 @@ foreach my $case (
 isa_ok $Gnuplot::Builder::Template::USING, "Gnuplot::Builder::JoinDict";
 
 {
-    note("--- internal key check...");
-    my @keys = $Gnuplot::Builder::Template::USING->{pkl}->get_all_keys();
-    is(scalar(grep { $_ =~ /^-/ } @keys), scalar(@keys), "all keys begin with -");
+    note("--- key check");
+    my @keys = $Gnuplot::Builder::Template::USING->get_all_keys();
+    is(scalar(grep { $_ =~ /^-/ } @keys), scalar(@keys), "all predefined keys begin with -");
 }
 
 done_testing;
