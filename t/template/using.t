@@ -1,6 +1,7 @@
 use strict;
 use warnings FATAL => "all";
 use Test::More;
+use Test::Fatal;
 use Gnuplot::Builder::Template qw(gusing);
 
 foreach my $case (
@@ -75,6 +76,27 @@ isa_ok $Gnuplot::Builder::Template::USING, "Gnuplot::Builder::JoinDict";
     note("--- key check");
     my @keys = $Gnuplot::Builder::Template::USING->get_all_keys();
     is(scalar(grep { $_ =~ /^-/ } @keys), scalar(@keys), "all predefined keys begin with -");
+}
+
+{
+    note("--- custom keys");
+    my $using = gusing(hoge => 1, foo => 2, -x => 3, -y => 4);
+    is "$using", "3:4:1:2", "custom keys are always at the last";
+}
+
+{
+    note("--- unknown hyphen keys");
+    like(
+        exception { gusing(-z => 10, -this_does_not_exist => 20) },
+        qr/unknown key.*-this_does_not_exist/i,
+        "it dies if unknown hyphen keys are given"
+    );
+    my $using = gusing(-x => 10);
+    like(
+        exception { $using->set(-this_does_not_exist => 200) },
+        qr/unknown key.*-this_does_not_exist/i,
+        "it dies if unknown hyphen keys are given, even after JoinDict is created"
+    );
 }
 
 done_testing;

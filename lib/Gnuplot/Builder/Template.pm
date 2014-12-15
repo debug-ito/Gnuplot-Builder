@@ -1,46 +1,16 @@
 package Gnuplot::Builder::Template;
 use strict;
 use warnings;
-
-## TODO:
-## - how should we maintain backward-compatibility??
-## - can we assume this module provides JoinDict only??
-## 個別の関数ごとに互換性条項を定めるか？それもなー。
-## 
-## ロード時のimportオプションでバージョンを指定する？
-## それでもいいけど、それならバージョンサブモジュールがあったほうがいいような。
-## Exporterをそのまんま使えなくなるし、importなしで使った場合に変なことになる。
-## 
-## 間違ってなければいいんだけど。あとはgnuplot側のバージョンアップに追従する必要はある。
-## 別の関数、別のテンプレートオブジェクトを作るか？ using2とか。それがいいか。
-## 
-## あとはキー名のルール。テンプレートにユーザがパラメータのせて、
-## その後バージョンアップでそのパラメータがテンプレートに入ったら順番変わってしまう。
-## キーの追加をしないってポリシーはさすがにダルいよな
-## 
-## ちなみにDBIではattribute nameとして以下の規則をおいている。
-## 
-## - UPPER_CASE: standard
-## - MixedCase: DBI
-## - lower_case: driver specific
-## 
-## あるいはハイフンから始まるようにしてもいいかも。
-## でもstart_pointなんかだとハイフンとアンダースコアが混ざることになる。
-## ハイフンが語中に混ざる場合、ベアワードではキーとして認識されない。
-## それは使いづらいなあ。
-## 
-## まあ、頭にハイフン、中間はアンダースコア、が妥当だと思う。
-## MixedCaseは変換ルールが曖昧になりがちだし、UPPERCASEも打ちづらい。
-
 use Exporter 5.57 qw(import);
+use Carp;
 use Gnuplot::Builder::JoinDict;
 
 our @EXPORT_OK = qw(gusing);
 
-our $USING = Gnuplot::Builder::JoinDict->new(
-    separator => ":",
-    content => [
-        map { substr($_, 0, 1) eq "-" ? ( $_ => undef ) : () }
+our $USING;
+
+{
+    my @using_keys = grep { substr($_, 0, 1) eq "-" }
         qw(
     USE CASES        | KEYS
     =================+==============================================
@@ -62,9 +32,20 @@ our $USING = Gnuplot::Builder::JoinDict->new(
     "circles"        | -radius -start_angle -end_angle
     "ellipses"       | -major_diam -minor_diam -angle
     variable style   | -pointsize -arrowstyle -linecolor
-      )
-    ]
-);
+      );
+    my %using_keys_dict = map { $_ => 1 } @using_keys;
+    
+    $USING = Gnuplot::Builder::JoinDict->new(
+        separator => ":",
+        content => [map { $_ => undef } @using_keys],
+        validator => sub {
+            my ($dict) = @_;
+            foreach my $hyphen_key (grep { substr($_, 0, 1) eq "-" } $dict->get_all_keys) {
+                croak "Unknown key: $hyphen_key" if !$using_keys_dict{$hyphen_key};
+            }
+        }
+    );
+}
 
 sub gusing {
     return $USING->set(@_);
@@ -121,6 +102,7 @@ The L<Gnuplot::Builder::JoinDict> object returned by this function has predifine
 By default, values for the predefined keys are all C<undef>.
 
 The predefined keys are listed in the right column of the following table.
+Typical use cases for the keys are listed in the left column.
 
     USE CASES        | KEYS
     =================+==============================================
@@ -142,8 +124,6 @@ The predefined keys are listed in the right column of the following table.
     "circles"        | -radius -start_angle -end_angle
     "ellipses"       | -major_diam -minor_diam -angle
     variable style   | -pointsize -arrowstyle -linecolor
-
-We also show typical use cases for the keys in the left column of the table.
 
 Note that these keys are in the same order as shown in the table,
 so you would always get the "using" parameter in the correct order.
@@ -169,12 +149,14 @@ You can add your own key-value pairs to the parameters. For example,
     my $using = gusing(-x => 1, -y => 2, -x_width => "(0.7)", tics => "xticlabels(3)");
     "$using";  ## 1:2:(0.7):xticlabels(3)
 
-Keys that start with C<"-"> are preserved, so you should avoid using them for your own keys.
+Keys that start with C<"-"> are preserved.
+If you add a key that starts with C<"-"> but is not listed in the above table,
+this function dies.
 
 C<gusing()> function uses C<$Gnuplot::Builder::Template::USING> package variable as the template.
 You can customize it.
 
-Note that some keys may be added to the template in the future. See L</COMPATIBILITY> for detail.
+Some keys may be added to the template in the future. See L</COMPATIBILITY> for detail.
 
 =head2 $every_joindict = gevery(@key_value_pairs)
 
