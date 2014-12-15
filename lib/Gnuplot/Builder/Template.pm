@@ -160,6 +160,12 @@ Some keys may be added to the template in the future. See L</COMPATIBILITY> for 
 
 =head2 $every_joindict = gevery(@key_value_pairs)
 
+Like C<gusing()>, it creates and returns a L<Gnuplot::Builder::JoinDict> object useful for "every" parameters.
+Actually it's just a short for C<< $Gnuplot::Builder::Template::EVERY->set(@key_value_pairs) >>.
+
+The L<Gnuplot::Builder::JoinDict> object returned by this function has predifined keys.
+
+
 =head1 PACKAGE VARIABLES
 
 =head2 $USING
