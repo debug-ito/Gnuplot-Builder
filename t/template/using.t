@@ -3,6 +3,7 @@ use warnings FATAL => "all";
 use Test::More;
 use Test::Fatal;
 use Gnuplot::Builder::Template qw(gusing);
+use Gnuplot::Builder::JoinDict;
 
 foreach my $case (
     {label => "basic 2D", keys => [qw(x y)]},
@@ -98,5 +99,15 @@ isa_ok $Gnuplot::Builder::Template::USING, "Gnuplot::Builder::JoinDict";
         "it dies if unknown hyphen keys are given, even after JoinDict is created"
     );
 }
+
+{
+    note("--- template customize");
+    local $Gnuplot::Builder::Template::USING = Gnuplot::Builder::JoinDict->new(
+        separator => ","
+    );
+    my $using = gusing(-foo => 10, -bar => 20, -x => 30);
+    is "$using", "10,20,30", "template is replaced";
+}
+
 
 done_testing;

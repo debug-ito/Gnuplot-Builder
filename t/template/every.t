@@ -3,6 +3,7 @@ use warnings FATAL => "all";
 use Test::More;
 use Test::Fatal;
 use Gnuplot::Builder::Template qw(gevery);
+use Gnuplot::Builder::JoinDict;
 
 foreach my $case (
     {label => "empty", input => [], exp => "1"},
@@ -47,5 +48,13 @@ foreach my $case (
     );
 }
 
+{
+    note("--- template customize");
+    local $Gnuplot::Builder::Template::EVERY = Gnuplot::Builder::JoinDict->new(
+        separator => ","
+    );
+    my $every = gevery(-foo => 10, -bar => 20, -point_incr => 30);
+    is "$every", "10,20,30", "template is replaced";
+}
 
 done_testing;
