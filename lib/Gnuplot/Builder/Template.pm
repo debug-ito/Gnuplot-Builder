@@ -5,7 +5,7 @@ use Exporter 5.57 qw(import);
 use Carp;
 use Gnuplot::Builder::JoinDict;
 
-our @EXPORT_OK = qw(gusing);
+our @EXPORT_OK = qw(gusing gevery);
 
 our $USING;
 
@@ -47,10 +47,52 @@ our $USING;
     );
 }
 
+our $EVERY;
+
+{
+    my @every_keys =
+        qw(
+    -point_incr
+    -block_incr
+    -start_point
+    -start_block
+    -end_point
+    -end_block
+      );
+    $EVERY = Gnuplot::Builder::JoinDict->new(
+        separator => ":",
+        content => [$every_keys[0] => 1, map { $_ => undef } @every_keys[1 .. $#every_keys]],
+        filter => sub {
+            my ($dict) = @_;
+            my @values = $dict->get_all_values;
+            my ($first_def_index, $last_def_index);
+            foreach my $front_i (0 .. $#values) {
+                my $rear_i = $#values - $front_i;
+                if(!defined($first_def_index) && defined($values[$front_i])) {
+                    $first_def_index = $front_i;
+                }
+                if(!defined($last_def_index) && defined($values[$rear_i])) {
+                    $last_def_index = $rear_i;
+                }
+                if(defined($first_def_index) && defined($last_def_index)) {
+                    last;
+                }
+            }
+            return () if !defined($first_def_index) || !defined($last_def_index);
+            return map {
+                defined($_) ? $_ : ""
+            } @values[$first_def_index .. $last_def_index];
+        }
+    );
+}
+
 sub gusing {
     return $USING->set(@_);
 }
 
+sub gevery {
+    return $EVERY->set(@_);
+}
 
 1;
 __END__

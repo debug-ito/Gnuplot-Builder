@@ -1,6 +1,7 @@
 use strict;
 use warnings FATAL => "all";
 use Test::More;
+use Test::Fatal;
 use Gnuplot::Builder::Template qw(gevery);
 
 foreach my $case (
@@ -12,6 +13,10 @@ foreach my $case (
     {label => "end_point", input => [-end_point => 10], exp => "1::::10"},
     {label => "end_block", input => [-end_block => 10], exp => "1:::::10"},
     {label => "split", input => [-block_incr => 10, -end_point => 20], exp => "1:10:::20"},
+    {label => "all reverse", input => [
+        -end_block => 1, -end_point => 2, -start_block => 3, -start_point => 4,
+        -block_incr => 5, -point_incr => 6
+    ], exp => "6:5:4:3:2:1"},
     {label => "custom", input => [hoge => 10], exp => "1::::::10"},
     {label => "undef point_incr", input => [-point_incr => undef], exp => ""},
     {label => "undef point_incr and custom", input => [-point_incr => undef, hoge => 10, foo => 20], exp => "10:20"},
