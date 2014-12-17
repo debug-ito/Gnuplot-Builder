@@ -109,5 +109,22 @@ isa_ok $Gnuplot::Builder::Template::USING, "Gnuplot::Builder::JoinDict";
     is "$using", "10,20,30", "template is replaced";
 }
 
+{
+    note("--- examples");
+    {
+        my $using = gusing(-y => 5, -x => 3);
+        is "$using", "3:5";
+    }
+    {
+        my $using = gusing(-x => 1,
+                           -whisker_min => 2, -box_min => 3,
+                           -box_high => 4, -whisker_high => 5);
+        is "$using", "1:3:2:5:4";
+    }
+    {
+        my $using = gusing(-x => 1, -y => 2, -x_width => "(0.7)", tics => "xticlabels(3)");
+        is "$using", "1:2:(0.7):xticlabels(3)";
+    }
+}
 
 done_testing;

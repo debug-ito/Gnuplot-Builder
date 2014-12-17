@@ -4,6 +4,7 @@ use Test::More;
 use Test::Fatal;
 use Gnuplot::Builder::Template qw(gevery);
 use Gnuplot::Builder::JoinDict;
+use Gnuplot::Builder::Dataset;
 
 foreach my $case (
     {label => "empty", input => [], exp => "1"},
@@ -55,6 +56,19 @@ foreach my $case (
     );
     my $every = gevery(-foo => 10, -bar => 20, -point_incr => 30);
     is "$every", "10,20,30", "template is replaced";
+}
+
+{
+    note("--- examples");
+    my $dataset = Gnuplot::Builder::Dataset->new_file(
+        "data", every => gevery
+    );
+    is "$dataset", "'data' every 1";
+    $dataset->set(
+        every => $dataset->get_option("every")->set(-start_point => 5)
+    );
+    is "$dataset", "'data' every 1::5";
+
 }
 
 done_testing;
