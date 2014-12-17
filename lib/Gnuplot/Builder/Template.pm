@@ -211,8 +211,36 @@ Some keys may be added to the template in the future. See L</COMPATIBILITY> for 
 Like C<gusing()>, it creates and returns a L<Gnuplot::Builder::JoinDict> object useful for "every" parameters.
 Actually it's just a short for C<< $Gnuplot::Builder::Template::EVERY->set(@key_value_pairs) >>.
 
-The L<Gnuplot::Builder::JoinDict> object returned by this function has predifined keys.
+The L<Gnuplot::Builder::JoinDict> object returned by this function has the following predifined keys.
 
+    -point_incr
+    -block_incr
+    -start_point
+    -start_block
+    -end_point
+    -end_block
+
+By default, C<-point_incr> is 1 and everything else is C<undef>.
+This makes it possible to casually pass C<gevery()> for "every" parameter
+and alter it afterward.
+
+    my $dataset = Gnuplot::Builder::Dataset->new_file(
+        "data", every => gevery
+    );
+    "$dataset";  ## => 'data' every 1
+    $dataset->set(
+        every => $dataset->get_option("every")->set(-start_point => 5)
+    );
+    "$dataset";  ## => 'data' every 1::5
+
+Like C<gusing()>, keys that start with C<"-"> are preserved.
+If you add a key that starts with C<"-"> but is not listed in the above list,
+this function dies.
+
+C<gevery()> function uses C<$Gnuplot::Builder::Template::EVERY> package variable as the template.
+You can customize it.
+
+Some keys may be added to the template in the future. See L</COMPATIBILITY> for detail.
 
 =head1 PACKAGE VARIABLES
 
