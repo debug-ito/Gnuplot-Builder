@@ -7,6 +7,17 @@ use Gnuplot::Builder::JoinDict;
 
 our @EXPORT_OK = qw(gusing gevery);
 
+sub _create_hyphen_validator {
+    my ($allowed_keys_arrayref) = @_;
+    my %allowed_keys = map { $_ => 1 } @$allowed_keys_arrayref;
+    return sub {
+        my ($dict) = @_;
+        foreach my $hyphen_key (grep { substr($_, 0, 1) eq "-" } $dict->get_all_keys) {
+            croak "Unknown key: $hyphen_key" if !$allowed_keys{$hyphen_key};
+        }
+    };
+}
+
 our $USING;
 
 {
@@ -33,17 +44,11 @@ our $USING;
     "ellipses"       | -major_diam -minor_diam -angle
     variable style   | -pointsize -arrowstyle -linecolor
       );
-    my %using_keys_dict = map { $_ => 1 } @using_keys;
     
     $USING = Gnuplot::Builder::JoinDict->new(
         separator => ":",
         content => [map { $_ => undef } @using_keys],
-        validator => sub {
-            my ($dict) = @_;
-            foreach my $hyphen_key (grep { substr($_, 0, 1) eq "-" } $dict->get_all_keys) {
-                croak "Unknown key: $hyphen_key" if !$using_keys_dict{$hyphen_key};
-            }
-        }
+        validator => _create_hyphen_validator(\@using_keys),
     );
 }
 
@@ -62,6 +67,7 @@ our $EVERY;
     $EVERY = Gnuplot::Builder::JoinDict->new(
         separator => ":",
         content => [$every_keys[0] => 1, map { $_ => undef } @every_keys[1 .. $#every_keys]],
+        validator => _create_hyphen_validator(\@every_keys),
         filter => sub {
             my ($dict) = @_;
             my @values = $dict->get_all_values;
