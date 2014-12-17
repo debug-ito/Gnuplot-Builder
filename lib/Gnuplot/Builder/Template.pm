@@ -23,26 +23,26 @@ our $USING;
 {
     my @using_keys = grep { substr($_, 0, 1) eq "-" }
         qw(
-    USE CASES        | KEYS
-    =================+==============================================
-                     | -x -y
-    "filledcurves"   | -y1 -y2
-                     | -z
-    polar            | -t
-    "image"          | -value
-    smooth kdensity  | -weight -bandwidth
-    "rgbalpha"       | -r -g -b -a
-    "labels"         | -string -label
-    "vectors"        | -xdelta -ydelta -zdelta
-    "xerrorbars"     | -xlow -xhigh
-    "yerrorbars"     | -ylow -yhigh
-    "financebars"    | -date -open -low -high -close
-    "candlesticks"   | -box_min -whisker_min -whisker_high -box_high
-    "boxes"          | -x_width
-    "boxplot"        | -boxplot_factor
-    "circles"        | -radius -start_angle -end_angle
-    "ellipses"       | -major_diam -minor_diam -angle
-    variable style   | -pointsize -arrowstyle -linecolor
+    USE CASES       | KEYS
+    ================+==============================================
+                    | -x -y
+    filledcurves    | -y1 -y2
+                    | -z
+    polar           | -t
+    image           | -value
+    smooth kdensity | -weight -bandwidth
+    rgbalpha        | -r -g -b -a
+    labels          | -string -label
+    vectors         | -xdelta -ydelta -zdelta
+    xerrorbars      | -xlow -xhigh
+    yerrorbars      | -ylow -yhigh
+    financebars     | -date -open -low -high -close
+    candlesticks    | -box_min -whisker_min -whisker_high -box_high
+    boxes           | -x_width
+    boxplot         | -boxplot_factor
+    circles         | -radius -start_angle -end_angle
+    ellipses        | -major_diam -minor_diam -angle
+    variable style  | -pointsize -arrowstyle -linecolor
       );
     
     $USING = Gnuplot::Builder::JoinDict->new(
@@ -152,26 +152,26 @@ By default, values for the predefined keys are all C<undef>.
 The predefined keys are listed in the right column of the following table.
 Typical use cases for the keys are listed in the left column.
 
-    USE CASES        | KEYS
-    =================+==============================================
-                     | -x -y
-    "filledcurves"   | -y1 -y2
-                     | -z
-    polar            | -t
-    "image"          | -value
-    smooth kdensity  | -weight -bandwidth
-    "rgbalpha"       | -r -g -b -a
-    "labels"         | -string -label
-    "vectors"        | -xdelta -ydelta -zdelta
-    "xerrorbars"     | -xlow -xhigh
-    "yerrorbars"     | -ylow -yhigh
-    "financebars"    | -date -open -low -high -close
-    "candlesticks"   | -box_min -whisker_min -whisker_high -box_high
-    "boxes"          | -x_width
-    "boxplot"        | -boxplot_factor
-    "circles"        | -radius -start_angle -end_angle
-    "ellipses"       | -major_diam -minor_diam -angle
-    variable style   | -pointsize -arrowstyle -linecolor
+    USE CASES       | KEYS
+    ================+==============================================
+                    | -x -y
+    filledcurves    | -y1 -y2
+                    | -z
+    polar           | -t
+    image           | -value
+    smooth kdensity | -weight -bandwidth
+    rgbalpha        | -r -g -b -a
+    labels          | -string -label
+    vectors         | -xdelta -ydelta -zdelta
+    xerrorbars      | -xlow -xhigh
+    yerrorbars      | -ylow -yhigh
+    financebars     | -date -open -low -high -close
+    candlesticks    | -box_min -whisker_min -whisker_high -box_high
+    boxes           | -x_width
+    boxplot         | -boxplot_factor
+    circles         | -radius -start_angle -end_angle
+    ellipses        | -major_diam -minor_diam -angle
+    variable style  | -pointsize -arrowstyle -linecolor
 
 Note that these keys are in the same order as shown in the table,
 so you would always get the "using" parameter in the correct order.
@@ -246,9 +246,11 @@ Some keys may be added to the template in the future. See L</COMPATIBILITY> for 
 
 =head2 $USING
 
+The template L<Gnuplot::Builder::JoinDict> object for C<gusing()> function.
+
 =head2 $EVERY
 
-TODO: template package variables
+The template L<Gnuplot::Builder::JoinDict> object for C<gevery()> function.
 
 =head1 COMPATIBILITY
 
