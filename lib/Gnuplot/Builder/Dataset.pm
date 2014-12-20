@@ -298,6 +298,16 @@ In the above example, only the third dataset has its inline data.
 
 =back
 
+=head2 Complex Dataset Options
+
+Sometimes dataset options can be complex.
+For example, have you ever been confused by
+L<< the complicated order of "using" option parameters for "candlesticks" plot style |http://gnuplot.sourceforge.net/demo_4.6/candlesticks.html >>? I have!
+
+If you have trouble dealing with those complex options,
+check out L<Gnuplot::Builder::Template> and L<Gnuplot::Builder::JoinDict>.
+They might help you arrange option values and stuff.
+
 
 =head1 CLASS METHODS
 
