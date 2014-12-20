@@ -1,5 +1,12 @@
 Revision history for Gnuplot-Builder
 
+0.27    2014-12-20
+        [ENHANCEMENTS]
+        - JoinDict: Add separator(), get_all_keys(), get_all_values() and set_all() methods.
+          Add filter and validator options. Add joind() exportable function.
+        - PartiallyKeyedList: Add get_all_keys() method.
+        - Add Gnuplot::Builder::Template module.
+
 0.26    2014-11-09
         [INCOMPATIBLE API CHANGE]
         - Experimental methods Dataset#set_join() and delete_join()
