@@ -3,7 +3,10 @@ use strict;
 use warnings;
 use Gnuplot::Builder::PartiallyKeyedList;
 use Carp;
+use Exporter 5.57 qw(import);
 use overload '""' => "to_string";
+
+our @EXPORT_OK = qw(joind);
 
 sub new {
     my ($class, %args) = @_;
@@ -20,6 +23,14 @@ sub new {
     croak "content must be an array-ref" if ref($content) ne "ARRAY";
     $self->_set_destructive(@$content);
     return $self;
+}
+
+sub joind {
+    my ($separator, @content) = @_;
+    return __PACKAGE__->new(
+        separator => $separator,
+        content => \@content
+    );
 }
 
 sub get_all_keys {
@@ -142,6 +153,13 @@ L<Gnuplot::Builder::JoinDict> is B<immutable>. Every setter method doesn't alter
 When a L<Gnuplot::Builder::JoinDict> object is stringified, it B<joins> all its values with the given separator and returns the result.
 
 =back
+
+=head1 EXPORTABLE FUNCTIONS
+
+=head2 $dict = joind($separator, @content)
+
+Alias for C<< Gnuplot::Builder::JoinDict->new(separator => $separator, content => \@content) >>.
+Exported only by request.
 
 =head1 CLASS METHODS
 
