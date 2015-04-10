@@ -7,6 +7,7 @@ use Gnuplot::Builder::PartiallyKeyedList;
 use POSIX qw(:sys_wait_h);
 use File::Spec;
 use Try::Tiny;
+use Encode ();
 
 sub _get_env {
     my ($basename, @default) = @_;
@@ -23,6 +24,7 @@ our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 2);
 our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
 our $TAP = undef;
+our $ENCODING = _get_env("ENCODING", undef);
 
 my $END_SCRIPT_MARK = '@@@@@@_END_OF_GNUPLOT_BUILDER_@@@@@@';
 my $processes = Gnuplot::Builder::PartiallyKeyedList->new;
@@ -134,6 +136,7 @@ sub _writer {
     my $pid = $self->{pid};
     return sub {
         my $msg = join "", @_;
+        $msg = Encode::encode($ENCODING, $msg) if defined $ENCODING;
         $TAP->($pid, "write", $msg) if defined $TAP;
         print $write_handle ($msg);
     };
