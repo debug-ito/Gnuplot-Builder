@@ -14,7 +14,7 @@ sub contains_encoded {
     return (index($containing_string, encode_utf8($decoded_substring)) != -1);
 }
 
-$Gnuplot::Builder::ENCODING = "utf8";
+$Gnuplot::Builder::Process::ENCODING = "utf8";
 
 my $tapped = "";
 $Gnuplot::Builder::Process::TAP = sub {
@@ -23,7 +23,7 @@ $Gnuplot::Builder::Process::TAP = sub {
 };
 
 my $base_script = Gnuplot::Builder::Script->new(
-    term => "png size 500,500"
+    term => "pngcairo size 500,500"
 );
 
 if_no_file "test_enc_plot.png", sub {
@@ -53,6 +53,7 @@ if_no_file "test_enc_multiplot.png", sub {
         do => sub {
             my ($writer) = @_;
             $writer->('plot sin(x) title "サイン・エックス"');
+            $writer->("\n");
             Gnuplot::Builder::Script->new->plot($dataset);
         }
     );
