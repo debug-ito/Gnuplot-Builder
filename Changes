@@ -1,5 +1,9 @@
 Revision history for Gnuplot-Builder
 
+0.28    2015-04-10
+        [ENHANCEMENTS]
+        - Add $Gnuplot::Builder::Process::ENCODING option.
+
 0.27    2014-12-20
         [ENHANCEMENTS]
         - JoinDict: Add separator(), get_all_keys(), get_all_values() and set_all() methods.
