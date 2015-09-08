@@ -431,6 +431,10 @@ If it's set, C<@set_args> is directly given to C<set()> method.
 
 Most object methods return the object itself, so that you can chain those methods.
 
+=head2 $builder->set_no_error($error)
+
+Enable or disable errors and warnings in the output.
+
 =head2 $script = $builder->to_string()
 
 Build and return the gnuplot script string.

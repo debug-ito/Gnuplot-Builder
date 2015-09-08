@@ -69,6 +69,10 @@ sub wait_all {
 ## async (BOOL optional, default = false): If set to true, it won't
 ## wait for the gnuplot process to finish. In this case, the return
 ## value is an empty string.
+##
+## no_error (BOOL optional, default = false): If set to true, it won't
+## include gnuplot's warnings or errors in the output and just ignores
+## them.
 sub with_new_process {
     my ($class, %args) = @_;
     my $code = $args{do};
@@ -99,6 +103,9 @@ sub with_new_process {
 ## capture (BOOL optional, default: false): If true, it keeps the
 ## STDOUT and STDERR of the process so that it can read them
 ## afterward. Otherwise, it just discards the output.
+##
+## no_error (BOOL optional, default: false): If true, STDERR is discarded
+## instead of being redirected to STDOUT.
 sub _new {
     my ($class, %args) = @_;
     _clear_zombies();
@@ -297,6 +304,12 @@ By default, it's C<0> (false).
 
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_ASYNC>.
+
+=head2 $NOERROR
+
+If set to true, gnuplot's STDERR will not appear in the result. You can use this to prevent warnings in the output.
+
+By default it is C<0>, to be compatible with older versions.
 
 =head2 @COMMAND
 
