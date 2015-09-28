@@ -20,7 +20,7 @@ sub _get_env {
 }
 
 our $ASYNC = _get_env("ASYNC", 0);
-our $NOERROR = _get_env("NOERROR", 0);
+our $NOSTDERR = _get_env("NOSTDERR", 0);
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 2);
 our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
@@ -78,8 +78,8 @@ sub with_new_process {
     my $code = $args{do};
     croak "do parameter is mandatory" if !defined($code);
     my $async = defined($args{async}) ? $args{async} : $ASYNC;
-    my $no_error = defined($args{no_error}) ? $args{no_error} : $NOERROR;
-    my $process = $class->_new(capture => !$async, no_error => $no_error);
+    my $no_stderr = defined($args{no_stderr}) ? $args{no_stderr} : $NOSTDERR;
+    my $process = $class->_new(capture => !$async, no_stderr => $no_stderr);
     my $result = "";
     try {
         $code->($process->_writer);
@@ -117,13 +117,13 @@ sub _new {
         $proc->_waitpid(1);
     }
     my $capture = $args{capture};
-    my $no_error = $args{no_error};
+    my $no_stderr = $args{no_stderr};
     my ($write_handle, $read_handle, $pid);
 
     ## open3() does not seem to work well with lexical filehandles, so we use fileno()
     $pid = open3($write_handle,
                  $capture ? $read_handle : '>&'.fileno(_null_handle()),
-                 $no_error ? '>&'.fileno(_null_handle()) : undef, @COMMAND);
+                 $no_stderr ? '>&'.fileno(_null_handle()) : undef, @COMMAND);
     my $self = bless {
         pid => $pid,
         write_handle => $write_handle,

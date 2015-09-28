@@ -7,11 +7,11 @@ use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 
 sub create_builder {
-    my ($no_error) = @_;
+    my ($no_stderr) = @_;
     my $builder = Gnuplot::Builder::Script->new(
         terminal => 'dumb',
     );
-    $builder->set_no_error($no_error);
+    $builder->set_no_stderr($no_stderr);
     return $builder;
 }
 
