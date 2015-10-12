@@ -20,7 +20,7 @@ sub _get_env {
 }
 
 our $ASYNC = _get_env("ASYNC", 0);
-our $NOSTDERR = _get_env("NOSTDERR", 0);
+our $NO_STDERR = _get_env("NO_STDERR", 0);
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 2);
 our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
@@ -70,15 +70,15 @@ sub wait_all {
 ## wait for the gnuplot process to finish. In this case, the return
 ## value is an empty string.
 ##
-## no_error (BOOL optional, default = false): If set to true, it won't
-## include gnuplot's warnings or errors in the output and just ignores
-## them.
+## no_stderr (BOOL optional, default = $NO_STDERR): If set to true,
+## the return value won't include gnuplot's STDERR. It just includes
+## STDOUT.
 sub with_new_process {
     my ($class, %args) = @_;
     my $code = $args{do};
     croak "do parameter is mandatory" if !defined($code);
     my $async = defined($args{async}) ? $args{async} : $ASYNC;
-    my $no_stderr = defined($args{no_stderr}) ? $args{no_stderr} : $NOSTDERR;
+    my $no_stderr = defined($args{no_stderr}) ? $args{no_stderr} : $NO_STDERR;
     my $process = $class->_new(capture => !$async, no_stderr => $no_stderr);
     my $result = "";
     try {
@@ -104,8 +104,8 @@ sub with_new_process {
 ## STDOUT and STDERR of the process so that it can read them
 ## afterward. Otherwise, it just discards the output.
 ##
-## no_error (BOOL optional, default: false): If true, STDERR is discarded
-## instead of being redirected to STDOUT.
+## no_stderr (BOOL optional, default: false): If true, STDERR is
+## discarded instead of being redirected to STDOUT.
 sub _new {
     my ($class, %args) = @_;
     _clear_zombies();
@@ -123,7 +123,8 @@ sub _new {
     ## open3() does not seem to work well with lexical filehandles, so we use fileno()
     $pid = open3($write_handle,
                  $capture ? $read_handle : '>&'.fileno(_null_handle()),
-                 $no_stderr ? '>&'.fileno(_null_handle()) : undef, @COMMAND);
+                 $no_stderr ? '>&'.fileno(_null_handle()) : undef,
+                 @COMMAND);
     my $self = bless {
         pid => $pid,
         write_handle => $write_handle,
