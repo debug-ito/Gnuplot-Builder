@@ -20,6 +20,7 @@ sub _get_env {
 }
 
 our $ASYNC = _get_env("ASYNC", 0);
+our $NOSTDERR = _get_env("NOSTDERR", 0);
 our @COMMAND = _get_env("COMMAND", qw(gnuplot --persist));
 our $MAX_PROCESSES = _get_env("MAX_PROCESSES", 2);
 our $PAUSE_FINISH = _get_env("PAUSE_FINISH", 0);
@@ -68,12 +69,17 @@ sub wait_all {
 ## async (BOOL optional, default = false): If set to true, it won't
 ## wait for the gnuplot process to finish. In this case, the return
 ## value is an empty string.
+##
+## no_error (BOOL optional, default = false): If set to true, it won't
+## include gnuplot's warnings or errors in the output and just ignores
+## them.
 sub with_new_process {
     my ($class, %args) = @_;
     my $code = $args{do};
     croak "do parameter is mandatory" if !defined($code);
     my $async = defined($args{async}) ? $args{async} : $ASYNC;
-    my $process = $class->_new(capture => !$async);
+    my $no_stderr = defined($args{no_stderr}) ? $args{no_stderr} : $NOSTDERR;
+    my $process = $class->_new(capture => !$async, no_stderr => $no_stderr);
     my $result = "";
     try {
         $code->($process->_writer);
@@ -97,6 +103,9 @@ sub with_new_process {
 ## capture (BOOL optional, default: false): If true, it keeps the
 ## STDOUT and STDERR of the process so that it can read them
 ## afterward. Otherwise, it just discards the output.
+##
+## no_error (BOOL optional, default: false): If true, STDERR is discarded
+## instead of being redirected to STDOUT.
 sub _new {
     my ($class, %args) = @_;
     _clear_zombies();
@@ -108,12 +117,13 @@ sub _new {
         $proc->_waitpid(1);
     }
     my $capture = $args{capture};
+    my $no_stderr = $args{no_stderr};
     my ($write_handle, $read_handle, $pid);
-    
+
     ## open3() does not seem to work well with lexical filehandles, so we use fileno()
     $pid = open3($write_handle,
                  $capture ? $read_handle : '>&'.fileno(_null_handle()),
-                 undef, @COMMAND);
+                 $no_stderr ? '>&'.fileno(_null_handle()) : undef, @COMMAND);
     my $self = bless {
         pid => $pid,
         write_handle => $write_handle,
@@ -294,6 +304,12 @@ By default, it's C<0> (false).
 
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_ASYNC>.
+
+=head2 $NOERROR
+
+If set to true, gnuplot's STDERR will not appear in the result. You can use this to prevent warnings in the output.
+
+By default it is C<0>, to be compatible with older versions.
 
 =head2 @COMMAND
 

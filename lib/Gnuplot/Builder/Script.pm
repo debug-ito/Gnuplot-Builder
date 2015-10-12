@@ -13,6 +13,7 @@ sub new {
     my $self = bless {
         pdata => undef,
         parent => undef,
+        no_stderr => 0,
     };
     $self->_init_pdata();
     if(@set_args) {
@@ -34,6 +35,11 @@ sub _init_pdata {
             }
         }
     );
+}
+
+sub set_no_stderr {
+    my ($self, $no_stderr) = @_;
+    $self->{no_stderr}     = $no_stderr;
 }
 
 sub add {
@@ -337,13 +343,14 @@ sub run_with {
             }
         }
     };
+
     my $result = "";
     if(defined($args{writer})) {
         $do->($args{writer});
     }elsif(defined($_context_writer)) {
         $do->($_context_writer);
     }else {
-        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
+        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do, no_stderr => $self->{no_stderr});
     }
     return $result;
 }
@@ -423,6 +430,10 @@ If it's set, C<@set_args> is directly given to C<set()> method.
 =head1 OBJECT METHODS - BASICS
 
 Most object methods return the object itself, so that you can chain those methods.
+
+=head2 $builder->set_no_error($error)
+
+Enable or disable errors and warnings in the output.
 
 =head2 $script = $builder->to_string()
 
