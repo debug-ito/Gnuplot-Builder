@@ -832,7 +832,9 @@ the C<plot()> method doesn't generate the inline data section.
 
 Plot with more functionalities than C<plot()> method.
 
-Fields in C<%args> are
+Fields in C<%args> are as follows.
+Note that you can store default values for some arguments in C<$builder>.
+See L<"OBJECT METHODS - PLOTTING OPTIONS"> for detail.
 
 =over
 
@@ -1166,6 +1168,77 @@ See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for deta
     ## => plot 'c.dat' u 1:2 title 'c'
     ## => plot 'd.dat' u 1:2 title 'd'
 
+=head1 OBJECT METHODS - PLOTTING OPTIONS
+
+B<< Methods in this section is currently experimental. >>
+
+As you can see in L<"OBJECT METHODS - PLOTTING">,
+C<plot_with()>, C<splot_with()>, C<multiplot_with()> and C<run_with()> methods
+share some arguments.
+With the methods listed in this section, you can store defalt values for these arguments in a C<$builder> instance.
+
+You can store default values for the following plotting options:
+
+=over
+
+=item C<output> => OUTPUT_FILENAME
+
+=item C<no_stderr> => BOOL
+
+=item C<writer> => CODE-REF
+
+=item C<async> => BOOL
+
+=back
+
+For detail about those arguments, see L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method.
+
+Note that those default values also affect the behavior of short-hand methods, i.e. C<plot()>, C<splot()>, C<multiplot()> and C<run()>.
+
+The default values stored in a C<$builder> are used when C<undef> is implicitly or explicitly passed to the plotting methods.
+In other words, arguments directly passed to the plotting methods have precedence over the per-instance default values.
+
+The plotting options stored in a C<$builder> is inheritable, just like the "set" and "define" options.
+
+=head2 $builder = $builder->set_plot($arg_name => $arg_value)
+
+Set the plotting option C<$arg_name> to C<$arg_value>.
+C<$arg_name> must be one of the plotting options listed above.
+
+    $builder->set_plot(
+        output => "hoge.png",
+        async => 1
+    );
+    
+    $builder->plot('sin(x)');
+    ## Same as:
+    ##   $builder->plot_with(
+    ##       dataset => 'sin(x)',
+    ##       output => "hoge.png",
+    ##       async => 1
+    ##   );
+    
+    $builder->plot_with(
+        dataset => 'cos(x)',
+        output => 'foobar.png'
+    );
+    ## Same as:
+    ##   $builder->plot_with(
+    ##       dataset => 'cos(x)',
+    ##       output => 'foobar.png',
+    ##       async => 1
+    ##   );
+
+=head2 $arg_value = $builder->get_plot($arg_name)
+
+Get the value for C<$arg_name>.
+
+If C<$arg_name> is not set in C<$builder>, it returns the value set in its parent builder.
+If none of the ancestors have C<$arg_name>, it returns C<undef>.
+
+=head2 $builder = $builder->delete_plot($arg_name)
+
+Delete the default value for C<$arg_name>.
 
 =head1 OBJECT METHODS - INHERITANCE
 
@@ -1194,6 +1267,11 @@ Option settings and definitions in C<$child> are substituted in the C<$parent>'s
 if they are already set in C<$parent>.
 
 =back
+
+A simlar rule is applied to plotting options.
+Plotting options in C<$child> are used if those options are set in C<$child>.
+Otherwise, plotting options in C<$parent> are used.
+
 
 
 =head2 $builder = $builder->set_parent($parent_builder)
