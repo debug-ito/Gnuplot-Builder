@@ -1108,6 +1108,12 @@ Run the script with more functionalities than C<run()> method.
 A command or an array-ref of commands to be executed.
 See C<run()> for specification of commands.
 
+=item C<output> => OUTPUT_FILENAME (optional)
+
+If set, "set output" command is printed just before running commands.
+
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
+
 =item C<writer> => CODE-REF (optional)
 
 A code-ref to receive the whole script string. If set, the return value C<$result> will be an empty string.

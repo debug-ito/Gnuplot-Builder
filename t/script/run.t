@@ -121,6 +121,28 @@ ddd}
 hoge
 foo
 EXP
+    },
+    {
+        label => "output option with a simple do",
+        args => {
+            output => "foobar.png",
+            do => 'plot sin(x)'
+        },
+        exp => <<'EXP'
+set output 'foobar.png'
+plot sin(x)
+unset output
+EXP
+    },
+    {
+        label => "output option with no do",
+        args => {
+            output => "hoge.png",
+        },
+        exp => <<'EXP'
+set output 'hoge.png'
+unset output
+EXP
     }
 );
 
