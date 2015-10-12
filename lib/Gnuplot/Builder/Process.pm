@@ -340,7 +340,9 @@ C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.
 If set to true, gnuplot's STDERR will not appear in the result.
 You can use this to prevent warnings in the output.
 
-By default it is C<0>.
+By default it is C<0> (false).
+You can also set this variable by the environment variable
+C<PERL_GNUPLOT_BUILDER_PROCESS_NO_STDERR>.
 
 
 =head2 $PAUSE_FINISH
