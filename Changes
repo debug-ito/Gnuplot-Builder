@@ -1,5 +1,14 @@
 Revision history for Gnuplot-Builder
 
+0.29    2015-10-12
+        [ENHANCEMENTS]
+        - These enhacements are result of pull-request (gh#2)
+        - Add "output" option to Script#run_with() method.
+        - Add "no_stderr" option to Script#plot_with(),
+          splot_with(), multiplot_with() and run_with() methods.
+        - Add $Gnuplot::Builder::Process::NO_STDERR option.
+        - Minor improvements to documentation.
+
 0.28    2015-04-10
         [ENHANCEMENTS]
         - Add $Gnuplot::Builder::Process::ENCODING option.
