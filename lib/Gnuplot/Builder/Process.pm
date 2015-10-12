@@ -320,6 +320,17 @@ By default, it's C<("gnuplot", "--persist")>.
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_COMMAND>.
 
+
+=head2 $ENCODING
+
+If set, L<Gnuplot::Builder> encodes the script string in the specified encoding just before streaming into the gnuplot process.
+You can specify any encoding names recognizable by L<Encode> module.
+
+By default it's C<undef>, meaning it doesn't encode the script.
+
+You can also set this variable by the environment variable
+C<PERL_GNUPLOT_BUILDER_PROCESS_ENCODING>.
+
 =head2 $MAX_PROCESSES
 
 Maximum number of gnuplot processes that can run in parallel.
@@ -363,16 +374,6 @@ Example:
         my ($pid, $event, $body) = @_;
         warn "PID:$pid, EVENT:$event, BODY:$body";
     };
-
-=head2 $ENCODING
-
-If set, L<Gnuplot::Builder> encodes the script string in the specified encoding just before streaming into the gnuplot process.
-You can specify any encoding names recognizable by L<Encode> module.
-
-By default it's C<undef>, meaning it doesn't encode the script.
-
-You can also set this variable by the environment variable
-C<PERL_GNUPLOT_BUILDER_PROCESS_ENCODING>.
 
 
 =head1 AUTHOR
