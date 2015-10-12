@@ -315,6 +315,16 @@ if you do not have CPAN RT account.
  
 Toshio Ito, C<< <toshioito at cpan.org> >>
 
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Moritz Grosch (LittleFox)
+
+=back
+
 
 =head1 LICENSE AND COPYRIGHT
 
