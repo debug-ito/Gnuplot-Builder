@@ -13,7 +13,6 @@ sub new {
     my $self = bless {
         pdata => undef,
         parent => undef,
-        no_stderr => 0,
     };
     $self->_init_pdata();
     if(@set_args) {
@@ -35,11 +34,6 @@ sub _init_pdata {
             }
         }
     );
-}
-
-sub set_no_stderr {
-    my ($self, $no_stderr) = @_;
-    $self->{no_stderr}     = $no_stderr;
 }
 
 sub add {
@@ -350,7 +344,7 @@ sub run_with {
     }elsif(defined($_context_writer)) {
         $do->($_context_writer);
     }else {
-        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do, no_stderr => $self->{no_stderr});
+        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
     }
     return $result;
 }
