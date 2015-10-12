@@ -854,6 +854,14 @@ After "plot" command, it prints "set output" command with no argument to unlock 
 
 If not set, it won't print "set output" commands.
 
+=item C<no_stderr> => BOOL (optional, default: C<$Gnuplot::Builder::Process::NO_STDERR>)
+
+If set to true, the return value C<$result> contains gnuplot's STDOUT only. It doesn't contain STDERR.
+If false, C<$result> contains both STDOUT and STDERR.
+This option has no effect if C<writer> or C<async> is set.
+
+By default, it's false. You can change the default by C<$Gnuplot::Builder::Process::NO_STDERR> package varible.
+
 =item C<writer> => CODE-REF (optional)
 
 A code-ref to receive the whole script string instead of the gnuplot process.
@@ -962,6 +970,12 @@ A code-ref that is executed in the multiplot context.
 =item C<option> => OPTION_STR (optional, default: "")
 
 An option string for "set multiplot" command.
+
+=item C<no_stderr> => BOOL (optional, default: C<$Gnuplot::Builder::Process::NO_STDERR>)
+
+If set to true, the return value C<$result> contains STDOUT only. It doesn't contain gnuplot's STDERR.
+
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =item C<output> => OUTPUT_FILENAME (optional)
 
@@ -1111,6 +1125,12 @@ See C<run()> for specification of commands.
 =item C<output> => OUTPUT_FILENAME (optional)
 
 If set, "set output" command is printed just before running commands.
+
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
+
+=item C<no_stderr> => BOOL (optional, default: C<$Gnuplot::Builder::Process::NO_STDERR>)
+
+If set to true, the return value C<$result> contains STDOUT only. It doesn't contain gnuplot's STDERR.
 
 See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
