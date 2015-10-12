@@ -245,11 +245,11 @@ sub _draw_with {
         _write_inline_data($writer, $dataset_objects);
     };
     my @commands = ($plotter);
-    _wrap_commands_with_output(\@commands, $args{output});
     return $self->run_with(
         do => \@commands,
         writer => $args{writer},
-        async => $args{async}
+        async => $args{async},
+        output => $args{output}
     );
 }
 
@@ -291,11 +291,11 @@ sub multiplot_with {
         (defined($args{option}) && $args{option} ne "")
             ? "set multiplot $args{option}" : "set multiplot";
     my @commands = ($multiplot_command, $wrapped_do, "unset multiplot");
-    _wrap_commands_with_output(\@commands, $args{output});
     return $self->run_with(
         do => \@commands,
         writer => $args{writer},
-        async => $args{async}
+        async => $args{async},
+        output => $args{output}
     );
 }
 
@@ -320,6 +320,7 @@ sub run_with {
     }elsif(ref($commands) ne "ARRAY") {
         $commands = [$commands];
     }
+    _wrap_commands_with_output($commands, $args{output});
     my $async = $args{async};
     my $do = sub {
         my $writer = shift;

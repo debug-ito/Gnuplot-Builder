@@ -131,7 +131,7 @@ EXP
         exp => <<'EXP'
 set output 'foobar.png'
 plot sin(x)
-unset output
+set output
 EXP
     },
     {
@@ -141,7 +141,7 @@ EXP
         },
         exp => <<'EXP'
 set output 'hoge.png'
-unset output
+set output
 EXP
     }
 );
