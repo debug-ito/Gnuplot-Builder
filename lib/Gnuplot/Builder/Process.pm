@@ -305,12 +305,6 @@ By default, it's C<0> (false).
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_ASYNC>.
 
-=head2 $NOERROR
-
-If set to true, gnuplot's STDERR will not appear in the result. You can use this to prevent warnings in the output.
-
-By default it is C<0>, to be compatible with older versions.
-
 =head2 @COMMAND
 
 The command and arguments to run a gnuplot process.
@@ -340,6 +334,14 @@ By default, it's C<2>.
 
 You can also set this variable by the environment variable
 C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.
+
+=head2 $NO_STDERR
+
+If set to true, gnuplot's STDERR will not appear in the result.
+You can use this to prevent warnings in the output.
+
+By default it is C<0>.
+
 
 =head2 $PAUSE_FINISH
 
