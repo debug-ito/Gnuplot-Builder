@@ -338,7 +338,8 @@ C<PERL_GNUPLOT_BUILDER_PROCESS_MAX_PROCESSES>.
 
 =head2 $NO_STDERR
 
-If set to true, gnuplot's STDERR will not appear in the return value of L<Gnuplot::Builder::Script>'s C<plot()> method etc.
+If set to true, gnuplot's STDERR will not appear in the return value of L<Gnuplot::Builder::Script>'s plotting methods
+(C<plot()>, C<plot_with()>, C<splot()> ... etc).
 It returns STDOUT only. You can use this to prevent warnings in the output.
 
 By default it is C<0> (false).
