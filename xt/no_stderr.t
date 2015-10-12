@@ -1,51 +1,30 @@
 use strict;
 use warnings FATAL => "all";
-use lib "t";
-use testlib::ScriptUtil qw(plot_str);
 use Test::More;
 use Gnuplot::Builder::Script;
-use Gnuplot::Builder::Dataset;
+use Gnuplot::Builder::Process;
 
-sub create_builder {
-    my ($no_stderr) = @_;
-    my $builder = Gnuplot::Builder::Script->new(
-        terminal => 'dumb',
-    );
-    $builder->set_no_stderr($no_stderr);
-    return $builder;
+$Gnuplot::Builder::Process::ASYNC = 0;
+
+sub get_printed_string {
+    my ($printed_string, $is_stderr) = @_;
+    my $builder = Gnuplot::Builder::Script->new;
+    my $target = $is_stderr ? "" : qq{'-'};
+    $builder->add(qq{set print $target});
+    $builder->add(qq{print "$printed_string"});
+    return $builder->run;    
 }
 
 {
-    my $builder = create_builder(0);
-    my $dataset = Gnuplot::Builder::Dataset->new_data(
-        sub {
-            my ( $dataset, $writer ) = @_;
-
-            for ( 1 .. 10 ) {
-                $writer->("$_ 10\n");
-            }
-        },
-        with  => "lines",
-        title => "'xyz'",
-    );
-    my $ret_err = $builder->plot($dataset);
-    like ($ret_err, qr/Warning/, "Test for stderr-output");
+    local $Gnuplot::Builder::Process::NO_STDERR = 0;
+    is get_printed_string("foobar", 0), "foobar\n";
+    is get_printed_string("FOOBAR", 1), "FOOBAR\n";
 }
 
 {
-    my $builder = create_builder(1);
-    my $dataset = Gnuplot::Builder::Dataset->new_data(
-        sub {
-            my ( $dataset, $writer ) = @_;
-
-            for ( 1 .. 10 ) {
-                $writer->("$_ 10\n");
-            }
-        },
-        with  => "lines",
-        title => "'xyz'",
-    );
-    my $ret_noerr = $builder->plot($dataset);
-    unlike ($ret_noerr, qr/Warning/, "Test for no stderr-output");
+    local $Gnuplot::Builder::Process::NO_STDERR = 1;
+    is get_printed_string("hoge", 0), "hoge\n";
+    is get_printed_string("HOGE", 1), "";
 }
+
 done_testing;
