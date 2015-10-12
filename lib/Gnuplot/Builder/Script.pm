@@ -249,7 +249,8 @@ sub _draw_with {
         do => \@commands,
         writer => $args{writer},
         async => $args{async},
-        output => $args{output}
+        output => $args{output},
+        no_stderr => $args{no_stderr}
     );
 }
 
@@ -295,7 +296,8 @@ sub multiplot_with {
         do => \@commands,
         writer => $args{writer},
         async => $args{async},
-        output => $args{output}
+        output => $args{output},
+        no_stderr => $args{no_stderr}
     );
 }
 
@@ -321,7 +323,6 @@ sub run_with {
         $commands = [$commands];
     }
     _wrap_commands_with_output($commands, $args{output});
-    my $async = $args{async};
     my $do = sub {
         my $writer = shift;
         (!defined($_context_writer) || refaddr($_context_writer) != refaddr($writer))
@@ -345,7 +346,7 @@ sub run_with {
     }elsif(defined($_context_writer)) {
         $do->($_context_writer);
     }else {
-        $result = Gnuplot::Builder::Process->with_new_process(async => $async, do => $do);
+        $result = Gnuplot::Builder::Process->with_new_process(async => $args{async}, do => $do, no_stderr => $args{no_stderr});
     }
     return $result;
 }
