@@ -435,7 +435,6 @@ Most object methods return the object itself, so that you can chain those method
 
 Build and return the gnuplot script string.
 
-
 =head2 $builder = $buider->add($sentence, ...)
 
 Add gnuplot script sentences to the C<$builder>.
@@ -772,7 +771,7 @@ This method lets a gnuplot process do the actual job.
 
 You can specify more than one C<$dataset>s to plot.
 
-The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR.
+The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR (by default).
 
 Usually you should use a L<Gnuplot::Builder::Dataset> object for C<$dataset>.
 In this case, you can skip the rest of this section.
@@ -919,7 +918,7 @@ The C<$code> is called like
 
 where C<$writer> is a code-ref that you can call to write any data to the gnuplot process.
 
-The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR.
+The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR (by default).
 
 The script written to the C<$writer> is enclosed by "set multiplot" and "unset multiplot" commands,
 and passed to the gnuplot process.
@@ -1042,7 +1041,7 @@ where C<$writer> is a code-ref that you can call to write any data to the gnuplo
 
 =back
 
-The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR.
+The return value C<$result> is the data that the gnuplot process writes to STDOUT and STDERR (by default).
 
 C<run()> method is useful when you want to execute "plot" command more than once in a single gnuplot process.
 For example,
