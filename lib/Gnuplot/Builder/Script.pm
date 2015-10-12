@@ -967,21 +967,21 @@ An option string for "set multiplot" command.
 
 If set, "set output" command is printed just before "set multiplot" command.
 
-See C<plot_with()> method for detail.
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =item C<writer> => CODE-REF (optional)
 
 A code-ref to receive the whole script string.
 If set, the return value C<$result> will be an empty string.
 
-See C<plot_with()> method for detail.
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =item C<async> => BOOL (optional, default: C<$Gnuplot::Builder::Process::ASYNC>)
 
 If set to true, it won't wait for the gnuplot process to finish.
 In this case, the return value C<$result> will be an empty string.
 
-See C<plot_with()> method for detail.
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =back
 
@@ -1112,13 +1112,13 @@ See C<run()> for specification of commands.
 
 A code-ref to receive the whole script string. If set, the return value C<$result> will be an empty string.
 
-See C<plot_with()> method for detail.
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =item C<async> => BOOL (optional, default: C<$Gnuplot::Builder::Process::ASYNC>)
 
 If set to true, it won't wait for the gnuplot process to finish. In this case, the return value C<$result> will be an empty string.
 
-See C<plot_with()> method for detail.
+See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =back
 
