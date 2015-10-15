@@ -42,9 +42,32 @@ $Gnuplot::Buidler::Process::NO_STDERR = 0;
     identical $s->get_plot("output"), $aref;
 }
 
+{
+    note('effect on short-hands (plot() etc.)');
+    my $buf;
+    my $s = Gnuplot::Builder::Script->new(
+        term => 'dumb'
+    )->set_plot(
+        writer => sub { $buf .= $_[0] }
+    );
+    
+    $buf = "";
+    is $s->plot('sin(x)'), "";
+    like $buf, qr/^set term/, 'writer option for plot()';
 
+    $buf = "";
+    is $s->splot('sin(x * y)'), "";
+    like $buf, qr/^set term/, 'writer option for splot()';
 
-fail('effect on short-hands (plot() etc.)');
+    $buf = "";
+    is $s->multiplot("layout 1,2", sub { }), "";
+    like $buf, qr/^set term/, 'writer option for multiplot()';
+
+    $buf = "";
+    is $s->run(), "";
+    like $buf, qr/^set term/, 'writer option for run()';
+}
+
 
 fail('override by given arguments');
 
