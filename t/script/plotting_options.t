@@ -2,6 +2,7 @@ use strict;
 use warnings FATAL => "all";
 use Test::More;
 use Test::Identity;
+use Test::Fatal;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 
@@ -68,10 +69,52 @@ $Gnuplot::Buidler::Process::NO_STDERR = 0;
     like $buf, qr/^set term/, 'writer option for run()';
 }
 
+{
+    note('override by given arguments');
+    my $buf1;
+    my $buf2;
+    my $writer2 = sub { $buf2 .= $_[0] };
+    my $s = Gnuplot::Builder::Script->new(
+        term => 'dumb'
+    )->set_plot(
+        writer => sub { $buf1 .= $_[0] },
+        output => "hoge.png"
+    );
 
-fail('override by given arguments');
+    foreach my $method (qw(plot_with splot_with)) {
+        $buf1 = $buf2 = "";
+        is $s->$method(
+            dataset => 'sin(x)',
+            writer => $writer2,
+            output => "foobar.jpg"
+        ), "";
+        is $buf1, "", "$method: writer is overridden";
+        unlike $buf2, qr/hoge\.png/, "$method: output hoge.png is overridden";
+        like $buf2, qr/foobar\.jpg/, "$method: output is now foobar.png";
+    }
 
-fail('exception on unknown argument');
+    foreach my $method (qw(multiplot_with run_with)) {
+        $buf1 = $buf2 = "";
+        is $s->$method(
+            do => sub {  },
+            writer => $writer2,
+            output => "foobar.png"
+        ), "";
+        is $buf1, "", "$method: writer is overridden";
+        unlike $buf2, qr/hoge\.png/, "$method: output hoge.png is overridden";
+        like $buf2, qr/foobar\.jpg/, "$method: output is now foobar.png";
+    }
+}
+
+{
+    note('exception on unknown argument');
+    my $s = Gnuplot::Builder::Script->new;
+    like exception { $s->set_plot(hoge => 1) }, qr/unknown plotting option/i;
+    like exception { $s->get_plot("hoge") }, qr/unknown plotting option/i;
+    like exception { $s->delete_plot("hoge") }, qr/unknown plotting option/i;
+}
+
+
 
 fail('inheritance set-get-delete');
 
