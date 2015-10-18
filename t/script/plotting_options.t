@@ -112,11 +112,11 @@ $Gnuplot::Buidler::Process::NO_STDERR = 0;
         is $s->$method(
             do => sub {  },
             writer => $writer2,
-            output => "foobar.png"
+            output => "foobar.jpg"
         ), "";
         is $buf1, "", "$method: writer is overridden";
         unlike $buf2, qr/hoge\.png/, "$method: output hoge.png is overridden";
-        like $buf2, qr/foobar\.jpg/, "$method: output is now foobar.png";
+        like $buf2, qr/foobar\.jpg/, "$method: output is now foobar.jpg";
     }
 }
 
