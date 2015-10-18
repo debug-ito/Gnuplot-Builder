@@ -1216,12 +1216,12 @@ See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for deta
 
 =head1 OBJECT METHODS - PLOTTING OPTIONS
 
-B<< Methods in this section is currently experimental. >>
+B<< Methods in this section are currently experimental. >>
 
 As you can see in L<"OBJECT METHODS - PLOTTING">,
 C<plot_with()>, C<splot_with()>, C<multiplot_with()> and C<run_with()> methods
 share some arguments.
-With the methods listed in this section, you can store defalt values for these arguments in a C<$builder> instance.
+With the methods listed in this section, you can store default values for these arguments in a C<$builder> instance.
 
 You can store default values for the following plotting options:
 
@@ -1237,11 +1237,11 @@ You can store default values for the following plotting options:
 
 =back
 
-For detail about those arguments, see L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method.
+For detail about these arguments, see L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method.
 
 Note that those default values also affect the behavior of short-hand methods, i.e. C<plot()>, C<splot()>, C<multiplot()> and C<run()>.
 
-The default values stored in a C<$builder> are used when C<undef> is implicitly or explicitly passed to the plotting methods.
+The default values stored in a C<$builder> are used when the correponding arguments are not passed to the plotting methods.
 In other words, arguments directly passed to the plotting methods have precedence over the per-instance default values.
 
 The plotting options stored in a C<$builder> is inheritable, just like the "set" and "define" options.
