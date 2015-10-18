@@ -369,12 +369,15 @@ sub run {
 
 my %KNOWN_PLOTTING_OPTIONS = map { ($_ => 1) } qw(output no_stderr writer async);
 
+sub _check_plotting_option {
+    my ($arg_name) = @_;
+    croak "Unknown plotting option: $arg_name" if !$KNOWN_PLOTTING_OPTIONS{$arg_name};
+}
+
 sub set_plot {
     my ($self, %opts) = @_;
     foreach my $key (keys %opts) {
-        if(!$KNOWN_PLOTTING_OPTIONS{$key}) {
-            croak "Unknown plotting option: $key";
-        }
+        _check_plotting_option($key);
         $self->{pdata}->set_attribute(
             key => $key,
             value => $opts{$key}
@@ -385,13 +388,17 @@ sub set_plot {
 
 sub get_plot {
     my ($self, $arg_name) = @_;
+    _check_plotting_option($arg_name);
     croak "arg_name cannot be undef" if not defined $arg_name;
     return $self->{pdata}->get_resolved_attribute($arg_name);
 }
 
 sub delete_plot {
     my ($self, @arg_names) = @_;
-    $self->{pdata}->delete_attribute($_) for @arg_names;
+    foreach my $arg_name (@arg_names) {
+        _check_plotting_option($arg_name);
+        $self->{pdata}->delete_attribute($arg_name) 
+    }
     return $self;
 }
 
