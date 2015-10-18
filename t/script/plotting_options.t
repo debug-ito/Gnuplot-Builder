@@ -1,12 +1,15 @@
 use strict;
-use warnings FATAL => "all";
+use warnings FATAL => 'all';
 use Test::More;
 use Test::Identity;
 use Test::Fatal;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 
-$Gnuplot::Buidler::Process::NO_STDERR = 0;
+{
+    no warnings "once";
+    $Gnuplot::Buidler::Process::NO_STDERR = 0;
+}
 
 {
     note('basic set-get-delete operation');

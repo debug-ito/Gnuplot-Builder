@@ -4,9 +4,12 @@ use Test::More;
 use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Process;
 
-$Gnuplot::Buidler::Process::NO_STDERR = 0;
-$Gnuplot::Buidler::Process::ASYNC = 0;
-$Gnuplot::Builder::Process::MAX_PROCESSES = 1;
+{
+    no warnings "once";
+    $Gnuplot::Buidler::Process::NO_STDERR = 0;
+    $Gnuplot::Buidler::Process::ASYNC = 0;
+    $Gnuplot::Builder::Process::MAX_PROCESSES = 1;
+}
 
 {
     note('no_stderr');
