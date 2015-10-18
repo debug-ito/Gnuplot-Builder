@@ -121,6 +121,20 @@ $Gnuplot::Buidler::Process::NO_STDERR = 0;
 }
 
 {
+    note("override by given undef");
+    my $s = Gnuplot::Builder::Script->new->set_plot(output => "hoge.png");
+    my $buf = "";
+    $s->plot_with(
+        dataset => 'sin(x)',
+        writer => sub { $buf .= $_[0] },
+        output => undef,
+    );
+    like $buf, qr/sin\(x\)/, "script is writtent to buffer";
+    unlike $buf, qr/set output/, "not output because output is now overridden by undef";
+    unlike $buf, qr/hoge\.png/;
+}
+
+{
     note('exception on unknown argument');
     my $s = Gnuplot::Builder::Script->new;
     like exception { $s->set_plot(hoge => 1) }, qr/unknown plotting option/i;
