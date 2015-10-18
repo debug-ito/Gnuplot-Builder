@@ -1200,10 +1200,11 @@ In other words, arguments directly passed to the plotting methods have precedenc
 
 The plotting options stored in a C<$builder> is inheritable, just like the "set" and "define" options.
 
-=head2 $builder = $builder->set_plot($arg_name => $arg_value)
+=head2 $builder = $builder->set_plot($arg_name => $arg_value, ...)
 
 Set the plotting option C<$arg_name> to C<$arg_value>.
 C<$arg_name> must be one of the plotting options listed above.
+You can set more than one C<< $arg_name => $arg_value >> pairs.
 
     $builder->set_plot(
         output => "hoge.png",
@@ -1236,9 +1237,9 @@ Get the value for C<$arg_name>.
 If C<$arg_name> is not set in C<$builder>, it returns the value set in its parent builder.
 If none of the ancestors have C<$arg_name>, it returns C<undef>.
 
-=head2 $builder = $builder->delete_plot($arg_name)
+=head2 $builder = $builder->delete_plot($arg_name, ...)
 
-Delete the default value for C<$arg_name>.
+Delete the default value for C<$arg_name>. You can specify more than one C<$arg_name>s.
 
 =head1 OBJECT METHODS - INHERITANCE
 

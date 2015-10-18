@@ -28,6 +28,20 @@ $Gnuplot::Buidler::Process::NO_STDERR = 0;
 }
 
 {
+    note('set-delete multiple');
+    my $s = Gnuplot::Builder::Script->new;
+    $s->set_plot(
+        output => "hoge.png",
+        no_stderr => 1
+    );
+    is $s->get_plot("output"), "hoge.png";
+    is $s->get_plot("no_stderr"), 1;
+    $s->delete_plot(qw(output no_stderr));
+    is $s->get_plot("output"), undef;
+    is $s->get_plot("no_stderr"), undef;
+}
+
+{
     note('passing code-ref, get it as-is');
     my $s = Gnuplot::Builder::Script->new;
     my $code = sub { die "this should not be executed." };
