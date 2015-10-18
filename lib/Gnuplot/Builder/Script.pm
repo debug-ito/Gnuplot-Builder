@@ -247,11 +247,13 @@ sub _draw_with {
     my @commands = ($plotter);
     return $self->run_with(
         do => \@commands,
-        writer => $args{writer},
-        async => $args{async},
-        output => $args{output},
-        no_stderr => $args{no_stderr}
+        _pair_slice(\%args, qw(writer async output no_stderr))
     );
+}
+
+sub _pair_slice {
+    my ($hash_ref, @keys) = @_;
+    return map { exists($hash_ref->{$_}) ? ($_ => $hash_ref->{$_}) : () } @keys;
 }
 
 sub plot_with {
@@ -294,10 +296,7 @@ sub multiplot_with {
     my @commands = ($multiplot_command, $wrapped_do, "unset multiplot");
     return $self->run_with(
         do => \@commands,
-        writer => $args{writer},
-        async => $args{async},
-        output => $args{output},
-        no_stderr => $args{no_stderr}
+        _pair_slice(\%args, qw(writer async output no_stderr))
     );
 }
 
@@ -322,7 +321,7 @@ sub run_with {
     }elsif(ref($commands) ne "ARRAY") {
         $commands = [$commands];
     }
-    _wrap_commands_with_output($commands, $args{output});
+    _wrap_commands_with_output($commands, $self->_plotting_option(\%args, "output"));
     my $do = sub {
         my $writer = shift;
         (!defined($_context_writer) || refaddr($_context_writer) != refaddr($writer))
@@ -341,19 +340,59 @@ sub run_with {
     };
 
     my $result = "";
-    if(defined($args{writer})) {
-        $do->($args{writer});
+    my $got_writer = $self->_plotting_option(\%args, "writer");
+    if(defined($got_writer)) {
+        $do->($got_writer);
     }elsif(defined($_context_writer)) {
         $do->($_context_writer);
     }else {
-        $result = Gnuplot::Builder::Process->with_new_process(async => $args{async}, do => $do, no_stderr => $args{no_stderr});
+        $result = Gnuplot::Builder::Process->with_new_process(
+            async => $self->_plotting_option(\%args, "async"),
+            do => $do,
+            no_stderr => $self->_plotting_option(\%args, "no_stderr")
+        );
     }
     return $result;
+}
+
+sub _plotting_option {
+    my ($self, $given_args_ref, $key) = @_;
+    return (exists $given_args_ref->{$key})
+        ? $given_args_ref->{$key}
+        : $self->get_plot($key);
 }
 
 sub run {
     my ($self, @commands) = @_;
     return $self->run_with(do => \@commands);
+}
+
+my %KNOWN_PLOTTING_OPTIONS = map { ($_ => 1) } qw(output no_stderr writer async);
+
+sub set_plot {
+    my ($self, %opts) = @_;
+    foreach my $key (keys %opts) {
+        if(!$KNOWN_PLOTTING_OPTIONS{$key}) {
+            croak "Unknown plotting option: $key";
+        }
+        $self->{pdata}->set_attribute(
+            key => $key,
+            value => $opts{$key}
+        );
+    }
+    return $self;
+}
+
+sub get_plot {
+    my ($self, $arg_name) = @_;
+    croak "arg_name cannot be undef" if not defined $arg_name;
+    return $self->{pdata}->get_resolved_attribute($arg_name);
+}
+
+sub delete_plot {
+    my ($self, @arg_names) = @_;
+    $self->{pdata}->delete_attribute($_) for @arg_names;
+    return $self;
 }
 
 1;
