@@ -128,8 +128,42 @@ $Gnuplot::Buidler::Process::NO_STDERR = 0;
     like exception { $s->delete_plot("hoge") }, qr/unknown plotting option/i;
 }
 
+{
+    note('inheritance set-get-delete');
+    my $p1 = Gnuplot::Builder::Script->new->set_plot(
+        output => "hoge.png"
+    );
+    my $p2 = Gnuplot::Builder::Script->new->set_plot(
+        output => "foobar.png",
+        no_stderr => 1
+    );
+    my $c = $p1->new_child;
+    
+    is $c->get_plot("output"), "hoge.png";
+    is $c->get_plot("no_stderr"), undef;
+    
+    $c->set_plot(output => "buzz.jpg");
+    is $c->get_plot("output"), "buzz.jpg";
+    is $c->get_plot("no_stderr"), undef;
+
+    $c->set_parent($p2);
+    is $c->get_plot("output"), "buzz.jpg";
+    is $c->get_plot("no_stderr"), 1;
+
+    $c->delete_plot("output", "no_stderr");
+    is $c->get_plot("output"), "foobar.png";
+    is $c->get_plot("no_stderr"), 1;
+
+    $c->set_plot(no_stderr => undef);
+    is $c->get_plot("output"), "foobar.png";
+    is $c->get_plot("no_stderr"), undef;
+
+    $c->delete_plot("no_stderr");
+    is $c->get_plot("output"), "foobar.png";
+    is $c->get_plot("no_stderr"), 1;
+}
 
 
-fail('inheritance set-get-delete');
+
 
 done_testing;
