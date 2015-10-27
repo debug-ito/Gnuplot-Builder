@@ -1356,19 +1356,22 @@ When you evaluate a C<$builder> as a string, it executes C<< $builder->to_string
 
 L<Gnuplot::Builder::Script> implements C<Lens()> method, so you can use L<Data::Focus> to access its attributes.
 
-The C<Lens()> method creates a lens for accessing gnuplot options via C<get_option()> and C<set_option()>.
+The C<Lens()> method creates a L<Data::Focus::Lens> object for accessing gnuplot options via C<get_option()> and C<set_option()>.
+
+Note that the lens calls C<get_option()> always in scalar context.
 
     use Data::Focus qw(focus);
     
     my $scalar = focus($builder)->get("xrange");
-    ## same as: my $scalar = $builder->get_option("xrange");
-    
-    my @list = focus($builder)->list("style");
-    ## same as: my @list = $builder->get_option("style");
-    
-    focus($builder)->set(xrange => "[10:100]");
-    ## same as: $builder->set_option(xrange => "[10:100]");
+    ## same as: my $scalar = scalar($builder->get_option("xrange"));
+        
+    my @list = focus($builder)->get("style");
+    ## same as: my @list = scalar($builder->get_option("style"));
+        
+    focus($builder)->set(xrange => '[10:100]');
+    ## same as: $builder->set_option(xrange => '[10:100]');
 
+This results in a surprising behavior if you pass array-refs to C<set()> method. Use with care.
 
 =head1 SEE ALSO
 

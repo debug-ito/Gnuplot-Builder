@@ -16,13 +16,13 @@ sub new {
 sub _getter {
     my ($self, $target) = @_;
     my $getter = $self->{getter};
-    return $target->$getter($self->{key});
+    return scalar($target->$getter($self->{key}));
 }
 
 sub _setter {
-    my ($self, $target, @parts) = @_;
+    my ($self, $target, $part) = @_;
     my $setter = $self->{setter};
-    return $target->$setter($self->{key} => \@parts);
+    return $target->$setter($self->{key} => $part);
 }
 
 make_lens_from_accessors(\&_getter, \&_setter);
