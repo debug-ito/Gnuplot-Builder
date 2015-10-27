@@ -23,7 +23,7 @@ test_lens_options("Script", sub { Gnuplot::Builder::Script->new });
     my $scalar = focus($builder)->get("xrange");
     my $exp_scalar = scalar($exp_builder->get_option("xrange"));
         
-    my @list = focus($builder)->get("style");
+    my @list = focus($builder)->list("style");
     my @exp_list = scalar($exp_builder->get_option("style"));
         
     focus($builder)->set(xrange => '[10:100]');

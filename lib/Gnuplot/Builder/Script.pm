@@ -1365,7 +1365,7 @@ Note that the lens calls C<get_option()> always in scalar context.
     my $scalar = focus($builder)->get("xrange");
     ## same as: my $scalar = scalar($builder->get_option("xrange"));
         
-    my @list = focus($builder)->get("style");
+    my @list = focus($builder)->list("style");
     ## same as: my @list = scalar($builder->get_option("style"));
         
     focus($builder)->set(xrange => '[10:100]');
