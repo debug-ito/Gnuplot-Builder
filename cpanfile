@@ -9,6 +9,7 @@ requires "parent" => "0";
 requires "File::Spec" => "0";
 requires "Exporter" => "5.57";
 requires 'Encode';
+requires 'parent';
 
 suggests "Data::Focus" => "0.03";
 
