@@ -1344,6 +1344,24 @@ When you evaluate a C<$builder> as a string, it executes C<< $builder->to_string
 
     "$builder" eq $builder->to_string;
 
+=head1 Data::Focus COMPATIBLITY
+
+L<Gnuplot::Builder::Script> implements C<Lens()> method, so you can use L<Data::Focus> to access its attributes.
+
+The C<Lens()> method creates a lens for accessing gnuplot options via C<get_option()> and C<set_option()>.
+
+    use Data::Focus qw(focus);
+    
+    my $scalar = focus($builder)->get("xrange");
+    ## same as: my $scalar = $builder->get_option("xrange");
+    
+    my @list = focus($builder)->list("style");
+    ## same as: my @list = $builder->get_option("style");
+    
+    focus($builder)->set(xrange => "[10:100]");
+    ## same as: $builder->set_option(xrange => "[10:100]");
+
+
 =head1 SEE ALSO
 
 L<Gnuplot::Builder::Dataset>

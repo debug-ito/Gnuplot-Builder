@@ -10,11 +10,14 @@ requires "File::Spec" => "0";
 requires "Exporter" => "5.57";
 requires 'Encode';
 
+suggests "Data::Focus" => "0.03";
+
 on 'test' => sub {
     requires 'Test::More' => "0";
     requires 'Test::Identity' => "0";
     requires 'Test::Memory::Cycle' => "0";
     requires 'Test::Fatal';
+    requires 'Test::Requires';
     requires 'Scalar::Util';
 };
 
