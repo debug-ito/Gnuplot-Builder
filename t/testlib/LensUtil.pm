@@ -15,7 +15,7 @@ sub test_lens_options {
         my $o = $new->();
         my $got_s = focus($o)->get("hoge");
         is $got_s, undef;
-        my @got_l = focus($o)->get("hoge");
+        my @got_l = focus($o)->list("hoge");
         is_deeply \@got_l, [undef], "one empty focal point at first";
     }
     {
