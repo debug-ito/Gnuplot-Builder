@@ -5,6 +5,7 @@ use Test::More;
 use Test::Identity;
 use Exporter qw(import);
 use Data::Focus qw(focus);
+use Gnuplot::Builder::JoinDict qw(joind);
 
 our @EXPORT_OK = qw(test_lens_options);
 
@@ -68,6 +69,18 @@ sub test_lens_options {
         is scalar(focus($o)->get("hoge")), undef, "undef: get";
         is_deeply [focus($o)->list("hoge")], [undef], "undef: list";
         is_deeply [$o->get_option("hoge")], [undef], "undef: get_option list";
+    }
+    {
+        my $o = $new->();
+        my $j = joind(":", x => 1, y => 2);
+        identical focus($o)->set(using => $j), $o;
+        identical scalar(focus($o)->get("using")), $j, "object: get";
+        my @got_list = focus($o)->list("using");
+        is scalar(@got_list), 1, "object: list elems";
+        identical $got_list[0], $j, "object: list";
+        my @got_opts = $o->get_option("using");
+        is scalar(@got_opts), 1, "object: get_option list elems";
+        identical $got_list[0], $j, "object: get_option list";
     }
 }
 
