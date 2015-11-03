@@ -4,8 +4,9 @@ use warnings FATAL => "all";
 use Test::More;
 use Test::Identity;
 use Exporter qw(import);
-use Data::Focus qw(focus);
 use Gnuplot::Builder::JoinDict qw(joind);
+use Test::Requires { "Data::Focus" => "0.03" };
+use Data::Focus qw(focus);
 
 our @EXPORT_OK = qw(test_lens_options);
 
