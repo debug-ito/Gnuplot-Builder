@@ -216,6 +216,14 @@ sub delete_join {
     return $self;
 }
 
+sub Lens {
+    my ($self, $key) = @_;
+    require Gnuplot::Builder::Lens;
+    return Gnuplot::Builder::Lens->new(
+        "get_option", "set_option", $key
+    );
+}
+
 1;
 
 __END__
@@ -706,6 +714,13 @@ When you evaluate a C<$dataset> as a string, it executes C<< $dataset->to_string
 
     "$dataset" eq $dataset->to_string;
 
+=head1 Data::Focus COMPATIBLITY
+
+L<Gnuplot::Builder::Dataset> implements C<Lens()> method, so you can use L<Data::Focus> to access its attributes.
+
+The C<Lens()> method creates a L<Data::Focus::Lens> object for accessing dataset options via C<get_option()> and C<set_option()>.
+
+Note that the lens calls C<get_option()> always in scalar context, just like the lens for L<Gnuplot::Builder::Script>.
 
 =head1 SEE ALSO
 
