@@ -275,6 +275,20 @@ When you evaluate a C<$dict> as a string, it executes C<< $dict->to_string() >>.
 
     "$dict" eq $dict->to_string;
 
+=head1 Data::Focus COMPATIBLITY
+
+L<Gnuplot::Builder::JoinDict> implements C<Lens()> method, so you can use L<Data::Focus> to access its attributes.
+
+The C<Lens()> method creates a L<Data::Focus::Lens> object for accessing the content via C<get()> and C<set()> methods.
+
+    use Data::Focus qw(focus);
+    
+    my $scalar = focus($dict)->get("x");
+    ## same as: my $scalar = $dict->get("x");
+    
+    my $new_dict = focus($dict)->set(x => '($1 * 1000)');
+    ## same as: my $new_dict = $dict->set(x => '($1 * 1000)');
+
 =head1 AUTHOR
 
 Toshio Ito, C<< toshioito at cpan.org >>
