@@ -34,7 +34,7 @@ use Data::Focus qw(focus);
 
 {
     note("-- example");
-    my $dict = joind(x => 100, y => 200);
+    my $dict = joind(",", x => 100, y => 200);
     my $exp_dict = $dict->clone;
 
     ##

@@ -103,6 +103,14 @@ sub separator {
     return $self->{separator};
 }
 
+sub Lens {
+    my ($self, $key) = @_;
+    require Gnuplot::Builder::Lens;
+    return Gnuplot::Builder::Lens->new(
+        "get", "set", $key
+    );
+}
+
 1;
 __END__
 
