@@ -1005,7 +1005,12 @@ Instead they write the script to the C<$writer> that is given by the enclosing C
         );
     });
 
-So, if you stick to using L<Gnuplot::Builder::Script> in the C<$code>, you don't need to use C<$writer> explicitly.
+So, which should we use, C<$writer> directly or a L<Gnuplot::Builder::Script> object?
+Well, it's up to you. It's ok to mix them.
+However, a good rule of thumb is that a L<Gnuplot::Builder::Script> object should be a piece of gnuplot script that makes just one plot.
+If you want to write anything that doesn't belong to a plot, you should use C<$writer> directly.
+
+For example,
 
 =head2 $result = $builder->multiplot_with(%args)
 

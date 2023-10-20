@@ -299,6 +299,7 @@ Arrange dataset options in valid order.
 Encode wide characters appropriately.
 
     use utf8;
+    use Gnuplot::Builder::Process;
     
     ## Let Gnuplot::Builder automatically encode input data for gnuplot process
     $Gnuplot::Builder::Process::ENCODING = 'utf8';
