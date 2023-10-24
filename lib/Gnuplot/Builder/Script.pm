@@ -1012,6 +1012,18 @@ If you want to write anything that doesn't belong to a plot, you should use C<$w
 
 For example,
 
+    $builder->multiplot('layout 2,2', sub {
+        my $writer = shift;
+        my $script = Gnuplot::Builder::Script->new(xrange => q{[-pi:pi]}, title => q{"1. sin(x)"});
+        $script->plot("sin(x)");
+        $writer->("set multiplot next\n");
+        $script->new_child()->set(title => q{"2. sin(2x)"})->plot("sin(2 * x)");
+    });
+
+The above example uses C<$builder> and its child to make two plots, while it uses C<$writer> to write "set multiplot next" command.
+The "set multiplot next" command is not part of a plot, but it controls the layout of plots.
+So we should use C<$writer> to write it.
+
 =head2 $result = $builder->multiplot_with(%args)
 
 Multiplot with more functionalities than C<multiplot()> method.
