@@ -49,10 +49,10 @@ EXP
             option => 'layout 2,2',
             do => sub {
                 my $writer = shift;
-                my $builder = Gnuplot::Builder::Script->new(xrange => q{[-pi:pi]}, title => q{"1. sin(x)"});
-                $builder->plot("sin(x)");
+                my $another_builder = Gnuplot::Builder::Script->new(xrange => q{[-pi:pi]}, title => q{"1. sin(x)"});
+                $another_builder->plot("sin(x)");
                 $writer->("set multiplot next\n");
-                $builder->new_child()->set(title => q{"2. sin(2x)"})->plot("sin(2 * x)");
+                $another_builder->new_child()->set(title => q{"2. sin(2x)"})->plot("sin(2 * x)");
             },
         },
         exp => <<'EXP'
