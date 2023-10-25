@@ -19,4 +19,4 @@ jobs:
           install-modules: Module::Build::Prereqs::FromCPANfile Devel::Hide Data::Focus
       - run: perl -V
       - run: perl Build.PL && ./Build && ./Build test
-      - run: PERL5OPT=MDevel::Hide DEVEL_HIDE_PM=Data::Focus DEVEL_HIDE_VERBOSE=0 ./Build test
+      - run: env PERL5OPT=MDevel::Hide DEVEL_HIDE_PM=Data::Focus DEVEL_HIDE_VERBOSE=0 ./Build test
