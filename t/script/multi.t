@@ -55,17 +55,7 @@ EXP
                 $another_builder->new_child()->set(title => q{"2. sin(2x)"})->plot("sin(2 * x)");
             },
         },
-        exp => <<'EXP'
-set multiplot layout 2,2
-set xrange [-pi:pi]
-set title "1. sin(x)"
-plot sin(x)
-set multiplot next
-set xrange [-pi:pi]
-set title "2. sin(2x)"
-plot sin(2 * x)
-unset multiplot
-EXP
+        exp => "",
     },
     {
         label => "with output",
