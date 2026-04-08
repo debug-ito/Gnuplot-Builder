@@ -937,6 +937,20 @@ If set to false, it waits for the gnuplot process to finish and return its outpu
 
 By default it's false, but you can change the default by C<$Gnuplot::Builder::Process::ASYNC> package variable.
 
+=item C<on_exit> => CODE-REF (optional)
+
+A code-ref called when the gnutplot process exits. The code-ref is called like
+
+    $on_exit->($status)
+
+where C<$status> is the value of C<$?> for the finished gnuplot process.
+
+If C<plot_with> method does not start a new gnuplot process (e.g. because C<writer> option is set), setting C<on_exit> callback throws an exception.
+
+Note that the C<on_exit> callback might not be called just after the C<plot_with> method finishes, even if C<async> option is set to false.
+This is because the process might persist, e.g. to keep the plotting window open.
+To ensure the process exits, call C<wait_all> method of L<Gnuplot::Builder::Process>.
+
 =back
 
     my $script = "";
