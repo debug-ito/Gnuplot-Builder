@@ -47,6 +47,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 Gnuplot::Builder - object-oriented gnuplot script builder
