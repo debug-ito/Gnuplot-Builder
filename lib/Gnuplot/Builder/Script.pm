@@ -247,7 +247,7 @@ sub _draw_with {
     my @commands = ($plotter);
     return $self->run_with(
         do => \@commands,
-        _pair_slice(\%args, qw(writer async output no_stderr))
+        _pair_slice(\%args, qw(writer async output no_stderr on_exit))
     );
 }
 
@@ -321,6 +321,10 @@ sub run_with {
     }elsif(ref($commands) ne "ARRAY") {
         $commands = [$commands];
     }
+    my $on_exit = $args{on_exit};
+    if(defined($on_exit) && ref($on_exit) ne "CODE") {
+        croak "on_exit must be a CODE-REF";
+    }
     _wrap_commands_with_output($commands, $self->_plotting_option(\%args, "output"));
     my $do = sub {
         my $writer = shift;
@@ -349,7 +353,8 @@ sub run_with {
         $result = Gnuplot::Builder::Process->with_new_process(
             async => $self->_plotting_option(\%args, "async"),
             do => $do,
-            no_stderr => $self->_plotting_option(\%args, "no_stderr")
+            no_stderr => $self->_plotting_option(\%args, "no_stderr"),
+            on_exit => $on_exit,
         );
     }
     return $result;
