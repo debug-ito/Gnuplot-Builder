@@ -346,8 +346,14 @@ sub run_with {
     my $result = "";
     my $got_writer = $self->_plotting_option(\%args, "writer");
     if(defined($got_writer)) {
+        if(defined($on_exit)) {
+            croak "on_exit should not be set if writer is set";
+        }
         $do->($got_writer);
     }elsif(defined($_context_writer)) {
+        if(defined($on_exit)) {
+            croak "on_exit should not be set if there is a writer in the context"
+        }
         $do->($_context_writer);
     }else {
         $result = Gnuplot::Builder::Process->with_new_process(
