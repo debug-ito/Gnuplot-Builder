@@ -16,17 +16,11 @@ sub add_case_param {
 
 {
     my @cases = add_case_param(
-        "exit_status", [0, 1, 100],
-        map {
-            (
-                {%$_, method => "plot_with", dataset => "sin(x)"},
-                {%$_, method => "splot_with", dataset => "sin(x) * sin(y)"},
-            )
-        } (add_case_param(
-            "output", ["none", "test_on_exit_plot_splot.svg"], add_case_param(
-            "async", [0, 1], {})
-        ))
-    );
+        "exit_status", [0, 1, 100], add_case_param(
+        "method", ["plot_with", "splot_with"], add_case_param(
+        "output", ["none", "test_on_exit_plot_splot.svg"], add_case_param(
+        "async", [0, 1], {}
+    ))));
     foreach my $case (@cases) {
         my $method = $case->{method};
         my $output = $case->{output};
@@ -38,7 +32,7 @@ sub add_case_param {
         $s->add("exit status $exit_status");
         my $got_status;
         $s->$method(
-            dataset => $case->{dataset},
+            dataset => $case->{method} eq 'plot_with' ? "sin(x)" : "sin(x) * sin(y)",
             on_exit => sub {
                 my ($status) = @_;
                 $got_status = $status;
@@ -83,6 +77,46 @@ note('--- multiplot and run');
         );
         Gnuplot::Builder::Process->wait_all;
         is($got_status, ($exit_status << 8), $label);
+    }
+}
+
+note("--- async");
+
+{
+    my @cases = add_case_param(
+        "method", ["plot_with", "splot_with", "multiplot_with", "run_with"], {}
+    );
+    foreach my $case (@cases) {
+        my $method = $case->{method};
+        my $exit_status = 1;
+        my $label = "method = $method";
+        my $s = Gnuplot::Builder::Script->new(
+            terminal => "svg",
+        );
+        my %args;
+        if($case->{method} eq "plot_with" || $case->{method} eq "splot_with") {
+            $args{dataset} = "sin(x)";
+            $s->add("pause 1");
+            $s->add("exit status $exit_status");
+        }else {
+            $args{do} = sub {
+                my ($writer) = @_;
+                $writer->("pause 1\n");
+                $writer->("exit status $exit_status\n");
+            };
+        }
+        my @got_statuses = ();
+        $s->$method(
+            %args,
+            async => 1,
+            on_exit => sub {
+                my ($status) = @_;
+                push(@got_statuses, $status);
+            },
+        );
+        is_deeply(\@got_statuses, [], "$label: before on_exit callback is called");
+        Gnuplot::Builder::Process->wait_all();
+        is_deeply(\@got_statuses, [$exit_status << 8], "$label: after on_exit callback is called");
     }
 }
 
