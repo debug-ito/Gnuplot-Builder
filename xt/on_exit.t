@@ -22,13 +22,16 @@ sub add_case_param {
                 {%$_, method => "plot_with", dataset => "sin(x)"},
                 {%$_, method => "splot_with", dataset => "sin(x) * sin(y)"},
             )
-        } (add_case_param("output", ["none", "test_on_exit_plot_splot.svg"], {}))
+        } (add_case_param(
+            "output", ["none", "test_on_exit_plot_splot.svg"], add_case_param(
+            "async", [0, 1], {})
+        ))
     );
     foreach my $case (@cases) {
         my $method = $case->{method};
         my $output = $case->{output};
         my $exit_status = $case->{exit_status};
-        my $label = "method = $method, output = $output, status = $exit_status";
+        my $label = "method = $method, output = $output, async = $case->{async}, status = $exit_status";
         my $s = Gnuplot::Builder::Script->new(
             terminal => "svg",
         );
@@ -41,6 +44,7 @@ sub add_case_param {
                 $got_status = $status;
             },
             output => $output eq "none" ? undef : $output,
+            async => $case->{async},
         );
         Gnuplot::Builder::Process->wait_all;
         is($got_status, ($exit_status << 8), $label);
@@ -53,19 +57,21 @@ note('--- multiplot and run');
     my @cases = add_case_param(
         "exit_status", [0, 1, 100], add_case_param(
         "output", ["none", "test_on_exit_multiplot_run.svg"], add_case_param(
+        "async", [0, 1], add_case_param(
         "method",  ["multiplot_with", "run_with"], {}
-    )));
+    ))));
     foreach my $case (@cases) {
         my $method = $case->{method};
         my $output = $case->{output};
         my $exit_status = $case->{exit_status};
-        my $label = "method = $method, output = $output, status = $exit_status";
+        my $label = "method = $method, output = $output, async = $case->{async}, status = $exit_status";
         my $s = Gnuplot::Builder::Script->new(
             terminal => "svg",
         );
         my $got_status;
         $s->$method(
             output => $output eq "none" ? undef : $output,
+            async => $case->{async},
             on_exit => sub {
                 my ($status) = @_;
                 $got_status = $status;
