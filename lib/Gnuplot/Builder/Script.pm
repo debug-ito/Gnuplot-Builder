@@ -296,7 +296,7 @@ sub multiplot_with {
     my @commands = ($multiplot_command, $wrapped_do, "unset multiplot");
     return $self->run_with(
         do => \@commands,
-        _pair_slice(\%args, qw(writer async output no_stderr))
+        _pair_slice(\%args, qw(writer async output no_stderr on_exit))
     );
 }
 
@@ -1084,6 +1084,10 @@ In this case, the return value C<$result> will be an empty string.
 
 See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
+=item C<on_exit> => CODE-REF (optional)
+
+A code-ref called when the gnutplot process exits. See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
+
 =back
 
     my $builder = Gnuplot::Builder::Script->new;
@@ -1232,6 +1236,10 @@ See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for deta
 If set to true, it won't wait for the gnuplot process to finish. In this case, the return value C<$result> will be an empty string.
 
 See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
+
+=item C<on_exit> => CODE-REF (optional)
+
+A code-ref called when the gnutplot process exits. See L<< C<plot_with()>|"$result = $builder->plot_with(%args)" >> method for detail.
 
 =back
 
